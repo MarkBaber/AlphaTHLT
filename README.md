@@ -11,6 +11,7 @@ Installation instructions:
   cmsrel CMSSW_X_Y_Z
   cd CMSSW_X_Y_Z/src
   mkdir AlphaTHLT
+  cd AlphaTHLT
   cmsenv
   
   git init
