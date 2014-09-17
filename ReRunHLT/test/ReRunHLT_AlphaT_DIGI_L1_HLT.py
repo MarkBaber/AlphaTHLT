@@ -36,9 +36,6 @@ process.load('AlphaTHLT.ReRunHLT.HLT_AlphaT_cff')
 # For producing L1 Extra objects 
 process.load("L1Trigger.L1ExtraFromDigis.l1extraParticles_cff")
 
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(200)
-)
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -165,7 +162,7 @@ process.HLTDEBUGoutput = cms.OutputModule("PoolOutputModule",
       'keep *_*GenJets_*_HLT2',
       'keep *_ak5PFJets*_*_*',
       'keep *_ak5CaloJets*_*_*',
-      'keep *_*_Rho_*',
+      'keep *_*_rho_*',
       'keep PileupSummaryInfos_*_*_*',
 
 
