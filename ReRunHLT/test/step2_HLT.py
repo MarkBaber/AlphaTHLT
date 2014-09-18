@@ -11,7 +11,7 @@ process = cms.Process('HLT2')
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-  input = cms.untracked.int32(100)
+  input = cms.untracked.int32(10)
 )
 
 # process.options = cms.untracked.PSet(
@@ -37,8 +37,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #process.load('AlphaTHLT.ReRunHLT.HLT_GRun_cff')
 process.load('AlphaTHLT.ReRunHLT.HLT_GRun_slim_cff')
 
-# For producing L1 Extra objects 
-process.load("L1Trigger.L1ExtraFromDigis.l1extraParticles_cff")
+
+
+
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -90,8 +91,43 @@ process.configurationMetadata = cms.untracked.PSet(
 # ------------------------------------------------------------
 
 # For producing L1 Extra objects 
-process.load("L1Trigger.L1ExtraFromDigis.l1extraParticles_cff")
+#process.load("L1Trigger.L1ExtraFromDigis.l1extraParticles_cff")
 
+
+
+# GCT modifications for 2015
+# --------------------------------------------------------------------------------
+
+process.load("Configuration.StandardSequences.RawToDigi_cff")
+
+process.load('L1Trigger.Configuration.L1Extra_cff')
+process.load("L1TriggerConfig.GctConfigProducers.L1GctConfig_cff")
+process.load("Configuration.StandardSequences.L1HwVal_cff")
+
+# Employ new 10 GeV seed
+process.L1GctConfigProducers.JetFinderCentralJetSeed = 10.0
+process.L1GctConfigProducers.JetFinderForwardJetSeed = 10.0
+
+process.es_prefer_gct = cms.ESPrefer("L1GctConfigProducers")
+
+process.l1extraParticles.isolatedEmSource      = cms.InputTag('valGctDigis', 'isoEm')
+process.l1extraParticles.nonIsolatedEmSource   = cms.InputTag('valGctDigis', 'nonIsoEm')
+process.l1extraParticles.centralJetSource      = cms.InputTag('valGctDigis', 'cenJets')
+process.l1extraParticles.forwardJetSource      = cms.InputTag('valGctDigis', 'forJets')
+process.l1extraParticles.tauJetSource          = cms.InputTag('valGctDigis', 'tauJets')
+process.l1extraParticles.etTotalSource         = cms.InputTag('valGctDigis')
+process.l1extraParticles.etHadSource           = cms.InputTag('valGctDigis')
+process.l1extraParticles.etMissSource          = cms.InputTag('valGctDigis')
+process.l1extraParticles.htMissSource          = cms.InputTag("valGctDigis")
+process.l1extraParticles.hfRingEtSumsSource    = cms.InputTag("valGctDigis")
+process.l1extraParticles.hfRingBitCountsSource = cms.InputTag("valGctDigis")
+
+
+# ------------------------------------------------------------
+# UCT
+# ------------------------------------------------------------
+
+process.load('L1Trigger.L1TCalorimeter.L1TCaloStage1_PPFromRaw_cff')
 
 # # ------------------------------------------------------------
 # # RECOJets                                             
@@ -183,18 +219,17 @@ process.ak4GenJets = process.ak5GenJets.clone(
 
 
 
-process.JetRECO = cms.Path(
-  process.l1extraParticles
+process.JetProducer = cms.Path(
+#  process.l1extraParticles
 
-  # # RECO jets
-  # +process.RawToDigi
-  # +process.calolocalreco
-  # +process.caloTowersRec
+  # GCT
+  process.RawToDigi
+  *process.valRctDigis
+  *process.valGctDigis
+  *process.L1Extra
 
-  # +process.ak4CaloJets
-
-  #*process.ak5CaloJetsL1FastL2L3
-  #*process.ak4PFJetsL1FastL2L3
+  # UCT
+  *process.L1TCaloStage1_PPFromRaw
   
   # GenJets                                                                                                                               
   *process.genParticlesForJetsNoMuNoNu
@@ -211,18 +246,23 @@ process.JetRECO = cms.Path(
 
 )
 
-process.JetRECOSchedule = cms.Schedule( process.JetRECO )
+process.JetProducerSchedule = cms.Schedule( process.JetProducer )
 
 # ================================================================================
 
 
 # Output definition
-process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
+process.output = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = cms.untracked.vstring( 
       'drop *',
+
+      # GCT
       'keep *_l1extraParticles_*_*',
+      # UCT
+      'keep *_caloStage1LegacyFormatDigis_*_*',
+
       'keep *_genMetCalo_*_*',
       'keep *_genMetCaloAndNonPrompt_*_*',
       'keep *_genMetTrue_*_*',
@@ -235,7 +275,6 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
       'keep *_hlt1PFJetNoPU20_*_*',
 
       # Offline jets
-
       'keep *_ak5*Jets*_*_*',
       'drop *_ak5*Jets*_rho_*',
       'drop *_ak5*Jets*_sigma*_*',
@@ -274,15 +313,14 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS162_V2::All', '')
 process.digitisation_step = cms.Path(process.pdigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.endjob_step = cms.EndPath(process.endOfProcess)
-process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
+process.output_step = cms.EndPath(process.output)
 
 # Schedule definition
 process.schedule = cms.Schedule()
 process.schedule.extend([process.digitisation_step,process.L1simulation_step])
-process.schedule.extend(process.JetRECOSchedule)
+process.schedule.extend(process.JetProducerSchedule)
 process.schedule.extend(process.HLTSchedule)
-#process.schedule.extend(process.JetRECOSchedule)
-process.schedule.extend([process.endjob_step,process.FEVTDEBUGHLToutput_step])
+process.schedule.extend([process.endjob_step,process.output_step])
 
 # customisation of the process.
 
