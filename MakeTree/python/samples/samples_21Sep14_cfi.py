@@ -7,21 +7,17 @@ date = now.strftime("%Y-%m-%d")
 
 
 
-# #
-# # ttbar 
-# #
-# ttbar = cms.PSet(
-#     name  = cms.string("TT_Tune4C_13TeV-pythia8-tauola_" + date + ".root"),
+
+# # ---------------------------------------------------------------------------------------------------------------------------------------
+# # Sample
+# # ---------------------------------------------------------------------------------------------------------------------------------------
+# sample = cms.PSet(
+#     name  = cms.string("SampleName.root"),
 #     files = cms.untracked.vstring()
 # )
-# ttbar.files.extend([
+# sample.files.extend([
 # ])
-# ttbar = cms.PSet(
-#     name  = cms.string("TT_Tune4C_13TeV-pythia8-tauola_" + date + ".root"),
-#     files = cms.untracked.vstring()
-#     files.extend([
-#             ])
-# )
+
 
 
 

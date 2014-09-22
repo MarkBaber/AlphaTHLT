@@ -66,6 +66,7 @@ def main():
     fileCount = len(MakeTrees_cfg.selectedSample.files)
     fileName  = MakeTrees_cfg.selectedSample.name
 
+
     # Calculate the required number of files per job
     filesPerJob = int( math.ceil( float(fileCount) / jobs ) )
 
@@ -146,10 +147,11 @@ def main():
         filenamesStr += ")"
 
         tempCfgText = tempCfgText.replace("fileNames = selectedSample.files", filenamesStr ) 
+        tempCfgText = tempCfgText.replace("fileName = selectedSample.name",  "fileName = '" + outputROOTName + "'")
 
 
         # Create the configuration file and batchshell script for the job
-        batchCfgFile = outputDir + "/AnalyzeJets"   + "_" + str(jobNum) + ".py"
+        batchCfgFile = outputDir + "/MakeTree"   + "_" + str(jobNum) + ".py"
         batchShFile  = outputDir + "/SubmitBatchIC" + "_" + str(jobNum) + ".sh"
 
         f = open( batchCfgFile, "w")
