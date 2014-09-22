@@ -6,7 +6,7 @@ process = cms.Process("TreeMaker")
 
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
     )
@@ -27,15 +27,10 @@ selectedSample = TTbar
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
-                             #fileNames = selectedSample.files
-                             fileNames = cms.untracked.vstring(
-
-        'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/AlphaTHLT_POSTLS162_V2_PU40bx25_18Sep14/TT_Tune4C_13TeV-pythia8-tauola/hltReRunResults_159_1_hJl.root',
-
-        # 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mcitron/skims/140917_ngun50_alphatL1/l1_skim_2014-09-17_1466_1_SGk.root',
-        #        'file:///home/hep/mc3909/AlphaT/CMSSW_7_1_0_pre8/src/AlphaTL1/MakeL1Trees/test/l1_skim_2014-09-17.root'
-
-        )
+                             fileNames = selectedSample.files
+                             # fileNames = cms.untracked.vstring(
+                             #        'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/AlphaTHLT_POSTLS162_V2_PU40bx25_18Sep14/TT_Tune4C_13TeV-pythia8-tauola/hltReRunResults_159_1_hJl.root',
+                             # )
 )
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
