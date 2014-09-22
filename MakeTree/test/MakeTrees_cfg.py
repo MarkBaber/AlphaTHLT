@@ -22,7 +22,10 @@ from AlphaTHLT.MakeTree.samples.samples_21Sep14_cfi import *
 # MonoJet     = DataSets_cfi.MonoJet
 # MonoJet1000 = DataSets_cfi.MonoJet1000
 
-selectedSample = TTbar
+# TTbar, DYJets, 
+# QCD30to50, QCD50to80, QCD80to120, QCD120to170, QCD170to300, QCD300to470,  QCD470to600, QCD600to800, QCD800to1000
+# NuGun
+selectedSample = NuGun
 
 # --------------------------------------------------------------------------------
 
