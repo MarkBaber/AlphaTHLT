@@ -147,7 +147,7 @@ def main():
         filenamesStr += ")"
 
         tempCfgText = tempCfgText.replace("fileNames = selectedSample.files", filenamesStr ) 
-        tempCfgText = tempCfgText.replace("fileName = selectedSample.name",  "fileName = '" + outputROOTName + "'")
+        tempCfgText = tempCfgText.replace("fileName = selectedSample.name",  "fileName = cms.string('" + outputROOTName + "')")
 
 
         # Create the configuration file and batchshell script for the job
