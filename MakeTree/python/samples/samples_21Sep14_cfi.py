@@ -18,6 +18,16 @@ date = now.strftime("%Y-%m-%d")
 # sample.files.extend([
 # ])
 
+# ---------------------------------------------------------------------------------------------------------------------------------------
+# test dataset
+# ---------------------------------------------------------------------------------------------------------------------------------------
+Test = cms.PSet(
+    name  = cms.string("Test.root"),
+    files = cms.untracked.vstring()
+)
+Test.files.extend([
+        'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/AlphaTHLT_POSTLS162_V2_PU40bx25_18Sep14/TT_Tune4C_13TeV-pythia8-tauola/hltReRunResults_157_1_MD0.root',
+])
 
 
 

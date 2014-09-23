@@ -168,7 +168,8 @@ def main():
 
         tempShText +=     "# IC Batch Job Script\n"
         tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/AlphaTHLT/CMSSW_7_1_8/src\"\n"
-        tempShText +=     "export TOP=\"$PWD\"\n\n"
+#        tempShText +=     "export TOP=\"$PWD\"\n\n"
+#        tempShText +=     "export BATCH_DIR=\"/vols/cms04/mb1512/Batch/\"\n"
 
         tempShText +=     "cd /home/hep/mb1512/$CMSSW_PROJECT_SRC\n\n"
 
@@ -177,11 +178,12 @@ def main():
         tempShText +=     "export SCRAM_ARCH=slc6_amd64_gcc481\n"
         tempShText +=     "eval `scramv1 runtime -sh`\n\n"
 
-        tempShText +=     "cd $TOP\n"
+ #       tempShText +=     "cd $TOP\n"
+        tempShText +=     "cd $OUTPUTDIR\n"
         tempShText +=     "cmsRun " + batchCfgFile + "\n\n"
-        tempShText +=     "# Copy the produced rootfile to the required directory\n"
-        tempShText +=     "rfcp $FILENAME $OUTPUTDIR\n"
-        tempShText +=     "rfrm $FILENAME\n"
+        # tempShText +=     "# Copy the produced rootfile to the required directory\n"
+        # tempShText +=     "rfcp $FILENAME $OUTPUTDIR\n"
+        # tempShText +=     "rfrm $FILENAME\n"
         
 
         f = open( batchShFile, "w")
@@ -199,7 +201,12 @@ def main():
         print "File range       = ", indexLow, "-", indexHigh
 
         # Submit the job
-        os.system( "qsub -o " + configOutDir + " -e " + configOutDir + " -q hepshort.q " + batchShFile )
+        submitCommand  = "qsub -o " + configOutDir + " -e " + configOutDir # Change stdout/err location
+        submitCommand += " -wd " + configOutDir                            # Change return directory
+        submitCommand += " -N " + outputROOTName.replace(".root","")       # Rename job 
+        submitCommand += " -cwd -q hepshort.q " + batchShFile
+        os.system( submitCommand )
+#        os.system( "qsub -o " + configOutDir + " -e " + configOutDir + " -N " + outputROOTName.replaceAll(".root","") + " -cwd -q hepshort.q " + batchShFile )
 
 
         pass
