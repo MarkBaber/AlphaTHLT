@@ -1,21 +1,24 @@
 AlphaTHLT
 =========
 
-Working with CMSSW_6_2_5
+Working with CMSSW_7_1_0_pre8
 
 Installation instructions:
 
 
 <pre><code>
   mkdir AlphaTHLT
-  cmsrel CMSSW_X_Y_Z
-  cd CMSSW_X_Y_Z/src
+  cmsrel CMSSW_7_1_0_pre8
+  cd CMSSW_7_1_0_pre8/src
+  cmsenv
+  git cms-merge-topic --unsafe cms-l1t-offline:Emulator_1.2
+
   mkdir AlphaTHLT
   cd AlphaTHLT
-  cmsenv
-  
   git init
   git remote add origin git@github.com:MarkBaber/AlphaTHLT.git
-  git pull origin master
+  git fetch origin
+  git checkout Run2_CMSSW_7_1_0_pre8
+  cd $CMSSW_BASE/src
   scram b -j8
 </code></pre>
