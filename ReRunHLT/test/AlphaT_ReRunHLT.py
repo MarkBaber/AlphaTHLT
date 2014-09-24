@@ -256,7 +256,7 @@ process.output = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = cms.untracked.vstring( 
-      'drop *',
+#      'drop *',
 
       # GCT
       'keep *_l1extraParticles_*_*',
@@ -307,7 +307,8 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS162_V2::All', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'PRE_LS171_V5A::All', '')
+
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi)
