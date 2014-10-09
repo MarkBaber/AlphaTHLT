@@ -1,6 +1,7 @@
 AlphaTHLT
 =========
 
+<code><pre>
   mkdir AlphaTHLT
   cd AlphaTHLT
   cmsenv
@@ -10,3 +11,4 @@ AlphaTHLT
   git fetch origin
   cd $CMSSW_BASE/src
   scram b -j8
+</code></pre>
