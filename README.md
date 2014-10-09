@@ -1,7 +1,7 @@
 AlphaTHLT
 =========
 
-<code><pre>
+<pre><code>
   mkdir AlphaTHLT
   cd AlphaTHLT
   cmsenv
