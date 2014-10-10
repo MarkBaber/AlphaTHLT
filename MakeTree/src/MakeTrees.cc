@@ -18,35 +18,37 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/Scalers/interface/LumiScalers.h"
+#include "TTree.h"
+// L1
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticleFwd.h"
-
 #include "DataFormats/L1Trigger/interface/Jet.h"
 #include "DataFormats/L1Trigger/interface/EtSum.h"
-
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-
-#include "DataFormats/Scalers/interface/LumiScalers.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-
-#include "TTree.h"
+// Jets
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
-
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-
+// NVTX
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+// PAT trigger
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
+
+// Generator information
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "GeneratorInterface/LHEInterface/interface/LHEEvent.h"
 
 
 
@@ -140,22 +142,16 @@ class MakeTrees : public edm::EDAnalyzer {
 
 
 
-
-//Get the Regions;
-/*    edm::InputTag srcRegionEt_;
-    edm::InputTag srcRegionEta_;
-    edm::InputTag srcRegionPhi_;
-*/
     //Define the levels
     std::vector<TString> lvl_;
     TTree* tree;
 
-    std::map<TString,Float_t> mhtPt30_;
-    std::map<TString,Float_t> alphaT30_;
-    std::map<TString,Float_t> mhtPhi30_;
-    std::map<TString,Float_t> ht30_;
-    std::map<TString,Float_t> dht30_;
-    std::map<TString,Float_t> mhtDivHt30_;
+    // std::map<TString,Float_t> mhtPt30_;
+    // std::map<TString,Float_t> alphaT30_;
+    // std::map<TString,Float_t> mhtPhi30_;
+    // std::map<TString,Float_t> ht30_;
+    // std::map<TString,Float_t> dht30_;
+    // std::map<TString,Float_t> mhtDivHt30_;
 
     std::map<TString,Float_t> mhtPt_;
     std::map<TString,Float_t> alphaT_;
@@ -231,6 +227,8 @@ class MakeTrees : public edm::EDAnalyzer {
 
 
   edm::InputTag HLTResultsTag;
+  
+  float PThat;
 
 
 };
@@ -242,20 +240,11 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     tree = fs->make<TTree>("Ntuple", "Ntuple");
 
 
-    HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT"));
-
-    // lvl_.push_back("S2Nopus");
-    // lvl_.push_back("S2Donut");
-    // lvl_.push_back("S2Global");
-    //    lvl_.push_back("gct");
 
 
-    //    lvl_.push_back("uctCen");
     lvl_.push_back("gctCen");
-
     lvl_.push_back("genAk4");
     lvl_.push_back("genAk5");
-
     lvl_.push_back("hltAk4Calo");
     lvl_.push_back("hltAk4PF");
 
@@ -271,24 +260,35 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
 
     // lvl_.push_back("Calo");
     // lvl_.push_back("Pf");
-    //    invEnergy_ = new std::vector<Float_t>;
-    //regionEt_ = new std::vector<double>;
-    //regionEta_ = new std::vector<Int_t>;
-    //regionPhi_ = new std::vector<Int_t>;
 
 
-    NVTX = 0;
-    tree->Branch("NVTX", &NVTX, "NVTX/i");
+
+    // ********************************************************************************
+    // Set the tree branches
+    // ********************************************************************************
+
+    NVTX  = 0;
+    PThat = 0;
+    genElectronPt  = new std::vector<Float_t>();
+    genElectronEta = new std::vector<Float_t>();
+    genElectronPhi = new std::vector<Float_t>();
+    genMuonPt      = new std::vector<Float_t>();
+    genMuonEta     = new std::vector<Float_t>();
+    genMuonPhi     = new std::vector<Float_t>();
 
 
-    //Set the tree branches
+    // Event
+    tree->Branch("NVTX",  &NVTX,  "NVTX/i");
+    tree->Branch("PThat", &PThat, "PThat/f");
+
+
     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
-	mhtPt30_[*iLvl]        = -10.0;
-	mhtPhi30_[*iLvl]       = -10.0;
-	ht30_[*iLvl]           = -10.0;
-	dht30_[*iLvl]           = -10.0;
-	alphaT30_[*iLvl]       = 0.0;
-	mhtDivHt30_[*iLvl]     = 0.0;
+	// mhtPt30_[*iLvl]        = -10.0;
+	// mhtPhi30_[*iLvl]       = -10.0;
+	// ht30_[*iLvl]           = -10.0;
+	// dht30_[*iLvl]           = -10.0;
+	// alphaT30_[*iLvl]       = 0.0;
+	// mhtDivHt30_[*iLvl]     = 0.0;
 
 	mhtPt_[*iLvl]        = -10.0;
 	mhtPhi_[*iLvl]       = -10.0;
@@ -308,37 +308,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
 	jetPy[*iLvl]       = new std::vector<Float_t>();
 	jetPhi[*iLvl]      = new std::vector<Float_t>();
 	jetEta[*iLvl]      = new std::vector<Float_t>();
-	//	jetDPhi12_[*iLvl]    = -1.0;
-	// if(*iLvl=="Uct" || *iLvl=="Gct"){
-	//     jetPtsAll_[*iLvl]  = new std::vector<Float_t>();
-	//     jetPhisAll_[*iLvl] = new std::vector<Float_t>();
-	//     jetEtasAll_[*iLvl] = new std::vector<Float_t>();
-	// }
-
-	// if(*iLvl=="Gen4" || *iLvl=="Gen5" || *iLvl=="Calo" || *iLvl=="Pf"){ 
-	//     tree->Branch("mhtPt30"+*iLvl, &mhtPt30_[*iLvl], "mhtPt30"+*iLvl+"/f");
-	//     tree->Branch("mhtPhi30"+*iLvl, &mhtPhi30_[*iLvl], "mhtPhi30"+*iLvl+"/f");
-	//     tree->Branch("ht30"+*iLvl, &ht30_[*iLvl], "ht30"+*iLvl+"/f");
-	//     tree->Branch("dht30"+*iLvl, &dht30_[*iLvl], "dht30"+*iLvl+"/f");
-	//     tree->Branch("alphaT30"+*iLvl, &alphaT30_[*iLvl], "alphaT30"+*iLvl+"/f");
-	//     tree->Branch("mhtDivHt30"+*iLvl, &mhtDivHt30_[*iLvl], "mhtDivHt30"+*iLvl+"/f");
-	// tree->Branch("multiplicity30"+*iLvl, &multiplicity30_[*iLvl], "multiplicity30"+*iLvl+"/i");
-	// tree->Branch("multiplicity50"+*iLvl, &multiplicity50_[*iLvl], "multiplicity50"+*iLvl+"/i");
-	// }
-
-	// tree->Branch("ht"+*iLvl, &ht_[*iLvl], "ht"+*iLvl+"/f");
-	// tree->Branch("dht"+*iLvl, &dht_[*iLvl], "dht"+*iLvl+"/f");
-	// tree->Branch("alphaT"+*iLvl, &alphaT_[*iLvl], "alphaT"+*iLvl+"/f");
-	// tree->Branch("mhtDivHt"+*iLvl, &mhtDivHt_[*iLvl], "mhtDivHt"+*iLvl+"/f");
-
-	// if(*iLvl!="S2Global" && *iLvl!="S2Nopus" && *iLvl!="S2Donut"){ 
-	// tree->Branch("metPt"+*iLvl, &metPt_[*iLvl], "metPt"+*iLvl+"/f");
-	// tree->Branch("metPhi"+*iLvl, &metPhi_[*iLvl], "metPhi"+*iLvl+"/f");
-	// tree->Branch("et"+*iLvl, &et_[*iLvl], "et"+*iLvl+"/f");
-	// }
-
-	// tree->Branch("multiplicity"+*iLvl, &multiplicity_[*iLvl], "multiplicity"+*iLvl+"/i");
-	// tree->Branch("jetDPhi12"+*iLvl, &jetDPhi12_[*iLvl], "jetDPhi12"+*iLvl+"/f");
 
 	tree->Branch(*iLvl + "_Pt",  "std::vector<float>", &jetPt[*iLvl]);
 	tree->Branch(*iLvl + "_Px",  "std::vector<float>", &jetPx[*iLvl]);
@@ -347,51 +316,11 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
 	tree->Branch(*iLvl + "_Phi", "std::vector<float>", &jetPhi[*iLvl]);
 	tree->Branch(*iLvl + "_Eta", "std::vector<float>", &jetEta[*iLvl]);
 
-
-
-	// if(*iLvl=="Uct" || *iLvl=="Gct"){
-	//     tree->Branch("jetPtsAll"+*iLvl, "std::vector<float>", &jetPtsAll_[*iLvl]);
-	//     tree->Branch("jetPhisAll"+*iLvl, "std::vector<float>", &jetPhisAll_[*iLvl]);
-	//     tree->Branch("jetEtasAll"+*iLvl, "std::vector<float>", &jetEtasAll_[*iLvl]);
-	// }
     } // End ilvl loop
 
 
-    tree->Branch("gct_Ht",       &ht_["gct"],      "gct_Ht/f");
-    tree->Branch("gct_MhtPt",    &mhtPt_["gct"],   "gct_MhtPt/f");
-    tree->Branch("gct_MhtPhi",   &mhtPhi_["gct"],  "gct_MhtPhi/f");
-    tree->Branch("gct_MhtDivHt", &mhtDivHt_["gct"],"GCT Mht divided by Ht/f"); 
-
-    tree->Branch("gct_Et",     &et_["gct"],     "gct_Et/f");
-    tree->Branch("gct_MetPt",  &metPt_["gct"],  "gct_MetPt/f");
-    tree->Branch("gct_MetPhi", &metPhi_["gct"], "gct_MetPhi/f");
 
 
-    tree->Branch("genMetCalo_MetPt",              &metPt_["genMetCalo"],             "genMetCalo_MetPt/f");
-    tree->Branch("genMetCaloAndNonPrompt_MetPt",  &metPt_["genMetCaloAndNonPrompt"], "genMetCaloAndNonPrompt_MetPt/f");
-    tree->Branch("genMetTrue_MetPt",              &metPt_["genMetTrue"],             "genMetTrue_MetPt/f");
-
-
-    genElectronPt  = new std::vector<Float_t>();
-    genElectronEta = new std::vector<Float_t>();
-    genElectronPhi = new std::vector<Float_t>();
-    genMuonPt      = new std::vector<Float_t>();
-    genMuonEta     = new std::vector<Float_t>();
-    genMuonPhi     = new std::vector<Float_t>();
-
-    tree->Branch("genLeptonVeto",   &genLeptonVeto,       "genLeptonVeto/b");
-    tree->Branch("genElectron_Pt",  "std::vector<float>", &genElectronPt);
-    tree->Branch("genElectron_Eta", "std::vector<float>", &genElectronEta);
-    tree->Branch("genElectron_Phi", "std::vector<float>", &genElectronPhi);		
-    tree->Branch("genMuon_Pt",      "std::vector<float>", &genMuonPt);
-    tree->Branch("genMuon_Eta",     "std::vector<float>", &genMuonEta);
-    tree->Branch("genMuon_Phi",     "std::vector<float>", &genMuonPhi);		
-
-    // Trigger bits
-    tree->Branch("HLT_PFHT900_v1",                       &HLT_PFHT900_v1,                       "HLT_PFHT900_v1/b");
-    tree->Branch("HLT_PFHT350_PFMET120_NoiseCleaned_v1", &HLT_PFHT350_PFMET120_NoiseCleaned_v1, "HLT_PFHT350_PFMET120_NoiseCleaned_v1/b");
-    tree->Branch("HLT_HT200_AlphaT0p4_v1",               &HLT_HT200_AlphaT0p4_v1,               "HLT_HT200_AlphaT0p4_v1/b");
-    tree->Branch("HLT_HT200_PFAlphaT0p4_v1",             &HLT_HT200_PFAlphaT0p4_v1,             "HLT_HT200_PFAlphaT0p4_v1/b");
 
 
     // AlphaT, HT  
@@ -410,28 +339,42 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     tree->Branch("hltAk4Calo_HT50",     &hltAk4CaloAlphaTHT50.second, "hltAk4Calo_HT50/f");
 
 
+    // Energy sums
+    tree->Branch("gct_Ht",       &ht_["gct"],      "gct_Ht/f");
+    tree->Branch("gct_MhtPt",    &mhtPt_["gct"],   "gct_MhtPt/f");
+    tree->Branch("gct_MhtPhi",   &mhtPhi_["gct"],  "gct_MhtPhi/f");
+    tree->Branch("gct_MhtDivHt", &mhtDivHt_["gct"],"GCT Mht divided by Ht/f"); 
+
+    tree->Branch("gct_Et",     &et_["gct"],     "gct_Et/f");
+    tree->Branch("gct_MetPt",  &metPt_["gct"],  "gct_MetPt/f");
+    tree->Branch("gct_MetPhi", &metPhi_["gct"], "gct_MetPhi/f");
+
+    tree->Branch("genMetCalo_MetPt",              &metPt_["genMetCalo"],             "genMetCalo_MetPt/f");
+    tree->Branch("genMetCaloAndNonPrompt_MetPt",  &metPt_["genMetCaloAndNonPrompt"], "genMetCaloAndNonPrompt_MetPt/f");
+    tree->Branch("genMetTrue_MetPt",              &metPt_["genMetTrue"],             "genMetTrue_MetPt/f");
 
 
-    //    tree->Branch("invEnergy", "std::vector<float>", &invEnergy_);
+    // Gen leptons
+    tree->Branch("genLeptonVeto",   &genLeptonVeto,       "genLeptonVeto/b");
+    tree->Branch("genElectron_Pt",  "std::vector<float>", &genElectronPt);
+    tree->Branch("genElectron_Eta", "std::vector<float>", &genElectronEta);
+    tree->Branch("genElectron_Phi", "std::vector<float>", &genElectronPhi);		
+    tree->Branch("genMuon_Pt",      "std::vector<float>", &genMuonPt);
+    tree->Branch("genMuon_Eta",     "std::vector<float>", &genMuonEta);
+    tree->Branch("genMuon_Phi",     "std::vector<float>", &genMuonPhi);		
 
-    //tree->Branch("regionEt", "std::vector<double>", &regionEt_);
-    //tree->Branch("regionEta", "std::vector<int>", &regionEta_);
-    //tree->Branch("regionPhi", "std::vector<int>", &regionPhi_);
+    // Trigger bits
+    tree->Branch("HLT_PFHT900_v1",                       &HLT_PFHT900_v1,                       "HLT_PFHT900_v1/b");
+    tree->Branch("HLT_PFHT350_PFMET120_NoiseCleaned_v1", &HLT_PFHT350_PFMET120_NoiseCleaned_v1, "HLT_PFHT350_PFMET120_NoiseCleaned_v1/b");
+    tree->Branch("HLT_HT200_AlphaT0p4_v1",               &HLT_HT200_AlphaT0p4_v1,               "HLT_HT200_AlphaT0p4_v1/b");
+    tree->Branch("HLT_HT200_PFAlphaT0p4_v1",             &HLT_HT200_PFAlphaT0p4_v1,             "HLT_HT200_PFAlphaT0p4_v1/b");
 
-    // tree->Branch("metPtS2", &metPt_["S2"], "metPtS2/f");
-    // tree->Branch("metPhiS2", &metPhi_["S2"], "metPhiS2/f");
-    // tree->Branch("etS2", &et_["S2"], "etS2/f");
 
-    // tree->Branch("jetVeto50",   &jetVeto50_,   "jetVeto50/O");
-    // tree->Branch("jetVeto30",   &jetVeto30_,   "jetVeto30/O");
 
-    // jetMuons_["Pf"]       = new std::vector<Float_t>();
-    // tree->Branch("jetMuonsPf", "std::vector<float>", &jetMuons_["Pf"]);
 
-    //    tree->Branch("MuonNumber",   &Muon_,   "NMuons/i");
-    // tree->Branch("run",   &run_,   "run/i");
-    // tree->Branch("lumi",  &lumi_,  "run/i");
-    // tree->Branch("event", &event_, "run/l");
+
+
+    HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT"));
 
 
     srcUctMET_ = pset.getParameter<edm::InputTag>("srcUctMet");
@@ -699,29 +642,34 @@ namespace {
 }
 
 
-void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
+void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
   
-  // get nvertices from simulation
+  // Get NVTX from simulation
   edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
-  evt.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
+  iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
 
   NVTX = 0;
   std::vector<PileupSummaryInfo>::const_iterator PVI;
   for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
     int BX = PVI->getBunchCrossing();
-    //    std::cout << "bx = " << BX << std::endl;
     if(BX == 0) {
       NVTX = PVI->getPU_NumInteractions();
-      //std::cout << "NPV = " << NVTX << std::endl;
       break;
     }
   }
 
+  // Get gen info
+  edm::Handle<GenEventInfoProduct> geninfo;  iEvent.getByLabel("generator",geninfo);
+  std::auto_ptr<bool>   genInfoValid ( new bool( geninfo.isValid() && !geninfo->binningValues().empty()));
+  std::auto_ptr<double> pthat (new double(*genInfoValid ? geninfo->binningValues()[0] : -1.));
+  PThat = *pthat;
+
+
 
   // // Get UCT jets
   // edm::Handle< BXVector<l1t::Jet>> uctCalibJets;
-  // evt.getByLabel(srcUctJet_, uctCalibJets);
+  // iEvent.getByLabel(srcUctJet_, uctCalibJets);
 
   // std::vector<const reco::Candidate*> uctCenUnskimmed;
   // // std::vector<const reco::Candidate*> uctJetAll;
@@ -747,11 +695,11 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
   // ------------------------------------------------------------------------------------------------------------------------
 
   edm::Handle<edm::TriggerResults> hltresults;
-  evt.getByLabel(HLTResultsTag, hltresults);
+  iEvent.getByLabel(HLTResultsTag, hltresults);
   
   // Get the PAT TriggerEvent
   edm::Handle< pat::TriggerEvent > triggerEvent;
-  evt.getByLabel( "patTriggerEvent", triggerEvent );
+  iEvent.getByLabel( "patTriggerEvent", triggerEvent );
   
   // Get a vector of all HLT paths
   std::vector<pat::TriggerPath> const* paths = triggerEvent->paths();
@@ -787,36 +735,36 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     
     // Input jets without eta or pT requirements
     // --------------------------------------------------------------------------------
-    // std::vector<const reco::Candidate*> s2NopusJetCentral    = getCollections( evt, srcS2NopusJetCentral_);
-    // std::vector<const reco::Candidate*> s2GlobalJetCentral    = getCollections( evt, srcS2GlobalJetCentral_);
-    // std::vector<const reco::Candidate*> s2DonutJetCentral    = getCollections( evt, srcS2DonutJetCentral_);
-    std::vector<const reco::Candidate*> gctCenUnskimmed       = getCollections( evt, srcGctJetCentral_);
-    // std::vector<const reco::Candidate*> gctJetAll        = getCollections( evt, srcGctJetAll_);
-    std::vector<const reco::Candidate*> genJet4Unskimmed      = getCollections( evt, srcGen4Jet_);
-    std::vector<const reco::Candidate*> genJet5Unskimmed      = getCollections( evt, srcGen5Jet_);
+    // std::vector<const reco::Candidate*> s2NopusJetCentral    = getCollections( iEvent, srcS2NopusJetCentral_);
+    // std::vector<const reco::Candidate*> s2GlobalJetCentral    = getCollections( iEvent, srcS2GlobalJetCentral_);
+    // std::vector<const reco::Candidate*> s2DonutJetCentral    = getCollections( iEvent, srcS2DonutJetCentral_);
+    std::vector<const reco::Candidate*> gctCenUnskimmed       = getCollections( iEvent, srcGctJetCentral_);
+    // std::vector<const reco::Candidate*> gctJetAll        = getCollections( iEvent, srcGctJetAll_);
+    std::vector<const reco::Candidate*> genJet4Unskimmed      = getCollections( iEvent, srcGen4Jet_);
+    std::vector<const reco::Candidate*> genJet5Unskimmed      = getCollections( iEvent, srcGen5Jet_);
 
-    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed   = getCollections( evt, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4PFUnskimmed     = getCollections( evt, srcHLTAk4PF );
+    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed   = getCollections( iEvent, srcHLTAk4Calo );
+    std::vector<const reco::Candidate*> hltAk4PFUnskimmed     = getCollections( iEvent, srcHLTAk4PF );
 
 
-    std::vector<const reco::Candidate*> gctForUnskimmed          = getCollections( evt, srcGctJetForward_);
-    std::vector<const reco::Candidate*> genJet4ForUnskimmed      = getCollections( evt, srcGen4Jet_);
-    std::vector<const reco::Candidate*> genJet5ForUnskimmed      = getCollections( evt, srcGen5Jet_);
-    std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed   = getCollections( evt, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4PFForUnskimmed     = getCollections( evt, srcHLTAk4PF );
+    std::vector<const reco::Candidate*> gctForUnskimmed          = getCollections( iEvent, srcGctJetForward_);
+    std::vector<const reco::Candidate*> genJet4ForUnskimmed      = getCollections( iEvent, srcGen4Jet_);
+    std::vector<const reco::Candidate*> genJet5ForUnskimmed      = getCollections( iEvent, srcGen5Jet_);
+    std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed   = getCollections( iEvent, srcHLTAk4Calo );
+    std::vector<const reco::Candidate*> hltAk4PFForUnskimmed     = getCollections( iEvent, srcHLTAk4PF );
 
-    //    std::vector<const reco::Candidate*> hltAk4PFNoPUUnskimmed = getCollections( evt, srcHLTAk4PFNoPU );
+    //    std::vector<const reco::Candidate*> hltAk4PFNoPUUnskimmed = getCollections( iEvent, srcHLTAk4PFNoPU );
 
-    // std::vector<const reco::Candidate*> caloJetUnskimmed = getCollections( evt, srcCaloJet_);
-    // std::vector<const reco::Candidate*> pfJetUnskimmed   = getCollections( evt, srcPfJet_);
+    // std::vector<const reco::Candidate*> caloJetUnskimmed = getCollections( iEvent, srcCaloJet_);
+    // std::vector<const reco::Candidate*> pfJetUnskimmed   = getCollections( iEvent, srcPfJet_);
     /*
        edm::Handle<std::vector<double> > regionEtHandle;
        edm::Handle<std::vector<Int_t> > regionEtaHandle;
        edm::Handle<std::vector<Int_t> > regionPhiHandle;
 
-       evt.getByLabel(srcRegionEt_,regionEtHandle);
-       evt.getByLabel(srcRegionEta_,regionEtaHandle);
-       evt.getByLabel(srcRegionPhi_,regionPhiHandle);
+       iEvent.getByLabel(srcRegionEt_,regionEtHandle);
+       iEvent.getByLabel(srcRegionEta_,regionEtaHandle);
+       iEvent.getByLabel(srcRegionPhi_,regionPhiHandle);
 
        std::vector<double> regionEtTemp =  (*regionEtHandle); 
        std::vector<Int_t> regionEtaTemp = (*regionEtaHandle); 
@@ -867,7 +815,7 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     // --------------------
     std::vector<const reco::Candidate*> gctCen     = skimJets(gctCenUnskimmed,     minPt, minEtaCen, maxEtaCen );
 
-    std::cout << gctCen.size() << "\n";
+    //    std::cout << gctCen.size() << "\n";
     //    std::cout << "UCTHLT:\n";
     // for ( std::vector<const reco::Candidate*>::const_iterator itr = gctCen.begin(); itr != gctCen.end(); ++itr ){
     //   std::cout << (*itr)->pt() << "\t" <<  (*itr)->eta() << "\t" << (*itr)->phi() << "\n";
@@ -926,9 +874,9 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     }
 
     // // Setup meta info
-    // run_ = evt.id().run();
-    // lumi_ = evt.id().luminosityBlock();
-    // event_ = evt.id().event();
+    // run_ = iEvent.id().run();
+    // lumi_ = iEvent.id().luminosityBlock();
+    // event_ = iEvent.id().event();
 
     // ********************************************************************************
     // *                           Loop over Jet collections                          *
@@ -968,10 +916,10 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
 
     // Energy sums
     // --------------------
-    getValue(evt,   srcGctMht_, mhtPt_["gct"], mhtPhi_["gct"]);
-    getValue(evt,   srcGctMet_, metPt_["gct"], metPhi_["gct"]);
-    getSumEtL1(evt, srcGctMht_, ht_["gct"], false);
-    getSumEtL1(evt, srcGctMet_, et_["gct"], false); 
+    getValue(iEvent,   srcGctMht_, mhtPt_["gct"], mhtPhi_["gct"]);
+    getValue(iEvent,   srcGctMet_, metPt_["gct"], metPhi_["gct"]);
+    getSumEtL1(iEvent, srcGctMht_, ht_["gct"], false);
+    getSumEtL1(iEvent, srcGctMet_, et_["gct"], false); 
     if( ht_["gct"] > 0.){
       mhtDivHt_["gct"] = mhtPt_["gct"]/ht_["gct"];
     }
@@ -979,9 +927,9 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
       mhtDivHt_["gct"] = 0;
     }
 
-    getValue(evt, srcGenMetCalo_,             metPt_["genMetCalo"],             metPhi_["genMetCalo"]);
-    getValue(evt, srcGenMetCaloAndNonPrompt_, metPt_["genMetCaloAndNonPrompt"], metPhi_["genMetCaloAndNonPrompt"]);
-    getValue(evt, srcGenMetTrue_,             metPt_["genMetTrue"],             metPhi_["genMetTrue"]);
+    getValue(iEvent, srcGenMetCalo_,             metPt_["genMetCalo"],             metPhi_["genMetCalo"]);
+    getValue(iEvent, srcGenMetCaloAndNonPrompt_, metPt_["genMetCaloAndNonPrompt"], metPhi_["genMetCaloAndNonPrompt"]);
+    getValue(iEvent, srcGenMetTrue_,             metPt_["genMetTrue"],             metPhi_["genMetTrue"]);
 
 
 
@@ -991,7 +939,7 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     genLeptonVeto = false;
     if (makeGenParticles){
       edm::Handle< std::vector<reco::GenParticle> > genParticles;
-      evt.getByLabel(srcGenParticles_, genParticles);
+      iEvent.getByLabel(srcGenParticles_, genParticles);
       for(std::vector<reco::GenParticle>::const_iterator iter = genParticles->begin(); iter != genParticles->end(); ++iter){
     	const reco::GenParticle& gen = *iter;
 
@@ -1002,8 +950,6 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     	// Electron
     	if(TMath::Abs(gen.pdgId()) == 11){
     	  if ( (genPt >= genElectronMinPt) && (TMath::Abs(genEta) <= genElectronMaxEta) ){
-
-    	    //	    std::cout << "Electron " << genPt << "\t" << genEta << "\n";
     	    genElectronPt ->push_back(  genPt );
     	    genElectronEta->push_back( genEta );
     	    genElectronPhi->push_back( genPhi );
@@ -1013,8 +959,6 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     	// Muon
     	if(TMath::Abs(gen.pdgId()) == 13){
     	  if ( (genPt >= genMuonMinPt) && (TMath::Abs(genEta) <= genMuonMaxEta) ){
-    	    //	    std::cout << "Muon " << genPt << "\t" << genEta << "\n";
-
     	    genMuonPt ->push_back(  genPt );
     	    genMuonEta->push_back( genEta );
     	    genMuonPhi->push_back( genPhi );
@@ -1023,7 +967,7 @@ void MakeTrees::analyze(const edm::Event& evt, const edm::EventSetup& es) {
     	}
 
       }
-    }
+    } // End gen particles
 
 
 
