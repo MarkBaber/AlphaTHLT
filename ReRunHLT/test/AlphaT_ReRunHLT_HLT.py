@@ -25,10 +25,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load('AlphaTHLT.ReRunHLT.hlt_stage1_AlphaT_cff')
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(3)
+    input = cms.untracked.int32(10)
 )
 
 # Input source
@@ -289,6 +289,26 @@ process.schedule.extend(process.JetProducerSchedule)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.output_step])
 
+
+# --------------------------------------------------------------------------------
+# customize the L1 emulator to run customiseL1EmulatorFromRaw with HLT to switchToSimStage1Digis
+process.load( 'Configuration.StandardSequences.RawToDigi_cff' )
+process.load( 'Configuration.StandardSequences.SimL1Emulator_cff' )
+
+#process.load('L1Trigger.L1TCalorimeter.L1TCaloStage1_PPFromRaw_cff')
+process.load('L1Trigger/L1TCalorimeter/caloStage1RegionSF_cfi')
+import L1Trigger.L1TCalorimeter.L1TCaloStage1_customForHLT
+import L1Trigger.Configuration.L1Trigger_custom
+process = L1Trigger.L1TCalorimeter.L1TCaloStage1_customForHLT.customiseL1EmulatorFromRaw( process )
+process = L1Trigger.Configuration.L1Trigger_custom.customiseResetPrescalesAndMasks( process )
+
+# customize the HLT to use the emulated results 
+import HLTrigger.Configuration.customizeHLTforL1Emulator
+process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToL1Emulator( process )
+process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimStage1Digis( process )
+# --------------------------------------------------------------------------------
+
+
 # customisation of the process.
 
 # Automatic addition of the customisation function from HLTrigger.Configuration.customizeHLTforMC
@@ -304,4 +324,6 @@ from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
 process = customisePostLS1(process)
 
 # End of customisation functions
+
+
 
