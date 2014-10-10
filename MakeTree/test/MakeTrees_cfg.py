@@ -27,9 +27,7 @@ selectedSample = QCD30to50
 process.source = cms.Source ("PoolSource",
 
                              fileNames = selectedSample.files,
-#                            fileNames = cms.untracked.vstring("file:/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_2_0_pre6/src/AlphaTHLT/ReRunHLT/test/hltReRunResults.root"),
-
-#  fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/AlphaTHLT_PRE_LS171_V5A_PU40bx25_07Oct14/TT_Tune4C_13TeV-pythia8-tauola/hltReRunResults_238_1_rPN.root' )
+                             #fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/AlphaTHLT_PRE_LS172_V16_PU40bx25_10Oct14/QCD_Pt-30to50_Tune4C_13TeV_pythia8/hltReRunResults_302_1_UtZ.root' )
 
 )
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
