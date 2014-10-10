@@ -45,7 +45,7 @@ def main():
         pass
     
     if ( cfgFile == "" ):
-        print "Error: Insufficienct arguments specified, expected two: cfgFilename, numberOfJobs"
+        print "Error: Insufficient arguments specified, expected two: cfgFilename, numberOfJobs"
         return
 
     print "\n\n"
@@ -167,7 +167,7 @@ def main():
         tempShText +=     "export FILENAME=\""  + outputROOTName + "\"\n\n"
 
         tempShText +=     "# IC Batch Job Script\n"
-        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_2_0_pre6/src\"\n"
+        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_2_0_pre7/src\"\n"
 #        tempShText +=     "export TOP=\"$PWD\"\n\n"
 #        tempShText +=     "export BATCH_DIR=\"/vols/cms04/mb1512/Batch/\"\n"
 
