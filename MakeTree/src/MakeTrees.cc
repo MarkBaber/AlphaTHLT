@@ -181,7 +181,7 @@ class MakeTrees : public edm::EDAnalyzer {
     UInt_t Muon_;
     UInt_t NVTX;
 
-
+    // Gen leptons
     bool genLeptonVeto;
     std::vector<Float_t>* genElectronPt;
     std::vector<Float_t>* genElectronEta;
@@ -190,11 +190,9 @@ class MakeTrees : public edm::EDAnalyzer {
     std::vector<Float_t>* genMuonEta;
     std::vector<Float_t>* genMuonPhi;
 
-
-  bool HLT_PFHT900_v1;
-  bool HLT_PFHT350_PFMET120_NoiseCleaned_v1;
-  bool HLT_HT200_AlphaT0p4_v1;
-  bool HLT_HT200_PFAlphaT0p4_v1;
+    // HLT paths
+    std::vector<TString>    hltPathNames;
+    std::map<TString, bool> hltPathFired;
 
 
   std::pair<float,float> genAk4AlphaTHT40;
@@ -320,9 +318,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
 
 
 
-
-
-
     // AlphaT, HT  
     tree->Branch("genAk4_AlphaT40",     &genAk4AlphaTHT40.first,      "genAk4_AlphaT40/f");
     tree->Branch("genAk4_HT40",         &genAk4AlphaTHT40.second,     "genAk4_HT40/f");
@@ -337,7 +332,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     tree->Branch("hltAk4PF_HT50",       &hltAk4PFAlphaTHT50.second,   "hltAk4PF_HT50/f");
     tree->Branch("hltAk4Calo_AlphaT50", &hltAk4CaloAlphaTHT50.first,  "hltAk4Calo_AlphaT50/f");
     tree->Branch("hltAk4Calo_HT50",     &hltAk4CaloAlphaTHT50.second, "hltAk4Calo_HT50/f");
-
 
     // Energy sums
     tree->Branch("gct_Ht",       &ht_["gct"],      "gct_Ht/f");
@@ -363,11 +357,41 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     tree->Branch("genMuon_Eta",     "std::vector<float>", &genMuonEta);
     tree->Branch("genMuon_Phi",     "std::vector<float>", &genMuonPhi);		
 
+
+
+    // Store HLT paths
+    hltPathNames.push_back("HLT_CaloJet20_v1");
+    hltPathNames.push_back("HLT_PFJet20_v1");
+    hltPathNames.push_back("HLT_HT100_v1");
+    hltPathNames.push_back("HLT_PFHT100_v1");
+    hltPathNames.push_back("HLT_HT200_AlphaT0p57_v1");
+    hltPathNames.push_back("HLT_HT250_AlphaT0p55_v1");
+    hltPathNames.push_back("HLT_HT300_AlphaT0p53_v1");
+    hltPathNames.push_back("HLT_HT350_AlphaT0p52_v1");
+    hltPathNames.push_back("HLT_HT400_AlphaT0p51_v1");
+    hltPathNames.push_back("HLT_HT200_AlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT250_AlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT300_AlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT350_AlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT200_PFAlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT250_PFAlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT300_PFAlphaT0p5_v1");
+    hltPathNames.push_back("HLT_HT350_PFAlphaT0p5_v1");
+    hltPathNames.push_back("HLT_PFHT350_v1");
+    hltPathNames.push_back("HLT_PFHT600_v1");
+    hltPathNames.push_back("HLT_PFHT900_v1");
+    hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_v1");
+    hltPathNames.push_back("HLT_PFHT350_NoL1_v1");
+    hltPathNames.push_back("HLT_PFHT600_NoL1_v1");
+    hltPathNames.push_back("HLT_PFHT900_NoL1_v1");
+    hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_NoL1_v1");
+
     // Trigger bits
-    tree->Branch("HLT_PFHT900_v1",                       &HLT_PFHT900_v1,                       "HLT_PFHT900_v1/b");
-    tree->Branch("HLT_PFHT350_PFMET120_NoiseCleaned_v1", &HLT_PFHT350_PFMET120_NoiseCleaned_v1, "HLT_PFHT350_PFMET120_NoiseCleaned_v1/b");
-    tree->Branch("HLT_HT200_AlphaT0p4_v1",               &HLT_HT200_AlphaT0p4_v1,               "HLT_HT200_AlphaT0p4_v1/b");
-    tree->Branch("HLT_HT200_PFAlphaT0p4_v1",             &HLT_HT200_PFAlphaT0p4_v1,             "HLT_HT200_PFAlphaT0p4_v1/b");
+    for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
+      TString path = hltPathNames[ iPath ];
+      hltPathFired[ path ] = false;
+      tree->Branch( path, &hltPathFired[ path ], path + "/b" );
+    }
 
 
 
@@ -376,18 +400,9 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
 
     HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT"));
 
-
     srcUctMET_ = pset.getParameter<edm::InputTag>("srcUctMet");
     srcUctMht_ = pset.getParameter<edm::InputTag>("srcUctMht");
     srcUctJet_ = pset.getParameter<edm::InputTag>("srcUctJet");
-
-    // srcS2Met_        = pset.getParameter<edm::InputTag>("srcS2Met");
-    // srcS2DonutMht_        = pset.getParameter<edm::InputTag>("srcS2DonutMht");
-    // srcS2DonutJetCentral_ = pset.getParameter<VInputTag>("srcS2DonutJetCentral");
-    // srcS2NopusMht_        = pset.getParameter<edm::InputTag>("srcS2NopusMht");
-    // srcS2NopusJetCentral_ = pset.getParameter<VInputTag>("srcS2NopusJetCentral");
-    // srcS2GlobalMht_        = pset.getParameter<edm::InputTag>("srcS2GlobalMht");
-    // srcS2GlobalJetCentral_ = pset.getParameter<VInputTag>("srcS2GlobalJetCentral");
 
     srcGenMetCalo_             = pset.getParameter<edm::InputTag>("srcGenMetCalo");
     srcGenMetCaloAndNonPrompt_ = pset.getParameter<edm::InputTag>("srcGenMetCaloAndNonPrompt");
@@ -711,18 +726,23 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   // Iterate through paths run
   for (unsigned i = 0; i < paths->size(); ++i) {
     std::string name = paths->at(i).name();
-    //    std::cout << name << "\n";
+    std::cout << name << "\n";
 
 
-    if ( name.find("HLT_PFHT900_v1")                             != name.npos ){
-      HLT_PFHT900_v1 = paths->at(i).wasAccept();
-    }else if ( name.find("HLT_PFHT350_PFMET120_NoiseCleaned_v1") != name.npos ){
-      HLT_PFHT350_PFMET120_NoiseCleaned_v1 = paths->at(i).wasAccept();
-    }else if ( name.find("HLT_HT200_AlphaT0p4_v1")               != name.npos ){
-      HLT_HT200_AlphaT0p4_v1 = paths->at(i).wasAccept();
-    }else if ( name.find("HLT_HT200_PFAlphaT0p4_v1")             != name.npos ){
-      HLT_HT200_PFAlphaT0p4_v1 = paths->at(i).wasAccept();
+    if ( hltPathFired.find( name ) != hltPathFired.end() ){
+      //      std::cout << name << " found\n";
+      hltPathFired[ name ] = paths->at(i).wasAccept();
     }
+
+    // if ( name.find("HLT_PFHT900_v1")                             != name.npos ){
+    //   HLT_PFHT900_v1 = paths->at(i).wasAccept();
+    // }else if ( name.find("HLT_PFHT350_PFMET120_NoiseCleaned_v1") != name.npos ){
+    //   HLT_PFHT350_PFMET120_NoiseCleaned_v1 = paths->at(i).wasAccept();
+    // }else if ( name.find("HLT_HT200_AlphaT0p4_v1")               != name.npos ){
+    //   HLT_HT200_AlphaT0p4_v1 = paths->at(i).wasAccept();
+    // }else if ( name.find("HLT_HT200_PFAlphaT0p4_v1")             != name.npos ){
+    //   HLT_HT200_PFAlphaT0p4_v1 = paths->at(i).wasAccept();
+    // }
 
   }
 
