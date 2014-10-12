@@ -14,13 +14,19 @@ process.maxEvents = cms.untracked.PSet(
 
 # --------------------------------------------------------------------------------
 
-from AlphaTHLT.MakeTree.samples.samples_PU40_10Oct14_cfi import *
+#from AlphaTHLT.MakeTree.samples.samples_PU40_10Oct14_cfi import *
+#from AlphaTHLT.MakeTree.samples.AlphaTHLTPRELS172V16PU40bx2511Oct14_cfi import *
+from AlphaTHLT.MakeTree.samples.AlphaTHLT_PRE_LS172_V16_PU40bx25_11Oct14_cfi import *
+
 
 # TTbar, DYJets, 
 # QCD30to50, QCD50to80, QCD80to120, QCD120to170, QCD170to300, QCD300to470,  QCD470to600, QCD600to800, QCD800to1000
 # NuGun
 # T2cc_250_210, T2tt_500_250
-selectedSample = QCD30to50
+
+samples = [QCD30to50,  QCD50to80, QCD80to120, QCD120to170, QCD170to300, QCD300to470,  QCD470to600, QCD600to800, QCD800to1000, TTbar, DYJets, NuGun]
+
+selectedSample = samples[10]
 
 # --------------------------------------------------------------------------------
 
