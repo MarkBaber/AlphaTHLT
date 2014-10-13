@@ -62,9 +62,9 @@ def main():
     f.close()
 
     # Load config file to extract configuration parameters
-    import AlphaT_ReRunHLT
-    fileCount = len(AlphaT_ReRunHLT.selectedSample.files)
-    fileName  = AlphaT_ReRunHLT.selectedSample.name
+    import AlphaT_ReRunHLT_HLT
+    fileCount = len(AlphaT_ReRunHLT_HLT.selectedSample.files)
+    fileName  = AlphaT_ReRunHLT_HLT.selectedSample.name
 
 
     # Calculate the required number of files per job
@@ -142,7 +142,7 @@ def main():
             if index == fileCount:
                 break
 
-            filenamesStr += "\t'" + AlphaT_ReRunHLT.selectedSample.files[index] + "',\n"
+            filenamesStr += "\t'" + AlphaT_ReRunHLT_HLT.selectedSample.files[index] + "',\n"
             pass
         filenamesStr += ")"
 
@@ -168,7 +168,7 @@ def main():
         tempShText +=     "export FILENAME=\""  + outputROOTName + "\"\n\n"
 
         tempShText +=     "# IC Batch Job Script\n"
-        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_2_0_pre6/src\"\n"
+        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_2_0_pre7/src\"\n"
 #        tempShText +=     "export TOP=\"$PWD\"\n\n"
 #        tempShText +=     "export BATCH_DIR=\"/vols/cms04/mb1512/Batch/\"\n"
 
@@ -180,7 +180,7 @@ def main():
         tempShText +=     "eval `scramv1 runtime -sh`\n\n"
 
         # Copy HLT DB to location executed
-        tempShText +=     "cp /home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_2_0_pre6/src/AlphaTHLT/ReRunHLT/test/dttf_config.db $OUTPUTDIR\n"
+#        tempShText +=     "cp /home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_2_0_pre7/src/AlphaTHLT/ReRunHLT/test/dttf_config.db $OUTPUTDIR\n"
         tempShText +=     "cd $OUTPUTDIR\n"
         tempShText +=     "cmsRun " + batchCfgFile + "\n\n"
         # tempShText +=     "# Copy the produced rootfile to the required directory\n"
