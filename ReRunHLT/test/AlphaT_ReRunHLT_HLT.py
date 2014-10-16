@@ -31,22 +31,24 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 
-#from AlphaTHLT.ReRunHLT.samples.samples_Signal_MC_cfi import *
-#selectedSample =  T2cc_250_210 #T2tt_500_250 #T2cc_250_210
+from AlphaTHLT.ReRunHLT.samples.samples_Signal_MC_cfi import *
+selectedSample = T2tt_500_250 #T2cc_250_210
 
 
 # Input source
 process.source = cms.Source("PoolSource",
 
-
-    fileNames = cms.untracked.vstring("root://xrootd.unl.edu//store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00005/02B79593-F47F-E311-8FF6-003048FFD796.root")
-
-
+     # Run on private MC samples (Run 'voms-proxy-init -out ~/myproxy -voms cms' first)
 #     fileNames = selectedSample.files,
 
 
-#    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00001/4AAC6F5B-9979-E311-9DED-0025905A48F0.root')
+ fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-30to50_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/002C6EAF-01A7-E311-A921-0030486790A0.root')
+
 #    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root')
+#    fileNames = cms.untracked.vstring("root://xrootd.unl.edu//store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00005/02B79593-F47F-E311-8FF6-003048FFD796.root")
+
+#    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00001/4AAC6F5B-9979-E311-9DED-0025905A48F0.root')
+
 
 
 )
@@ -61,20 +63,6 @@ process.configurationMetadata = cms.untracked.PSet(
     annotation = cms.untracked.string('AlphaT_ReRunHLT nevts:10'),
     name = cms.untracked.string('Applications')
 )
-
-# # Output definition
-
-# process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
-#     splitLevel = cms.untracked.int32(0),
-#     eventAutoFlushCompressedSize = cms.untracked.int32(1048576),
-#     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
-#     fileName = cms.untracked.string('file:step2.root'),
-#     dataset = cms.untracked.PSet(
-#         filterName = cms.untracked.string(''),
-#         dataTier = cms.untracked.string('GEN-SIM-DIGI')
-#     )
-# )
-
 
 
 # Output definition
@@ -100,64 +88,34 @@ process.output = cms.OutputModule("PoolOutputModule",
         
 
        #   'keep *_hlt*_*_HLT2',
-
-
        #  'keep *_*_*_HLT2',
        # 'drop *_*_*Digi*_',
        # 'drop *_mix_*_*',
 
-# gen particle skimmer
-
-# BXVector<l1t::Jet>                    "caloStage1FinalDigis"      ""                "HLT2"
 
         # UCT
        'keep *BXVector*_*_*_*',
        'keep *_caloStage1FinalDigis_*_*',
+       'keep l1extra*_*_*_*',
+       # HLT
+       'keep recoPFJets_hltAK4PFJetsCorrected*_*_*',
+       'keep recoCaloJets_hltAK4CaloJetsCorrected*_*_*',
 
+       'keep triggerTriggerFilterObjectWithRefs_*_*_HLT2',
+       'keep recoMETs_*_*_HLT2',
+       'keep recoCaloMETs_*_*_HLT2',
+       
 
-      # UCT
-      'keep l1extra*_*_*_*',
-      # HLT
-      'keep recoPFJets_hltAK4PFJetsCorrected*_*_*',
-      'keep recoCaloJets_hltAK4CaloJetsCorrected*_*_*',
-
-
-        'keep triggerTriggerFilterObjectWithRefs_*_*_HLT2',
-        'keep recoMETs_*_*_HLT2',
-        'keep recoCaloMETs_*_*_HLT2',
-
-
-# #       # HLT jet triggers
-#       'keep recoCaloJets_hltCaloJetL1FastJetCorrected_*_HLT2',
-#       'keep recoPFJets_hltAntiKT4PFJets*_*_HLT2',
-#       'keep *_hltSingleJet20_*_*',
-#       'keep *_hlt1PFJet20_*_*',
-#       'keep *_hlt1PFJetNoPU20_*_*',
-
-#       # Offline jets
-#       'keep *_ak5*Jets*_*_*',
-#       'drop *_ak5*Jets*_rho_*',
-#       'drop *_ak5*Jets*_sigma*_*',
-#       'keep *_kt6CaloJetsCentral_rho_*',
-# #      'keep *_*Jets*_*_*',
-
-
-      'keep *_ak4PFJets*_*_*',
-      'keep *_ak4CaloJets*_*_*',
-
-      # 'drop *_hlt*_rho_*',
-      # 'drop *_*Gen*_rho_*',
-
-
-
-      'keep *_hltL1GtObjectMap_*_HLT2',
-      'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
-      'keep FEDRawDataCollection_source_*_HLT2',
-      'keep edmTriggerResults_*_*_HLT2',
-      'keep triggerTriggerEvent_*_*_HLT2' 
-
-
-
+       'keep *_ak4PFJets*_*_*',
+       'keep *_ak4CaloJets*_*_*',
+       
+       
+       'keep *_hltL1GtObjectMap_*_HLT2',
+       'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
+       'keep FEDRawDataCollection_source_*_HLT2',
+       'keep edmTriggerResults_*_*_HLT2',
+       'keep triggerTriggerEvent_*_*_HLT2' 
+       
       ),
     fileName = cms.untracked.string('file:hltReRunResults.root'),
     dataset = cms.untracked.PSet(
@@ -325,16 +283,33 @@ from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
 process = customisePostLS1(process)
 
 # override the GlobalTag, connection string and pfnPrefix 
-if 'GlobalTag' in process.__dict__:
-    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'auto:run2_mc_GRun')
-    process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
-    process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-    for pset in process.GlobalTag.toGet.value():
-        pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-    # fix for multi-run processing 
-    process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
-    process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+GT = "NEW"
+
+# OLD INCORRECT GT
+if GT == "OLD":
+    if 'GlobalTag' in process.__dict__:
+        from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
+        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'auto:run2_mc_GRun')
+        process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
+        process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+        for pset in process.GlobalTag.toGet.value():
+            pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
+        # fix for multi-run processing 
+        process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
+        process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+    
+# NEW CORRECT GT?
+elif GT == "NEW":
+    if 'GlobalTag' in process.__dict__:
+        from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag 
+        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V1A::All') 
+        process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
+        process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+        for pset in process.GlobalTag.toGet.value():
+            pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
+        # fix for multi-run processing 
+        process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
+        process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
 # customize the L1 emulator to run customiseL1EmulatorFromRaw with HLT to switchToSimStage1Digis 
 process.load( 'Configuration.StandardSequences.RawToDigi_cff' )
