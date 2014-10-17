@@ -32,17 +32,17 @@ process.maxEvents = cms.untracked.PSet(
 
 
 from AlphaTHLT.ReRunHLT.samples.samples_Signal_MC_cfi import *
-selectedSample = T2tt_500_250 #T2cc_250_210
+selectedSample = T2tt_300_200 #T2tt_500_250 #T2cc_250_210
 
 
 # Input source
 process.source = cms.Source("PoolSource",
 
      # Run on private MC samples (Run 'voms-proxy-init -out ~/myproxy -voms cms' first)
-#     fileNames = selectedSample.files,
+     fileNames = selectedSample.files,
 
 
- fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-30to50_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/002C6EAF-01A7-E311-A921-0030486790A0.root')
+# fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-30to50_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/002C6EAF-01A7-E311-A921-0030486790A0.root')
 
 #    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root')
 #    fileNames = cms.untracked.vstring("root://xrootd.unl.edu//store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00005/02B79593-F47F-E311-8FF6-003048FFD796.root")
