@@ -38,7 +38,7 @@
 #include "GeneratorInterface/LHEInterface/interface/LHEEvent.h"
 
 
-
+#include "DataFormats/METReco/interface/GenMET.h" 
 
 typedef std::vector<edm::InputTag> VInputTag;
 
@@ -92,6 +92,14 @@ class MakeTrees : public edm::EDAnalyzer {
     edm::InputTag srcGenMetCalo_;
     edm::InputTag srcGenMetCaloAndNonPrompt_;
     edm::InputTag srcGenMetTrue_;
+
+    edm::InputTag srcHLTMetCalo_;
+    edm::InputTag srcHLTMetCleanCalo_;
+    edm::InputTag srcHLTMetPF_;
+    edm::InputTag srcHLTMhtCalo_;
+    edm::InputTag srcHLTMhtPF_;
+
+
 
     edm::InputTag srcGenParticles_;
     bool          makeGenParticles;
@@ -324,8 +332,8 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
     // NOTE: These are not always filled due to threshold requirements
     // recoCaloMETs_hltMetClean
-    tree->Branch("hltMetCleanCalo_MetPT",         &metPt_["hltMetCleanCalo"],        "hltMetCleanCalo_MetPt/f");
-
+    // tree->Branch("hltMetCleanCalo_MetPT",         &metPt_["hltMetCleanCalo"],        "hltMetCleanCalo_MetPt/f");
+    // tree->Branch("hltMetPF_MetPT",                &metPt_["hltMetPF"],               "hltMetPF_MetPt/f");
 
     // Gen leptons
     tree->Branch("genLeptonVeto",   &genLeptonVeto,       "genLeptonVeto/b");
@@ -445,6 +453,15 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcGenMetCaloAndNonPrompt_ = pset.getParameter<edm::InputTag>("srcGenMetCaloAndNonPrompt");
     srcGenMetTrue_             = pset.getParameter<edm::InputTag>("srcGenMetTrue");
 
+    srcHLTMetCalo_            = pset.getParameter<edm::InputTag>("srcHLTMetCalo");
+    srcHLTMetCleanCalo_       = pset.getParameter<edm::InputTag>("srcHLTMetCleanCalo");
+    srcHLTMetPF_              = pset.getParameter<edm::InputTag>("srcHLTMetPF");
+    srcHLTMhtCalo_            = pset.getParameter<edm::InputTag>("srcHLTMhtCalo");
+    srcHLTMhtPF_              = pset.getParameter<edm::InputTag>("srcHLTMhtPF");
+
+
+
+
     // Gen particles
     makeGenParticles           = pset.getParameter<bool>("MakeGenParticles");
     srcGenParticles_           = pset.getParameter<edm::InputTag>("srcGenParticles");
@@ -518,10 +535,10 @@ namespace {
 	return output;
     }
 
-    void getValue(const edm::Event& evt, const edm::InputTag& tag, Float_t& et, Float_t& phi) {
+  void getValue(const edm::Event& evt, const edm::InputTag& tag, Float_t& pt, Float_t& phi) {
 	edm::Handle<edm::View<reco::Candidate> > handle;
 	evt.getByLabel(tag, handle);
-	et = handle->at(0).pt();
+	pt  = handle->at(0).pt();
 	phi = handle->at(0).phi();
     }
 
@@ -604,11 +621,15 @@ namespace {
 
       // Return a large value of alphaT 
       if ( (sum_et*sum_et - (sum_px*sum_px+sum_py*sum_py)) <= 0 ){
-	return std::make_pair(10.,  sum_et);
+	return std::make_pair(11.,  sum_et);
       }
 
       // Alpha_T 
-     return std::make_pair( (0.5 * (sum_et - min_delta_sum_et) / sqrt( sum_et*sum_et - (sum_px*sum_px+sum_py*sum_py) )), sum_et );
+      float alphaT = 0.5 * (sum_et - min_delta_sum_et) / sqrt( sum_et*sum_et - (sum_px*sum_px+sum_py*sum_py) );
+      if (alphaT > 10){
+	alphaT = 10;
+      }
+     return std::make_pair( alphaT, sum_et );
 
 
     }
@@ -990,9 +1011,18 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
       mhtDivHt_["gct"] = 0;
     }
 
+
+    // genMet
     getValue(iEvent, srcGenMetCalo_,             metPt_["genMetCalo"],             metPhi_["genMetCalo"]);
     getValue(iEvent, srcGenMetCaloAndNonPrompt_, metPt_["genMetCaloAndNonPrompt"], metPhi_["genMetCaloAndNonPrompt"]);
     getValue(iEvent, srcGenMetTrue_,             metPt_["genMetTrue"],             metPhi_["genMetTrue"]);
+    // hltMet
+    getValue(iEvent, srcHLTMetCalo_,             metPt_["hltMetCalo"],             metPhi_["hltMetCalo"]);
+    //    getValue(iEvent, srcHLTMetCleanCalo_,        metPt_["hltMetCleanCalo"],        metPhi_["hltMetCleanCalo"]);
+    //    getValue(iEvent, srcHLTMetPF_,               metPt_["hltMetPF"],               metPhi_["hltMetPF"]);
+    // hltMHT
+    getValue(iEvent, srcHLTMhtCalo_,             mhtPt_["hltMhtCalo"],             mhtPhi_["hltMhtCalo"]);
+    getValue(iEvent, srcHLTMhtPF_,               mhtPt_["hltMhtPF"],               mhtPhi_["hltMhtPF"]);
 
 
 

@@ -45,6 +45,15 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     srcGenMetCaloAndNonPrompt = cms.InputTag( "genMetCaloAndNonPrompt" ),
     srcGenMetTrue             = cms.InputTag( "genMetTrue" ),
 
+                           
+    srcHLTMetCalo             = cms.InputTag( "hltMet" ), 
+    srcHLTMetCleanCalo        = cms.InputTag( "hltMetCleanUsingJetID" ), 
+    srcHLTMetPF               = cms.InputTag( "hltPFMETProducer" ),
+
+    srcHLTMhtCalo             = cms.InputTag( "hltHtMht" ), 
+    srcHLTMhtPF               = cms.InputTag( "hltPFHT" ), 
+
+
     # Gen particles                           
     MakeGenParticles          = cms.bool( True ),
     srcGenParticles           = cms.InputTag( "prunedGenParticles"),
