@@ -1,18 +1,3 @@
-/*
- * =====================================================================================
- *
- *       Filename:  MakeTrees.cc
- *
- *    Description:  Produces a flat tree for trigger studies
- *
- *        Initial Author:  Evan Friis, evan.friis@cern.ch
- *        Company:  UW Madison
- *
- *        Modified by: Adam Elwood, adam.elwood09@imperial.ac.uk
- *
- * =====================================================================================
- */
-
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -42,6 +27,8 @@
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
+#include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 // Generator information
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -52,26 +39,9 @@
 
 
 
-struct alphatSums{
-  double ht;
-  double phi;
-  double mhtx;
-  double mhty;
-  double mht;
-  double dht;
-  double alphat;
-};
-struct regionEtStruct{
-double et;
-double phi;
-double eta;
-};
-bool compareByEt(const regionEtStruct &a, const regionEtStruct &b)
-{
-return a.et > b.et;
-}
 
 typedef std::vector<edm::InputTag> VInputTag;
+
 
 class MakeTrees : public edm::EDAnalyzer {
   public:
@@ -80,15 +50,15 @@ class MakeTrees : public edm::EDAnalyzer {
     void analyze(const edm::Event& evt, const edm::EventSetup& es);
 
 
-    void storeJet( TString jetCollName, const std::vector<const reco::Candidate*>& jetColl,                                                         
+    void storeJet( TString jetCollName, const std::vector<const reco::Candidate*>& jetColl, 
                    std::map<TString,std::vector<Float_t>* >& pt,
 		   std::map<TString,std::vector<Float_t>* >& px,
 		   std::map<TString,std::vector<Float_t>* >& py,
 		   std::map<TString,std::vector<Float_t>* >& eta,
 		   std::map<TString,std::vector<Float_t>* >& phi);
 
-		   //	 std::vector<Float_t>* pt, std::vector<Float_t>* eta, std::vector<Float_t>* phi);
-  std::vector< const reco::Candidate*> skimJets(const std::vector<const reco::Candidate*>& inJets, double minPt, double minEta, double maxEta);
+    std::vector< const reco::Candidate*> skimJets(const std::vector<const reco::Candidate*>& inJets, 
+						  double minPt, double minEta, double maxEta);
 
 
   private:
@@ -141,17 +111,10 @@ class MakeTrees : public edm::EDAnalyzer {
     VInputTag srcPfJet_;
 
 
-
     //Define the levels
     std::vector<TString> lvl_;
     TTree* tree;
 
-    // std::map<TString,Float_t> mhtPt30_;
-    // std::map<TString,Float_t> alphaT30_;
-    // std::map<TString,Float_t> mhtPhi30_;
-    // std::map<TString,Float_t> ht30_;
-    // std::map<TString,Float_t> dht30_;
-    // std::map<TString,Float_t> mhtDivHt30_;
 
     std::map<TString,Float_t> mhtPt_;
     std::map<TString,Float_t> alphaT_;
@@ -164,10 +127,6 @@ class MakeTrees : public edm::EDAnalyzer {
     std::map<TString,Float_t> metPhi_;
     std::map<TString,Float_t> et_;
 
-    // std::map<TString,int> multiplicity_;
-    // std::map<TString,int> multiplicity30_;
-    // std::map<TString,int> multiplicity50_; 
-  //    std::vector<Float_t> * invEnergy_;
     std::map<TString,std::vector<Float_t>* > jetPt;
     std::map<TString,std::vector<Float_t>* > jetPx;
     std::map<TString,std::vector<Float_t>* > jetPy;
@@ -195,13 +154,13 @@ class MakeTrees : public edm::EDAnalyzer {
     std::map<TString, bool> hltPathFired;
 
 
-  std::pair<float,float> genAk4AlphaTHT40;
-  std::pair<float,float> hltAk4PFAlphaTHT40;
-  std::pair<float,float> hltAk4CaloAlphaTHT40;
+    std::pair<float,float> genAk4AlphaTHT40;
+    std::pair<float,float> hltAk4PFAlphaTHT40;
+    std::pair<float,float> hltAk4CaloAlphaTHT40;
 
-  std::pair<float,float> genAk4AlphaTHT50;
-  std::pair<float,float> hltAk4PFAlphaTHT50;
-  std::pair<float,float> hltAk4CaloAlphaTHT50;
+    std::pair<float,float> genAk4AlphaTHT50;
+    std::pair<float,float> hltAk4PFAlphaTHT50;
+    std::pair<float,float> hltAk4CaloAlphaTHT50;
 
     UInt_t maxjet_;
     bool usePU_; 
@@ -219,19 +178,39 @@ class MakeTrees : public edm::EDAnalyzer {
     double maxEtaCen;
     double minEtaFor;
     double maxEtaFor;
-    /*std::vector<double> * regionEt_;
-    std::vector<Int_t> * regionEta_;
-    std::vector<Int_t> * regionPhi_;*/
 
 
-  edm::InputTag HLTResultsTag;
+    edm::InputTag HLTResultsTag;
   
-  float PThat;
+    float PThat;
 
+
+
+  // /// module config parameters
+  // std::string   processName_;
+  // std::string   triggerName_;
+
+  // edm::InputTag                                   triggerResultsTag_;
+  // edm::EDGetTokenT<edm::TriggerResults>           triggerResultsToken_;
+  // edm::InputTag                                   triggerEventWithRefsTag_;
+  // edm::EDGetTokenT<trigger::TriggerEventWithRefs> triggerEventWithRefsToken_;
+
+  // edm::Handle<edm::TriggerResults>           triggerResultsHandle_;
+  // edm::Handle<trigger::TriggerEventWithRefs> triggerEventWithRefsHandle_;
+  // trigger::Vids        jetIds_;
+
+  // HLTConfigProvider hltConfig_;
 
 };
 
-MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
+MakeTrees::MakeTrees(const edm::ParameterSet& pset){
+// : 
+//   processName_(pset.getParameter<std::string>("processName")),
+//   triggerName_(pset.getParameter<std::string>("triggerName")),
+//   triggerResultsTag_(pset.getParameter<edm::InputTag>("triggerResults")),
+//   triggerResultsToken_(consumes<edm::TriggerResults>(triggerResultsTag_)),
+//   triggerEventWithRefsTag_(pset.getParameter<edm::InputTag>("triggerEventWithRefs")),
+//   triggerEventWithRefsToken_(consumes<trigger::TriggerEventWithRefs>(triggerEventWithRefsTag_)) {
 
     // Initialize the ntuple builder
     edm::Service<TFileService> fs;
@@ -253,9 +232,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     lvl_.push_back("hltAk4CaloFor");
     lvl_.push_back("hltAk4PFFor");
 
-    //    lvl_.push_back("hltAk4PFNoPU");
-
-
+    // lvl_.push_back("hltAk4PFNoPU");
     // lvl_.push_back("Calo");
     // lvl_.push_back("Pf");
 
@@ -273,7 +250,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     genMuonPt      = new std::vector<Float_t>();
     genMuonEta     = new std::vector<Float_t>();
     genMuonPhi     = new std::vector<Float_t>();
-
 
     // Event
     tree->Branch("NVTX",  &NVTX,  "NVTX/i");
@@ -363,31 +339,89 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
 
 
     // Store HLT paths
+    // hltPathNames.push_back("HLT_CaloJet20_v1");
+    // hltPathNames.push_back("HLT_PFJet20_v1");
+    // hltPathNames.push_back("HLT_HT100_v1");
+    // hltPathNames.push_back("HLT_PFHT100_v1");
+    // hltPathNames.push_back("HLT_HT200_AlphaT0p57_v1");
+    // hltPathNames.push_back("HLT_HT250_AlphaT0p55_v1");
+    // hltPathNames.push_back("HLT_HT300_AlphaT0p53_v1");
+    // hltPathNames.push_back("HLT_HT350_AlphaT0p52_v1");
+    // hltPathNames.push_back("HLT_HT400_AlphaT0p51_v1");
+    // hltPathNames.push_back("HLT_HT200_AlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT250_AlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT300_AlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT350_AlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT200_PFAlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT250_PFAlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT300_PFAlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_HT350_PFAlphaT0p5_v1");
+    // hltPathNames.push_back("HLT_PFHT350_v1");
+    // hltPathNames.push_back("HLT_PFHT600_v1");
+    // hltPathNames.push_back("HLT_PFHT900_v1");
+    // hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_v1");
+    // hltPathNames.push_back("HLT_PFHT350_NoL1_v1");
+    // hltPathNames.push_back("HLT_PFHT600_NoL1_v1");
+    // hltPathNames.push_back("HLT_PFHT900_NoL1_v1");
+    // hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_NoL1_v1");
+
     hltPathNames.push_back("HLT_CaloJet20_v1");
     hltPathNames.push_back("HLT_PFJet20_v1");
     hltPathNames.push_back("HLT_HT100_v1");
     hltPathNames.push_back("HLT_PFHT100_v1");
-    hltPathNames.push_back("HLT_HT200_AlphaT0p57_v1");
-    hltPathNames.push_back("HLT_HT250_AlphaT0p55_v1");
-    hltPathNames.push_back("HLT_HT300_AlphaT0p53_v1");
-    hltPathNames.push_back("HLT_HT350_AlphaT0p52_v1");
-    hltPathNames.push_back("HLT_HT400_AlphaT0p51_v1");
-    hltPathNames.push_back("HLT_HT200_AlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT250_AlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT300_AlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT350_AlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT200_PFAlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT250_PFAlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT300_PFAlphaT0p5_v1");
-    hltPathNames.push_back("HLT_HT350_PFAlphaT0p5_v1");
-    hltPathNames.push_back("HLT_PFHT350_v1");
-    hltPathNames.push_back("HLT_PFHT600_v1");
-    hltPathNames.push_back("HLT_PFHT900_v1");
-    hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_v1");
+    
+    hltPathNames.push_back("HLT_HT200_AlphaT0p57_NoL1_v1");
+    hltPathNames.push_back("HLT_HT250_AlphaT0p55_NoL1_v1");
+    hltPathNames.push_back("HLT_HT300_AlphaT0p53_NoL1_v1");
+    hltPathNames.push_back("HLT_HT350_AlphaT0p52_NoL1_v1");
+    hltPathNames.push_back("HLT_HT400_AlphaT0p51_NoL1_v1");
+    hltPathNames.push_back("HLT_HT200_AlphaT0p57_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT250_AlphaT0p55_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT300_AlphaT0p53_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT350_AlphaT0p52_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT400_AlphaT0p51_L1HTT175OrETM70_v1");
+    
+    hltPathNames.push_back("HLT_HT200_AlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT250_AlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT300_AlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT350_AlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT200_AlphaT0p5_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT250_AlphaT0p5_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT300_AlphaT0p5_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT350_AlphaT0p5_L1HTT175OrETM70_v1");
+
+    hltPathNames.push_back("HLT_HT200_PFAlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT250_PFAlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT300_PFAlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT350_PFAlphaT0p5_NoL1_v1");
+    hltPathNames.push_back("HLT_HT200_PFAlphaT0p5_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT250_PFAlphaT0p5_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT300_PFAlphaT0p5_L1HTT175OrETM70_v1");
+    hltPathNames.push_back("HLT_HT350_PFAlphaT0p5_L1HTT175OrETM70_v1");
+          
     hltPathNames.push_back("HLT_PFHT350_NoL1_v1");
     hltPathNames.push_back("HLT_PFHT600_NoL1_v1");
+    hltPathNames.push_back("HLT_PFHT350_v1");
+    hltPathNames.push_back("HLT_PFHT600_v1");
+    
     hltPathNames.push_back("HLT_PFHT900_NoL1_v1");
     hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_NoL1_v1");
+    hltPathNames.push_back("HLT_PFMET170_NoiseCleaned_NoL1_v1");
+    hltPathNames.push_back("HLT_PFMET120_NoiseCleaned_BTagCSV07_NoL1_v1");
+    hltPathNames.push_back("HLT_PFHT900_v1");
+    hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_v1");
+    hltPathNames.push_back("HLT_PFMET170_NoiseCleaned_v1");
+    hltPathNames.push_back("HLT_PFMET120_NoiseCleaned_BTagCSV07_v1");
+    
+    hltPathNames.push_back("HLT_RsqMR300_Rsq0p09_MR200_NoL1_v1");
+    hltPathNames.push_back("HLT_RsqMR260_Rsq0p09_MR200_4jet_NoL1_v1");
+    hltPathNames.push_back("HLT_Rsq0p36_NoL1_v1");
+    hltPathNames.push_back("HLT_RsqMR300_Rsq0p09_MR200_v1");
+    hltPathNames.push_back("HLT_RsqMR260_Rsq0p09_MR200_4jet_v1");
+    hltPathNames.push_back("HLT_Rsq0p36_v1");
+    
+
+
 
     // Trigger bits
     for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
@@ -450,12 +484,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset) {
     minEtaFor         = pset.getParameter<double>("forJetMinEta");
     maxEtaFor         = pset.getParameter<double>("forJetMaxEta");
 
-/*
-    srcRegionEt_ = pset.getParameter<edm::InputTag>("srcRegionEt");
-    srcRegionEta_ = pset.getParameter<edm::InputTag>("srcRegionEta");
-    srcRegionPhi_ = pset.getParameter<edm::InputTag>("srcRegionPhi");
-*/
-
 
 }
 
@@ -511,76 +539,6 @@ namespace {
 
     const double PI = 3.14159265359;
 
-    //Return the jet energy sums in a vector: ht, mhtPt, mhtPhi, mhtPx, mhtPy
-    alphatSums getHSum(const std::vector<const reco::Candidate*>& jets, double htThreshold,unsigned int maxJet){
-
-	double ht   = 0.0;
-	double mhtX = 0.0;
-	double mhtY = 0.0;
-
-	int jetsAboveThresh(0);
-	for (size_t i = 0; i < jets.size(); ++i) {
-
-	    if ( jets[i]->pt() > htThreshold){
-
-		jetsAboveThresh++;
-		ht   += jets[i]->pt();
-		mhtX += jets[i]->px();
-		mhtY += jets[i]->py();
-	    }
-	    else{break;}
-	}
-	double mht = sqrt(mhtX*mhtX + mhtY*mhtY);
-	alphatSums hSumVec;
-	//
-	double phi = atan2(mhtY,mhtX) + PI;
-
-	//Make sure Phi is in range -pi to pi
-	phi = (phi>PI) ? phi-2.0*PI : phi;
-
-	// Minimum Delta Et for two pseudo-jets
-	//  if ( (jets.size() > 1) && jets.size() <= maxjet) // bit harsh - removes events with large jet multiplicities
-	double alphaT = 0.;
-	double min_delta_sum_et = -1.;
-	if (jetsAboveThresh > 1)
-	{
-
-	    unsigned int jetLimit = jetsAboveThresh;
-	    if ( jetLimit > maxJet){ jetLimit = maxJet; }
-
-	    //      for ( unsigned i=0; i < unsigned(1<<(jets.size()-1)); i++ )  //@@ iterate through different combinations
-	    for ( unsigned i=0; i < unsigned(1<<( jetLimit - 1)); i++ ) { //@@ iterate through different combinations
-		double delta_sum_et = 0.;
-		for ( unsigned j=0; j < jetLimit; j++ ) { //@@ iterate through jets
-		    delta_sum_et += jets.at(j)->pt() * ( 1 - 2 * (int(i>>j)&1) ); 
-		}
-		if ( ( fabs(delta_sum_et) < min_delta_sum_et || min_delta_sum_et < 0. ) ) {
-		    min_delta_sum_et = fabs(delta_sum_et);
-		}
-	    }
-	    if ( min_delta_sum_et < 0. ) { alphaT=0.; }
-
-	    // Alpha_T
-	    alphaT = 0.5 * ( ht - min_delta_sum_et ) / sqrt( ht*ht - (mht*mht) );
-	    if (alphaT > 10){ alphaT = 10; }
-	    //    return ( 0.5 * ( sum_et - min_delta_sum_et ) / sqrt( sum_et*sum_et - (sum_met*sum_met) ) );
-	}
-	else
-	{
-	    alphaT = 0.;
-	}
-
-	hSumVec.ht=ht;
-	hSumVec.dht=min_delta_sum_et;
-	hSumVec.mht = mht;
-	hSumVec.phi =phi;
-	hSumVec.mhtx = mhtX;
-	hSumVec.mhty = mhtY;
-	hSumVec.alphat = alphaT;
-
-	return hSumVec;
-    }
-
 
     inline float deltaPhi( float phi1, float phi2 ){
 
@@ -595,10 +553,8 @@ namespace {
 
 
 
-
   std::pair<float, float> calculateAlphaTHT(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
-      
-
+     
       // Momentum sums in transverse plane
       float sum_et(0), sum_px(0), sum_py(0);
 
@@ -718,7 +674,10 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   // Get the PAT TriggerEvent
   edm::Handle< pat::TriggerEvent > triggerEvent;
   iEvent.getByLabel( "patTriggerEvent", triggerEvent );
+
   
+
+
   // Get a vector of all HLT paths
   std::vector<pat::TriggerPath> const* paths = triggerEvent->paths();
   
@@ -751,6 +710,87 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
    // std::cout << "Tree: " << HLT_PFHT900_v1 << "\t" << HLT_PFHT350_PFMET120_NoiseCleaned_v1 << "\t" 
    // 	    << HLT_HT200_AlphaT0p4_v1 << "\t" << HLT_HT200_PFAlphaT0p4_v1    << "\n";
+
+
+
+
+  // Extracting triggerRefs
+
+  // // get event products
+  // iEvent.getByToken(triggerResultsToken_,triggerResultsHandle_);
+  // if (!triggerResultsHandle_.isValid()) {
+  //   std::cout << "HLTEventAnalyzerRAW::analyze: Error in getting TriggerResults product from Event!" << std::endl;
+  //   return;
+  // }
+  // iEvent.getByToken(triggerEventWithRefsToken_,triggerEventWithRefsHandle_);
+  // if (!triggerEventWithRefsHandle_.isValid()) {
+  //   std::cout << "HLTEventAnalyzerRAW::analyze: Error in getting TriggerEventWithRefs product from Event!" << std::endl;
+  //   return;
+  // }
+
+
+
+  // const unsigned int n(hltConfig_.size());
+  // const unsigned int triggerIndex(hltConfig_.triggerIndex(triggerName));
+  // assert(triggerIndex==iEvent.triggerNames(*triggerResultsHandle_).triggerIndex(triggerName));
+
+  // // abort on invalid trigger name
+  // if (triggerIndex>=n) {
+  //   std::cout << "HLTEventAnalyzerRAW::analyzeTrigger: path "
+  // 	      << triggerName << " - not found!" << std::endl;
+  //   return;
+  // }
+  
+  // std::cout << "HLTEventAnalyzerRAW::analyzeTrigger: path "
+  // 	    << triggerName << " [" << triggerIndex << "]" << std::endl;
+  // // modules on this trigger path
+  // const unsigned int m(hltConfig_.size(triggerIndex));
+  // const vector<string>& moduleLabels(hltConfig_.moduleLabels(triggerIndex));
+
+  // // Results from TriggerResults product
+  // std::cout << " Trigger path status:"
+  //      << " WasRun=" << triggerResultsHandle_->wasrun(triggerIndex)
+  //      << " Accept=" << triggerResultsHandle_->accept(triggerIndex)
+  //      << " Error =" << triggerResultsHandle_->error(triggerIndex)
+  // 	    << std::endl;
+
+
+  // const unsigned int moduleIndex(triggerResultsHandle_->index(triggerIndex));
+  // std::cout << " Last active module - label/type: "
+  //      << moduleLabels[moduleIndex] << "/" << hltConfig_.moduleType(moduleLabels[moduleIndex])
+  //      << " [" << moduleIndex << " out of 0-" << (m-1) << " on this path]"
+  //      << std::endl;
+
+  // for (unsigned int j=0; j<=moduleIndex; ++j) {
+  //   const string& moduleLabel(moduleLabels[j]);
+  //   const string  moduleType(hltConfig_.moduleType(moduleLabel));
+  //   // check whether the module is packed up in TriggerEventWithRef product
+  //   const unsigned int filterIndex(triggerEventWithRefsHandle_->filterIndex(InputTag(moduleLabel,"",processName_)));
+  //   if (filterIndex<triggerEventWithRefsHandle_->size()) {
+  //     std::cout << " Filter in slot " << j << " - label/type " << moduleLabel << "/" << moduleType << endl;
+  //     std::cout << " Filter packed up at: " << filterIndex << endl;
+  //     std::cout << "  Accepted objects:" << endl;
+
+
+
+  //     jetIds_.clear();
+  //     triggerEventWithRefsHandle_->getObjects(filterIndex,jetIds_,jetRefs_);
+  //     const unsigned int nJets(jetIds_.size());
+  //     if (nJets>0) {
+  // 	std::cout << "   Jets: " << nJets << "  - the objects: # id pt" << std::endl;
+  // 	for (unsigned int i=0; i!=nJets; ++i) {
+  // 	  std::cout << "   " << i << " " << jetIds_[i]
+  // 	       << " " << jetRefs_[i]->pt()
+  // 	       << std::endl;
+  // 	}
+  //     }
+      
+      
+      
+  //   }
+  // }
+
+
 
 
   // ------------------------------------------------------------------------------------------------------------------------
