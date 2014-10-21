@@ -4,8 +4,8 @@
 #define HLT_CALOJET
 
 
-float caloJetThreshold = 50; //50;
-float pfJetThreshold   = 50; //50;
+float caloJetThreshold = 40; //50;
+float pfJetThreshold   = 40; //50;
 float secondJetThreshold = 100;
 
 const int N_50NS_BUNCHES = 1368;
@@ -217,7 +217,7 @@ void makeSUSYHLTAlphaT(){
   sample test = sample("test", branch, "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_2_0_pre6/src/AlphaTHLT/MakeTree/test/QCD_Pt-30to50_Tune4C_13TeV_pythia8.root", 161500000);
 
   // ------------------------------------------------------------------------------------------------------------------------
-  sample selectedSample =  QCD30to50; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
+  sample selectedSample =  QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
 
   // Label QCD ptHat bins
   int samplePTHat = 0;
@@ -518,9 +518,9 @@ void makeSUSYHLTAlphaT(){
   // Trigger bits 
   for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
     TString path = hltPathNames[ iPath ];
-    histHLTRate[ path ]                  = new TH1D( path, path + ";Entries;Fired", 2, 0, 2.);
-    histHLTRate[ path  + "_AND_HTT175" ] = new TH1D( path + "_AND_HTT175", path + ";Entries;Fired", 2, 0, 2.);
-    histHLTRate[ path  + "_AND_Trig1" ]  = new TH1D( path + "_AND_Trig1", path + ";Entries;Fired", 2, 0, 2.);
+    // histHLTRate[ path ]                  = new TH1D( path, path + ";Entries;Fired", 2, 0, 2.);
+    // histHLTRate[ path  + "_AND_HTT175" ] = new TH1D( path + "_AND_HTT175", path + ";Entries;Fired", 2, 0, 2.);
+    // histHLTRate[ path  + "_AND_Trig1" ]  = new TH1D( path + "_AND_Trig1", path + ";Entries;Fired", 2, 0, 2.);
 
 
     // Get pt hat breakdown of rate of the triggers
@@ -528,6 +528,20 @@ void makeSUSYHLTAlphaT(){
     makePTHatBinnedHist( histHLTRate, path + "_AND_HTT175");
     makePTHatBinnedHist( histHLTRate, path + "_AND_Trig1");
     
+    
+    // Add alphaT with second jet threshold
+
+    if ( path.Contains("L1HTT175OrETM70_v1") && !path.Contains("AlphaT0p5_") ){
+      for (uint iJet2Cut = 0; iJet2Cut < jet2PTCuts.size(); ++iJet2Cut){
+      	TString newPath = path;
+	
+	float jet2PTCut = jet2PTCuts[ iJet2Cut ];
+	TString jet2PTCutStr = "Jet2gt" + TString(Form("%1.0f", jet2PTCut ));
+	newPath = newPath.ReplaceAll( "L1HTT175OrETM70_v1", jet2PTCutStr + TString("_L1HTT175OrETM70_v1") );
+
+	makePTHatBinnedHist( histHLTRate, newPath );
+      }
+    }
 
   }
   
@@ -1039,28 +1053,28 @@ void makeSUSYHLTAlphaT(){
 	bool HLT1(false), HLT2(false), HLT3(false), HLT4(false), HLT5(false);
 #ifdef HLT_CALOJET
 	if (jet2PTCut == 100.){
-	  HLT1 = ( (caloHT >= 240)  && (caloAlphaTStandard >= 0.92) );
-	  HLT2 = ( (caloHT >= 280)  && (caloAlphaTStandard >= 0.71) );
-	  HLT3 = ( (caloHT >= 320)  && (caloAlphaTStandard >= 0.64) );
-	  HLT4 = ( (caloHT >= 360)  && (caloAlphaTStandard >= 0.60) );
-	  HLT5 = ( (caloHT >= 400)  && (caloAlphaTStandard >= 0.58) );
+	  HLT1 = ( (caloHT > 240)  && (caloAlphaTStandard > 0.92) );
+	  HLT2 = ( (caloHT > 280)  && (caloAlphaTStandard > 0.71) );
+	  HLT3 = ( (caloHT > 320)  && (caloAlphaTStandard > 0.64) );
+	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.60) );
+	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.58) );
 	}
 	else if(jet2PTCut == 50.){
-	  HLT4 = ( (caloHT >= 360)  && (caloAlphaTStandard >= 0.78) );
-	  HLT5 = ( (caloHT >= 400)  && (caloAlphaTStandard >= 0.69) );
+	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.78) );
+	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.69) );
 	}
 #else
 	if (jet2PTCut == 100.){
-	  HLT1 = ( (caloHT >= 240)  && (caloAlphaTStandard >= 0.90) );
-	  HLT2 = ( (caloHT >= 280)  && (caloAlphaTStandard >= 0.64) );
-	  HLT3 = ( (caloHT >= 320)  && (caloAlphaTStandard >= 0.61) );
-	  HLT4 = ( (caloHT >= 360)  && (caloAlphaTStandard >= 0.57) );
-	  HLT5 = ( (caloHT >= 400)  && (caloAlphaTStandard >= 0.55) );
+	  HLT1 = ( (caloHT > 240)  && (caloAlphaTStandard > 0.90) );
+	  HLT2 = ( (caloHT > 280)  && (caloAlphaTStandard > 0.64) );
+	  HLT3 = ( (caloHT > 320)  && (caloAlphaTStandard > 0.61) );
+	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.57) );
+	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.55) );
 	}
 	else if(jet2PTCut == 50.){
-	  HLT3 = ( (caloHT >= 320)  && (caloAlphaTStandard >= 0.79) );
-	  HLT4 = ( (caloHT >= 360)  && (caloAlphaTStandard >= 0.64) );
-	  HLT5 = ( (caloHT >= 400)  && (caloAlphaTStandard >= 0.59) );
+	  HLT3 = ( (caloHT > 320)  && (caloAlphaTStandard > 0.79) );
+	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.64) );
+	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.59) );
 	}
 #endif
 	if (passesOffVetoes && passesOffJet){
@@ -1359,18 +1373,18 @@ void makeSUSYHLTAlphaT(){
     // ************************************************************
     for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
       TString path = hltPathNames[ iPath ];
-      histHLTRate[path] ->Fill( hltPathFired[ path ] );
+      //histHLTRate[path] ->Fill( hltPathFired[ path ] );
       histHLTRate[path + "_PTHat"]->Fill( hltPathFired[ path ] );
       histHLTRate[path + "_PTHat"]->Fill( samplePTHat, hltPathFired[ path ] );
 
 
       if ( l1HTT175 ){
-	histHLTRate[ path + "_AND_HTT175" ]     ->Fill( hltPathFired[ path ] );
+	//histHLTRate[ path + "_AND_HTT175" ]     ->Fill( hltPathFired[ path ] );
 	histHLTRate[ path + "_AND_HTT175_PTHat"]->Fill( hltPathFired[ path ] );
 	histHLTRate[ path + "_AND_HTT175_PTHat"]->Fill( samplePTHat, hltPathFired[ path ] );
       }
       if ( l1Trig1 ){
-	histHLTRate[ path + "_AND_Trig1"]      ->Fill( hltPathFired[ path ] );
+	//	histHLTRate[ path + "_AND_Trig1"]      ->Fill( hltPathFired[ path ] );
 	histHLTRate[ path + "_AND_Trig1_PTHat"]->Fill( hltPathFired[ path ] );
         histHLTRate[ path + "_AND_Trig1_PTHat"]->Fill( samplePTHat, hltPathFired[ path ] );
       }
@@ -1467,11 +1481,11 @@ void makeSUSYHLTAlphaT(){
 	  // Emulate AlphaT HLTrigger
 	  // ********************************************************************************
 	  if (l1Trig1){
-	    if ( (caloHT >= 200) && (caloAlphaTStandard >= 0.57) ){ legacyAlphaTHT200 = true; }
-	    if ( (caloHT >= 250) && (caloAlphaTStandard >= 0.55) ){ legacyAlphaTHT250 = true; }
-	    if ( (caloHT >= 300) && (caloAlphaTStandard >= 0.53) ){ legacyAlphaTHT300 = true; }
-	    if ( (caloHT >= 350) && (caloAlphaTStandard >= 0.52) ){ legacyAlphaTHT350 = true; }
-	    if ( (caloHT >= 400) && (caloAlphaTStandard >= 0.51) ){ legacyAlphaTHT400 = true; }
+	    if ( (caloHT > 200) && (caloAlphaTStandard > 0.57) ){ legacyAlphaTHT200 = true; }
+	    if ( (caloHT > 250) && (caloAlphaTStandard > 0.55) ){ legacyAlphaTHT250 = true; }
+	    if ( (caloHT > 300) && (caloAlphaTStandard > 0.53) ){ legacyAlphaTHT300 = true; }
+	    if ( (caloHT > 350) && (caloAlphaTStandard > 0.52) ){ legacyAlphaTHT350 = true; }
+	    if ( (caloHT > 400) && (caloAlphaTStandard > 0.51) ){ legacyAlphaTHT400 = true; }
 	  }
 	  firesLegacyAlphaT = ( legacyAlphaTHT200 || legacyAlphaTHT250 || 
 				legacyAlphaTHT300 || legacyAlphaTHT350 ||
@@ -1561,27 +1575,39 @@ void makeSUSYHLTAlphaT(){
       // Breakdown of triggers fired
       if ( firesLegacyAlphaT ){
 	    
+	TString hltJet2 = jet2PTCutStr + TString("_L1HTT175OrETM70_v1_PTHat");
+
 	if (legacyAlphaTHT200){
 	  histHLTRate["LegacyAlphaT_HT200_" + jet2PTCutStr + "_vs_NVTX"]->Fill( NVTX );
+	  histHLTRate[ "HLT_HT200_AlphaT0p57_" + hltJet2]->Fill( hltPathFired["HLT_HT200_AlphaT0p57_L1HTT175OrETM70_v1"] );
+	  histHLTRate[ "HLT_HT200_AlphaT0p57_" + hltJet2]->Fill( samplePTHat, hltPathFired["HLT_HT200_AlphaT0p57_L1HTT175OrETM70_v1"] );
 	  histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr]->Fill( 2.5, firesSUSYMenu);
 	}
 	if (legacyAlphaTHT250){
 	  histHLTRate["LegacyAlphaT_HT250_" + jet2PTCutStr + "_vs_NVTX"]->Fill( NVTX );
+	  histHLTRate[ "HLT_HT250_AlphaT0p55_" + hltJet2]->Fill( hltPathFired["HLT_HT250_AlphaT0p55_L1HTT175OrETM70_v1"] );
+	  histHLTRate[ "HLT_HT250_AlphaT0p55_" + hltJet2]->Fill( samplePTHat, hltPathFired["HLT_HT250_AlphaT0p55_L1HTT175OrETM70_v1"] );
 	  histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr]->Fill( 3.5, firesSUSYMenu);
 	}
 	if (legacyAlphaTHT300){
 	  histHLTRate["LegacyAlphaT_HT300_" + jet2PTCutStr + "_vs_NVTX"]->Fill( NVTX );
+	  histHLTRate[ "HLT_HT300_AlphaT0p53_" + hltJet2]->Fill( hltPathFired["HLT_HT300_AlphaT0p53_L1HTT175OrETM70_v1"] );
+	  histHLTRate[ "HLT_HT300_AlphaT0p53_" + hltJet2]->Fill( samplePTHat, hltPathFired["HLT_HT300_AlphaT0p53_L1HTT175OrETM70_v1"] );
 	  histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr]->Fill( 4.5, firesSUSYMenu);
 	}
 	if (legacyAlphaTHT350){
 	  histHLTRate["LegacyAlphaT_HT350_" + jet2PTCutStr + "_vs_NVTX"]->Fill( NVTX );
+          histHLTRate[ "HLT_HT350_AlphaT0p52_" + hltJet2]->Fill( hltPathFired["HLT_HT350_AlphaT0p52_L1HTT175OrETM70_v1"] );
+          histHLTRate[ "HLT_HT350_AlphaT0p52_" + hltJet2]->Fill( samplePTHat, hltPathFired["HLT_HT350_AlphaT0p52_L1HTT175OrETM70_v1"] );
 	  histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr]->Fill( 5.5, firesSUSYMenu);
 	}
 	if (legacyAlphaTHT400){
 	  histHLTRate["LegacyAlphaT_HT400_" + jet2PTCutStr + "_vs_NVTX"]->Fill( NVTX );
+	  histHLTRate[ "HLT_HT400_AlphaT0p51_" + hltJet2]->Fill( hltPathFired["HLT_HT400_AlphaT0p51_L1HTT175OrETM70_v1"] );
+	  histHLTRate[ "HLT_HT400_AlphaT0p51_" + hltJet2]->Fill( samplePTHat, hltPathFired["HLT_HT400_AlphaT0p51_L1HTT175OrETM70_v1"] );
 	  histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr]->Fill( 6.5, firesSUSYMenu);
 	}
-	  
+
       }
       if ( firesSUSYMenu ){
 	
@@ -1632,6 +1658,7 @@ void makeSUSYHLTAlphaT(){
   fOut->mkdir("Raw");
   fOut->mkdir("Raw/Efficiency");
   fOut->mkdir("Raw/HLTEfficiency");
+  fOut->mkdir("Raw/HLTRateRaw");
   fOut->mkdir("Raw/HLTRate");
   fOut->mkdir("Raw/Rate");
   fOut->mkdir("Raw/Correlations");
@@ -1744,9 +1771,10 @@ void makeSUSYHLTAlphaT(){
   for(std::map<TString, TH1*>::const_iterator itr = histHLTRate.begin(); itr != histHLTRate.end(); ++itr){
 
     TString histoName = itr->first; //Extract the histogram key 
-    fOut->cd("Raw/HLTRate");
+    fOut->cd("Raw/HLTRateRaw");
     itr->second->Write();
 
+    fOut->cd("Raw/HLTRate");
     TH1* rateHist = (TH1F*)itr->second->Clone();
     rateHist->SetName( histoName + "_TrueRate" );
     rateHist->GetYaxis()->SetTitle("Rate (Hz)");
@@ -1758,9 +1786,10 @@ void makeSUSYHLTAlphaT(){
   for(std::map<TString, TH2*>::const_iterator itr = histHLTRate2D.begin(); itr != histHLTRate2D.end(); ++itr){
 
     TString histoName = itr->first; //Extract the histogram key 
-    fOut->cd("Raw/HLTRate");
+    fOut->cd("Raw/HLTRateRaw");
     itr->second->Write();
 
+    fOut->cd("Raw/HLTRate");
     TH2* rateHist = (TH2F*)itr->second->Clone();
     rateHist->SetName( histoName + "_TrueRate" );
     rateHist->Scale( rateScaleFactor );
