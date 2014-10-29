@@ -1,4 +1,4 @@
-//#define TEST
+#define TEST
 //#define SIGNAL
 #define NEUTRINO
 #define HLT_CALOJET
@@ -48,7 +48,6 @@ const double PB_TO_CM2      = 1e-36;
 
 
 // Function prototypes
-//TH2D * makeCumu(TH2D * input);
 void reverseCumulative( TH1* histogram, TH1* rCumulHist, double scale);
 void reverseCumulative2D( TH2* histogram, TH2* rCumulHist, double scale);
 void fillUniform2D( TH2* histogram, double value);
@@ -58,179 +57,13 @@ void clearRectangleX( TH1* histogram, float cut );
 void fillUniformY( TH2* histogram, TH2* rCumulHist);
 void reverseCumulativeY( TH2* histogram, TH2* rCumulHist, double scale);
 
-std::vector< std::pair< int, int> > getEfficiencyBins( TH2* histogram, double maxRate );
-bool passesAlphaTSelection( std::vector<float> *jetPT, int &jetsAbove50 );
-
-
-
-
-float calculateAlphaT( std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold );
-float calculateDynamicAlphaT(std::vector<float> *jetPT, std::vector<float> *jetPx,
-			     std::vector<float> *jetPy, //float jetThreshold,
-			     uint maxJets,
-			     float dynamicJetThreshold, float dynamicAlphaTThreshold);
-std::pair<float,float> calculateDynamicAlphaTHT(std::vector<float> *jetPT, std::vector<float> *jetPx,
-						std::vector<float> *jetPy, //float jetThreshold,
-						uint maxJets,
-                                                float dynamicJetThreshold, float dynamicAlphaTThreshold, float dynamicHTThreshold);
-
-std::vector<std::pair<float,float> > calculateDynamicAlphaTPairs(std::vector<float> *jetPT, std::vector<float> *jetPx,
-								 std::vector<float> *jetPy, //float jetThreshold,
-								 uint maxJets, float dynamicJetThreshold);
-
-
-
-//float const  PI        = TMath::Pi();
-
-
-struct triggerFiredBin{
-  int xBin;
-  int yBin;
-  triggerFiredBin():xBin(0),yBin(0){};
-  triggerFiredBin(int aXBin, int aYBin):xBin(aXBin),yBin(aYBin){};
-};
-
-class dynamicRate{
-
-private:
-  // Fired, < xBin, yBin >
-  std::vector< triggerFiredBin >     firedBin;
-  std::vector< std::vector< bool > > cumulativeFired;
-
-
-
-  void integrate(){
-
-    //    std::cout << "1\n";
-    // Store fired bins in array
-    for (uint iFired = 0; iFired < firedBin.size(); ++iFired){
-      //      std::cout << "Fired bin = " << firedBin[iFired].xBin << "\t" << firedBin[iFired].yBin << "\n";
-      cumulativeFired[ firedBin[iFired].xBin ][ firedBin[iFired].yBin ] = true;
-    }
-
-//      std::cout << "Input:\n";
-//      print();
-
-    // Integrate fired bins over y
-    for (int x = xBins - 1;x > -1;--x){
-      for (int y = yBins - 2;y > -1;--y){
-	if ( cumulativeFired[ x ][ y + 1 ] == true ){
-	  cumulativeFired[ x ][ y ] = cumulativeFired[ x ][ y + 1 ] ;
-	}
-      }
-    }
-
-//      std::cout << "Int x:\n";
-//      print();
-    
-    // Integrate fired bins over x
-    for (int y = yBins - 1;y > -1;--y){
-      for (int x = xBins - 2;x > -1;--x){
-	if ( cumulativeFired[ x + 1 ][ y ] == true ){
-	  cumulativeFired[ x ][ y ] = cumulativeFired[ x + 1 ][ y ] ;
-	}
-      }
-    }
-
-//      std::cout << "Int y:\n";
-//      print();
-
-  }
-  void addToSum(){
-    
-    for (int y = 0;y < yBins;++y){
-      for (int x = 0;x < xBins;++x){
-	
-	if ( cumulativeFired[x][y] == true ){ cumulativeSum[x][y]++; }
-	else{ break; }
-	
-      }
-    }
-    
-  }
-  void reset(){
-    firedBin.clear();
-    cumulativeFired.clear();
-    cumulativeFired.resize( xBins, std::vector<bool>( yBins, false ) );
-
-  }
-
-public:
-
-
-  int xBins;
-  float xMin;
-  float xMax;
-  int yBins;
-  float yMin;
-  float yMax;
-
-
-  std::vector< std::vector< int > >  cumulativeSum;
-
-
-  dynamicRate():xBins(0),xMin(0),xMax(0),yBins(0),yMin(0),yMax(0){};
-  dynamicRate(int aXBins, float aXMin, float aXMax, int aYBins, float aYMin, float aYMax):xBins(aXBins),xMin(aXMin),xMax(aXMax),yBins(aYBins),yMin(aYMin),yMax(aYMax){
-    cumulativeFired.resize( xBins, std::vector<bool>( yBins, false ) );
-    cumulativeSum.resize(   xBins, std::vector<int> ( yBins, 0 ) );
-  };
-  
-  void triggerFired( float x, float y ){
-
-    int xBin = floor( (x - xMin)/(xMax - xMin)*xBins);
-    int yBin = floor( (y - yMin)/(yMax - yMin)*yBins);
-
-    //    std::cout << "HT = " << x << "\tAlphaT = " << y << "\n";
-    
-    // Discard underflow
-    if ( (xBin < 0) || (yBin < 0) ){ return; }
-    // Keep overflow
-    if ( xBin >= xBins ){ xBin = xBins - 1; }
-    if ( yBin >= yBins ){ yBin = yBins - 1; }
-
-    //    std::cout << "xBin = " << xBin << "\tyBin = " << yBin << "\n\n";
-    firedBin.push_back( triggerFiredBin( xBin, yBin ) );
-  }
-  void endEvent(){
-    integrate();
-    addToSum();
-
-    reset();
-  }
-      
-  void print(){
-
-//     for (uint y = yBins - 1;y > 0;--y){
-//       for (uint x = 0;x < xBins;++x){
-// 	std::cout << cumulativeFired[x][y] << " ";
-// 	//	std::cout << "(" << x << ", " << y << ") = " << cumulativeFired[x][y] << "\n";
-//       }
-//       std::cout << "\n";
-//     }
-    
-    for (int y = yBins - 1;y > 0;--y){
-      for (int x = 0;x < xBins;++x){
-	std::cout << cumulativeSum[x][y] << " ";
-	//	std::cout << "(" << x << ", " << y << ") = " << cumulativeFired[x][y] << "\n";
-      }
-      std::cout << "\n";
-    }
-    
-  }
-  
-  
-};
-
 
 
 // ********************************************************************************
 // *                                  Selections                                  *
 // ********************************************************************************
 
-
-const int MAX_JETS = 4;
-
-
+  const int MAX_JETS = 4;
 
   // Dynamic alphaT variables
   int maxCaloJet              = 15;
@@ -245,25 +78,7 @@ const int MAX_JETS = 4;
 
 // ********************************************************************************
 
-
-
-int    nHTBINS = 3;
-double HTBINS[] = {200,275,325,375};
-
-// int    nHTBINS  = 10;
-// double HTBINS[] = {200, 275, 325, 375, 475, 575, 675, 775, 875, 975, 1075};
-
-int    nJetBINS = 3;
-double JetBINS[] = {1.5,2.5,3.5,4.5};
-int    nAlphaTBINS = 10;
-double AlphaTBINS[] = {0.3,0.35,0.4,0.45,0.5,0.55,0.60,0.65,0.70,0.75,0.8};
-
-
-
-
-
 unsigned int maxEvents(100000);
-
 
 struct sample{
   TString Name;
@@ -275,15 +90,6 @@ struct sample{
     Chain->Add( files );
   }
 };
-
-// struct sampleCollection{
-//   std::map<TString, sample> Sample;
-//   void AddSample( TString name, TString branch, TString files, double xs ){
-//     Sample[ name ] = sample( branch, files, xs );
-//   }
-// }
-
-
 
 void makePTHatBinnedHist( std::map<TString, TH1*> &hist, TString name ){
   
@@ -2816,118 +2622,5 @@ void fillUniform2D( TH2* histogram, double value){
   }      
 
 }
-
-
-// Return the bins for seed1 vs seed2 correlations for which the rate is below a given threshold
-std::vector< std::pair< int, int> > getEfficiencyBins( TH2* histogram, double maxRate ){
-
-  std::vector< std::pair< int, int> > selectedBins;
-
-  // Find bin with minimum cut for acceptable rate
-  int nBinsX          = histogram->GetNbinsX();
-  int nBinsY          = histogram->GetNbinsY();
-  
-  // Scan each y column for constant x to find minimum threshold that is below cut
-  for ( int iBinX = 0; iBinX <= nBinsX; ++iBinX ){     
-
-    for ( int iBinY = 0; iBinY <= nBinsY; ++iBinY ){
-      float currRate = histogram->GetBinContent( iBinX, iBinY );
-    
-
-      std::cout << currRate << "\t" << iBinX << "\t" << iBinY << "\n";
-//       if ( (iBinY == 0) && (currRate == 0) ){ break; }
-
-//       if ( currRate < maxRate ){
-// 	//	iBinY -= 1; // previous bin was last below acceptable rate
-
-// 	std::cout << "Selected: " << currRate << "\t" << iBinX << "\t" << iBinY << "\n\n";                                        
-// 	selectedBins.push_back( std::make_pair(iBinX, iBinY) );                                                                   
-// 	break;                                                 
-//       }
-
-            if ( fabs( currRate - maxRate ) < maxRate/2.){
-	      //	std::cout << currRate << "\t" << iBinX << "\t" << iBinY << "\n";
-	      if ( currRate < maxRate ){
-	  	  std::cout << "Selected: " << currRate << "\t" << iBinX << "\t" << iBinY << "\n\n";
-		  selectedBins.push_back( std::make_pair(iBinX, iBinY) );
-		  break;
-	      }
-	    }
-    }
-  }
-  
-  return selectedBins;
-}
-
-bool passesAlphaTSelection( std::vector<float> *jetPT, int &jetsAbove50 ){
-
-    bool passesAlphaT(true);
-    for (unsigned int iJet = 0; iJet < jetPT->size(); ++iJet ){
-      
-      float jetPt = (*jetPT)[ iJet ];
-
-      // Leading two jet cut
-      if ( (iJet+1 <= 2) && ( jetPt < 100. ) ){
-	passesAlphaT = false;
-	break;
-      }
-
-      if ( jetPt > 50. ){ jetsAbove50++; }
-      else{ break; }
-
-    }
-    // Require at least two jets
-    if ( (passesAlphaT) && ( jetsAbove50 < 2 ) ){
-      passesAlphaT = false;
-    }
-
-    return passesAlphaT;
-}
-
-
-
-// Check whether event passes low-HT alpha analysis cuts
-inline bool passesAlphaTFullSelection( std::vector<float> *jetPT, float HT, float AlphaT, int &jetsAbove50 ){
-  // Offline HT alphaT cuts
-  bool ht200to275(false), ht275to325(false), ht325to375(false);
-  if ( ((HT >= 200) && (HT < 275)) && (AlphaT > 0.65) ){ ht200to275 = true; }
-  if ( ((HT >= 275) && (HT < 325)) && (AlphaT > 0.60) ){ ht275to325 = true; }
-  if ( ((HT >= 325) && (HT < 375)) && (AlphaT > 0.55) ){ ht325to375 = true; }
-
-
-
-  for (unsigned int iJet = 0; iJet < jetPT->size(); ++iJet ){
-      
-      float jetPt = (*jetPT)[ iJet ];
-
-      // Leading two jet cut
-      if ( (iJet+1 <= 2) && ( jetPt < 100. ) ){
-	return false;
-      }
-      if ( jetPt > 50. ){ jetsAbove50++; }
-      else{ break; }
-
-  }
-  
-  // Count number of analysis jets
-  if ( jetsAbove50 > MAX_JETS ){
-    jetsAbove50 = MAX_JETS;
-  }
-
-
-  if ( (*jetPT)[1] >= 100  ){
-    if ( ht200to275 || ht275to325 || ht325to375 ){
-      return true;
-    }
-  }
-  return false;
-}
-
-
-
-
-
-
-
 
 
