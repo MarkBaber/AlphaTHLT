@@ -283,23 +283,9 @@ from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
 process = customisePostLS1(process)
 
 # override the GlobalTag, connection string and pfnPrefix 
-GT = "NEW"
+GT = "50ns"
 
-# OLD INCORRECT GT
-if GT == "OLD":
-    if 'GlobalTag' in process.__dict__:
-        from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'auto:run2_mc_GRun')
-        process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
-        process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-        for pset in process.GlobalTag.toGet.value():
-            pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-        # fix for multi-run processing 
-        process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
-        process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
-    
-# NEW CORRECT GT?
-elif GT == "NEW":
+if GT == "25ns":
     if 'GlobalTag' in process.__dict__:
         from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag 
         process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V1A::All') 
@@ -310,6 +296,18 @@ elif GT == "NEW":
         # fix for multi-run processing 
         process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
         process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+elif GT == "50ns":
+    if 'GlobalTag' in process.__dict__:
+        from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag 
+        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V0A::All') 
+        process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
+        process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+        for pset in process.GlobalTag.toGet.value():
+            pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
+        # fix for multi-run processing 
+        process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
+        process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+
 
 # customize the L1 emulator to run customiseL1EmulatorFromRaw with HLT to switchToSimStage1Digis 
 process.load( 'Configuration.StandardSequences.RawToDigi_cff' )
