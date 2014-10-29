@@ -123,7 +123,7 @@ void makeSUSYHLTAlphaT(){
   // ------------------------------------------------------------------------------------------------------------------------
   TString branch    = "MakeTrees/Ntuple";
 
-    TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC
+  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC
   //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/22Oct14_50ns/";  // pre8 with correct JEC, 50ns
 
   // Automatically determine bunch spacing
@@ -234,40 +234,17 @@ void makeSUSYHLTAlphaT(){
 
   // Sample cross section (cm^2)
   double sampleXS = PB_TO_CM2 * selectedSample.CrossSection;
-  // ------------------------------------------------------------------------------------------------------------------------
-
-
-  // rate_mc = collrate * (1 - math.exp(-1* (xs*ilumi*counts/nevt)/collrate))
-  //     collrate = (nfillb/mfillb)/xtime
-  //     nfillb = the number of filled bunches (usually 2662 for 25ns bunch spacing, 1331 for 50ns bunch spacing)
-  //     mfillb = the maximum number of bunches, which is 3564
-  //     xtime = the spacing between the bunches (25e-9 for 25ns bunch spacing, 50e-9 for 50ns bunch spacing)
-  //     xs = the cross section of your sample multiplied by 1e-36 to convert from pb to cm^2
-  //     ilumi = the luminosity you want to find the rate for. For example, the biggest luminosity we can 
-  //             achieve in 2015 with 25ns bunch spacing is estimated to be 1.4e34
-  //     counts = the number of events that pass your trigger
-  //     nevt = the total number of events of your sample
-
 
   // ------------------------------------------------------------------------------------------------------------------------
-
 
   unsigned int nuNEvents  = (unsigned int)rateChain ->GetEntries(); 
   unsigned int sigNEvents = (unsigned int)sigChain  ->GetEntries();
-
 
   // New scale factor calculation for QCD samples
   double rateScaleFactor = (sampleXS * instLumi)/nuNEvents;
   if (selectedSample.Name == "NuGun"){
     rateScaleFactor = double(ZB_XSECTION)/nuNEvents;
   }
-
-    // rate_mc_simple = (xs * ilumi * counts)/nevt
-    // The equation for the error of your rate is:
-    // rateerr_mc = xs * ilumi * ((math.sqrt(counts + ((counts)**2)/nevt))/nevt)
-    //   rateerr_mc_simple = ((xs * ilumi)/nevt)*math.sqrt(counts) 
-    //   So if you use several samples (like QCD binned in Pt), you 
-
 
   // Output files
   TFile* fOut = new TFile("output/" + selectedSample.Name + "_" + ntupleType + ".root","recreate");
@@ -657,16 +634,15 @@ void makeSUSYHLTAlphaT(){
     // hist2DOnEff[dyn2Str + "_Inclusive"] = new TEfficiency(dyn2Str + "_Inclusive","Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} efficiency inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
     // hist2DOnEff[dyn3Str + "_Inclusive"] = new TEfficiency(dyn3Str + "_Inclusive","Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} efficiency inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 
-    hist2DRate[stdStrRate  + "_Inclusive"] = new TH2D(stdStr  + "_InclusiveRate","Calojet #alpha_{T}^{static} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-    hist2DRate[dynStrRate  + "_Inclusive"] = new TH2D(dynStrRate  + "_InclusiveRate","Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-    // hist2DRate[dyn2Str + "_Inclusive"] = new TH2D(dyn2Str + "_InclusiveRate","Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-    // hist2DRate[dyn3Str + "_Inclusive"] = new TH2D(dyn3Str + "_InclusiveRate","Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 
     // Make candidate L1 trigger plots
     for (uint trigN = 1; trigN <= 1; ++trigN ){
       TString trigStr = TString("Trig") + Form("%d", trigN);
 
       hist2DRate[trigStr + stdStrRate  + "_Inclusive"] = new TH2D(trigStr + stdStrRate  + "_Inclusive",trigStr + " Calojet #alpha_{T}^{static} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+      hist2DRate[trigStr + dynStrRate  + "_Inclusive"] = new TH2D(trigStr + dynStr  + "_Inclusive",trigStr + " Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+      // hist2DRate[trigStr + dyn2Str + "_Inclusive"] = new TH2D(trigStr + dyn2Str + "_Inclusive",trigStr + " Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+      // hist2DRate[trigStr + dyn3Str + "_Inclusive"] = new TH2D(trigStr + dyn3Str + "_Inclusive",trigStr + " Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 
 
 
@@ -680,12 +656,9 @@ void makeSUSYHLTAlphaT(){
 	hist2DRate[trigStr + "SM" + stdStrRate  + "_Inclusive"] = new TH2D(trigStr + "SM" + stdStrRate  + "_Inclusive",trigStr + " Calojet #alpha_{T}^{static} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ") - Excluding SUSY hadronic menu overlap;H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
       }
 
-      hist2DRate[trigStr + dynStrRate  + "_Inclusive"] = new TH2D(trigStr + dynStr  + "_Inclusive",trigStr + " Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-      // hist2DRate[trigStr + dyn2Str + "_Inclusive"] = new TH2D(trigStr + dyn2Str + "_Inclusive",trigStr + " Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-      // hist2DRate[trigStr + dyn3Str + "_Inclusive"] = new TH2D(trigStr + dyn3Str + "_Inclusive",trigStr + " Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
     }
-    hist2DRate["NoL1" + stdStrRate  + "_Inclusive"] = new TH2D("NoL1" + stdStr  + "_Inclusive","No L1 - Calojet #alpha_{T}^{static} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-    // hist2DRate["NoL1" + dynStr  + "_Inclusive"] = new TH2D("NoL1" + dynStr  + "_Inclusive","No L1 - Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+    hist2DRate["NoL1" + stdStrRate  + "_Inclusive"] = new TH2D("NoL1" + stdStrRate  + "_Inclusive","No L1 - Calojet #alpha_{T}^{static} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+    hist2DRate["NoL1" + dynStrRate  + "_Inclusive"] = new TH2D("NoL1" + dynStrRate  + "_Inclusive","No L1 - Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
     // hist2DRate["NoL1" + dyn2Str + "_Inclusive"] = new TH2D("NoL1" + dyn2Str + "_Inclusive","No L1 - Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
     // hist2DRate["NoL1" + dyn3Str + "_Inclusive"] = new TH2D("NoL1" + dyn3Str + "_Inclusive","No L1 - Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} rate inclusive (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
     // ------------------------------------------------------------------------------------------------------------------------
@@ -803,7 +776,7 @@ void makeSUSYHLTAlphaT(){
     }
       
       hist2DOnEff["NoL1" + stdStr  + suffix] = new TEfficiency("NoL1" + stdStr  + suffix,"No L1 - Calojet #alpha_{T}^{static} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-      // hist2DOnEff["NoL1" + dynStr  + suffix] = new TEfficiency("NoL1" + dynStr  + suffix,"No L1 - Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+      hist2DOnEff["NoL1" + dynStr  + suffix] = new TEfficiency("NoL1" + dynStr  + suffix,"No L1 - Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
       // hist2DOnEff["NoL1" + dyn2Str + suffix] = new TEfficiency("NoL1" + dyn2Str + suffix,"No L1 - Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
       // hist2DOnEff["NoL1" + dyn3Str + suffix] = new TEfficiency("NoL1" + dyn3Str + suffix,"No L1 - Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 
@@ -1678,7 +1651,6 @@ void makeSUSYHLTAlphaT(){
     }
 
 
-
     // ********************************************************************************
     // *                              Calojets 
     // ********************************************************************************
@@ -1690,7 +1662,6 @@ void makeSUSYHLTAlphaT(){
     caloAlphaTDynamic   = calculateDynamicAlphaT( caloJetPT, caloJetPx, caloJetPy, //caloJetThreshold, 
 						  maxCaloJet, caloJetDynThreshold, 
     						  caloJetAlphaThreshold );
-
 
 
     // Calojets
@@ -1726,11 +1697,6 @@ void makeSUSYHLTAlphaT(){
 
 
 
-
-
-
-
-
     
     // Calo HT rate
     // --------------------------------------------------------------------------------
@@ -1743,7 +1709,6 @@ void makeSUSYHLTAlphaT(){
     }
 
     hist1DEff["HTT200_PFHT_TurnOn"] ->Fill( (uctHT >= 200), caloHT );
-
 
 
 
@@ -1761,18 +1726,11 @@ void makeSUSYHLTAlphaT(){
 	if ((*caloJetPT)[1] > jet2PTCut){
 
 
-
-
 	  TString stdStr  = "OnRate_AlphaTStd_vs_HT_"  + jet2PTCutStr;
 	  TString dynStr  = "OnRate_AlphaTDyn_vs_HT_"  + jet2PTCutStr;
 	  // TString dyn2Str = "OnRate_AlphaTDyn2_vs_HT_" + jet2PTCutStr;
 	  // TString dyn3Str = "OnRate_AlphaTDyn3_vs_HT_" + jet2PTCutStr;
 	  
-	  // Inclusive 
-	  hist2DRate[stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  hist2DRate[dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	  // hist2DRate[dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	  // hist2DRate[dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
 
 	  // ********************************************************************************
 	  // Emulate AlphaT HLTrigger
@@ -1784,9 +1742,7 @@ void makeSUSYHLTAlphaT(){
 	    if ( (caloHT > 350) && (caloAlphaTStandard > 0.52) ){ legacyAlphaTHT350 = true; }
 	    if ( (caloHT > 400) && (caloAlphaTStandard > 0.51) ){ legacyAlphaTHT400 = true; }
 	  }
-	  firesLegacyAlphaT = ( legacyAlphaTHT200 || legacyAlphaTHT250 || 
-				legacyAlphaTHT300 || legacyAlphaTHT350 ||
-				legacyAlphaTHT400 );
+	  firesLegacyAlphaT = ( legacyAlphaTHT200 || legacyAlphaTHT250 || legacyAlphaTHT300 || legacyAlphaTHT350 || legacyAlphaTHT400 );
 	  
 
 	  // Differential rate distribution 
@@ -1811,7 +1767,7 @@ void makeSUSYHLTAlphaT(){
 	  TString trigStr = "";
 	  trigStr = "NoL1";
 	  hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  //hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
+	  hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
 	  // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
 	  // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
 
@@ -1838,42 +1794,6 @@ void makeSUSYHLTAlphaT(){
 	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
 	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
 	  // }
-	  // if ( l1Trig3){
-	  //   trigStr = "Trig3";
-	  //   hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  //   // hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
-	  // }
-	  // if ( l1Trig4){
-	  //   trigStr = "Trig4";
-	  //   hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  //   // hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
-	  // }
-	  // if ( l1Trig5){
-	  //   trigStr = "Trig5";
-	  //   hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  //   // hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
-	  // }
-	  // if ( l1Trig6){
-	  //   trigStr = "Trig6";
-	  //   hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  //   // hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
-	  // }
-	  // if ( l1Trig7){
-	  //   trigStr = "Trig7";
-	  //   hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTStandard );
-	  //   // hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
-	  // }
-
 
 
 
@@ -1888,14 +1808,10 @@ void makeSUSYHLTAlphaT(){
       // ****************************************************************************************************
       histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr] ->Fill( firesLegacyAlphaT, firesSUSYMenu);
       histHLTRate2D["LegacyAlphaT_vs_SM_" + jet2PTCutStr] ->Fill( firesSUSYMenu,     firesLegacyAlphaT);
-
-
 	  
       // Breakdown of triggers fired
       if ( firesLegacyAlphaT ){
 	    
-
-
 	if (legacyAlphaTHT200){
 	  histHLTRate["LegacyAlphaT_HT200_" + jet2PTCutStr + "_vs_NVTX"]->Fill( NVTX );
 	  histHLTRate2D["SM_vs_LegacyAlphaT_" + jet2PTCutStr]->Fill( 2.5, firesSUSYMenu);
@@ -2210,6 +2126,7 @@ void makeSUSYHLTAlphaT(){
   fOut->mkdir("Raw/HLTRateRaw");
   fOut->mkdir("Raw/HLTRate");
   fOut->mkdir("Raw/Rate");
+  fOut->mkdir("Raw/RateDifferential");
   // fOut->mkdir("Raw/Correlations");
   // fOut->mkdir("Raw/Distributions");
 
@@ -2290,9 +2207,10 @@ void makeSUSYHLTAlphaT(){
   for(std::map<TString, TH2*>::const_iterator itr = hist2DRate.begin(); itr != hist2DRate.end(); ++itr){
 
     TString histoName = itr->first; //Extract the histogram key 
-    fOut->cd("Raw/Rate");
+    fOut->cd("Raw/RateDifferential");
     itr->second->Write();
 
+    fOut->cd("Raw/Rate");
     TH2* cumulHist = (TH2F*)itr->second->Clone();
     cumulHist->SetName( histoName + "_Cumul" );
     reverseCumulative2D( itr->second, cumulHist, rateScaleFactor );
