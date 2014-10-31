@@ -1,13 +1,15 @@
-#define TEST
+//#define TEST
 //#define SIGNAL
 #define NEUTRINO
-#define HLT_CALOJET
+//#define HLT_CALOJET
 
 //#define MATCHING
 
 float caloJetThreshold = 40; //50;
 float pfJetThreshold   = 40; //50;
 float secondJetThreshold = 90;
+
+float hltPFSecondJetThreshold = 90;
 
 // Jet matching
 float maxDeltaR = 0.2;
@@ -123,8 +125,8 @@ void makeSUSYHLTAlphaT(){
   // ------------------------------------------------------------------------------------------------------------------------
   TString branch    = "MakeTrees/Ntuple";
 
-  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC
-  //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/22Oct14_50ns/";  // pre8 with correct JEC, 50ns
+  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC, 25ns
+  //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/22Oct14_50ns/";  // pre8 with correct JEC (needs updating with latest GT), 50ns
 
   // Automatically determine bunch spacing
   double instLumi(0);
@@ -207,7 +209,7 @@ void makeSUSYHLTAlphaT(){
   sample test = sample("test", branch, "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_2_0_pre6/src/AlphaTHLT/MakeTree/test/QCD_Pt-30to50_Tune4C_13TeV_pythia8.root", 161500000);
 
   // ------------------------------------------------------------------------------------------------------------------------
-  sample selectedSample =  QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
+  sample selectedSample =  TTBar; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
 
   // Label QCD ptHat bins
   int samplePTHat = 0;
@@ -383,12 +385,12 @@ void makeSUSYHLTAlphaT(){
   // HLT
   // ------------------------------------------------------------
   // HLT CaloJet
-  // std::vector<float> *hltCaloJetPT  = new std::vector<float>();
-  // std::vector<float> *hltCaloJetPx  = new std::vector<float>();
-  // std::vector<float> *hltCaloJetPy  = new std::vector<float>();
-  // std::vector<float> *hltCaloJetEta = new std::vector<float>();
-  // //  std::vector<float> *hltCaloJetPhi = new std::vector<float>();
-  // float hltCaloJetHT(0), hltCaloJetAlphaT(0);
+  std::vector<float> *hltCaloJetPT  = new std::vector<float>();
+  std::vector<float> *hltCaloJetPx  = new std::vector<float>();
+  std::vector<float> *hltCaloJetPy  = new std::vector<float>();
+  std::vector<float> *hltCaloJetEta = new std::vector<float>();
+  //  std::vector<float> *hltCaloJetPhi = new std::vector<float>();
+  float hltCaloHT(0); //, hltCaloAlphaT(0);
   // // HLT PF
   // std::vector<float> *hltPFJetPT  = new std::vector<float>();
   // std::vector<float> *hltPFJetPx  = new std::vector<float>();
@@ -685,13 +687,13 @@ void makeSUSYHLTAlphaT(){
       // 							       HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 
 
-      // Make candidate HLTtrigger plots                                                                                                            
+      // Make CaloHLT -> PFHLT trigger plots 
       for (uint trigN = 1; trigN <= 5; ++trigN ){
 	TString trigStr = TString("HLT") + Form("%d", trigN);
 
-	if ( (jet2PTCut == 100.) || (jet2PTCut == 50.) ){
-	  hist2DHLTEff[trigStr + stdStr  + "_" + jetBinStr] = new TEfficiency(trigStr + stdStr  + "_" + jetBinStr,"Gen #alpha_{T}^{static} vs H_{T}^{static} efficiency "  + jetBinStr + " (" + jet2PTCutLab + ");Gen H_{T} (GeV);Gen #alpha_{T}",   20.,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-	}
+	hist2DHLTEff[trigStr + stdStr  + "_" + jetBinStr] = new TEfficiency(trigStr + stdStr  + "_" + jetBinStr,"HLT Calo #alpha_{T}^{static} vs H_{T}^{static} efficiency given HLT PF " + trigStr + " " + jetBinStr + " (" + jet2PTCutLab + ");HLT Calo H_{T} (GeV);HLT Calo #alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+	hist2DHLTEff[trigStr + dynStr  + "_" + jetBinStr] = new TEfficiency(trigStr + dynStr  + "_" + jetBinStr,"HLT Calo #alpha_{T}^{dynamic} vs H_{T}^{dynamic} efficiency given HLT PF " + trigStr + " " + jetBinStr + " (" + jet2PTCutLab + ");HLT Calo H_{T} (GeV);HLT Calo #alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+	  
       }
 
     }
@@ -722,7 +724,7 @@ void makeSUSYHLTAlphaT(){
 	  TString label  = anaHtLab + TString(", ") + anaAlphaTLab + TString(", ") + anaJetStr;
 	  
 	  hist2DOnEff[stdStr  + suffix] = new TEfficiency(stdStr  + suffix,"Calojet #alpha_{T}^{static} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-	  // hist2DOnEff[dynStr  + suffix] = new TEfficiency(dynStr  + suffix,"Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+	  hist2DOnEff[dynStr  + suffix] = new TEfficiency(dynStr  + suffix,"Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 	  // hist2DOnEff[dyn2Str + suffix] = new TEfficiency(dyn2Str + suffix,"Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 	  // hist2DOnEff[dyn3Str + suffix] = new TEfficiency(dyn3Str + suffix,"Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 	  
@@ -760,7 +762,7 @@ void makeSUSYHLTAlphaT(){
 
 
     // Make candidate L1 trigger plots
-    for (uint trigN = 1; trigN <= 7; ++trigN ){
+    for (uint trigN = 1; trigN <= 1; ++trigN ){
       TString trigStr = TString("Trig") + Form("%d", trigN);
 
 	hist2DOnEff[trigStr + stdStr  + suffix] = new TEfficiency(trigStr + stdStr  + suffix,trigStr + " Calojet #alpha_{T}^{static} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
@@ -791,6 +793,10 @@ void makeSUSYHLTAlphaT(){
 
 
 
+
+
+
+
   // ************************************************************************************************************************
   // *                                                    Matching study                                                    *
   // ************************************************************************************************************************
@@ -806,9 +812,6 @@ void makeSUSYHLTAlphaT(){
   jetRanks.push_back("AllJets");
   jetRanks.push_back("Jet1");
   jetRanks.push_back("Jet2");
-
-
-
 
   // ************************************************************
   // Jet ranked distributions
@@ -934,7 +937,99 @@ void makeSUSYHLTAlphaT(){
 
   
 
+
+
+
+
+
+  // ************************************************************
+  // Turn ons
+  // ************************************************************
+
+  // ****************************************
+  // HT
+  // ****************************************
+  std::vector<float> HTValues;
+  HTValues.push_back( 200 ); HTValues.push_back( 250 );   
+  HTValues.push_back( 300 ); HTValues.push_back( 350 ); HTValues.push_back( 400 );
+
+  for (uint iHT = 0; iHT < HTValues.size(); ++iHT){
+    float HTValue = HTValues[iHT];
+    TString HTStr = Form("%1.0f", HTValue );
+
+    hist1DEff["HLTCaloHT_HLTPFHT" + HTStr + "_TurnOn"] = new TEfficiency("HLTCalo_HLTPFHT" + HTStr + "_TurnOn",
+									 "HLTCalo H_{T} turn on (HLTPF H_{T} > " + HTStr + ");Efficiency", 
+									 40,0,800);
+    hist1DEff["HLTCaloHT_GenHT" + HTStr + "_TurnOn"]   = new TEfficiency("HLTCalo_GenHT" + HTStr + "_TurnOn",
+									 "HLTCalo H_{T} turn on (Gen H_{T} > " + HTStr + ");Efficiency",  
+									 40,0,800);
+    hist1DEff["HLTPFHT_GenHT" + HTStr + "_TurnOn"]     = new TEfficiency("HLTPF_GenHT" + HTStr + "_TurnOn",
+									 "HLTPF H_{T} turn on (Gen H_{T} > " + HTStr + ");Efficiency",  
+									 40,0,800);
+  }
+
+  // ****************************************
+  // Jet PT
+  // ****************************************
+  std::vector<float> PTValues;
+  PTValues.push_back( 40 ); PTValues.push_back( 50 ); PTValues.push_back( 60 ); PTValues.push_back( 70 );
+  PTValues.push_back( 80 ); PTValues.push_back( 90 ); PTValues.push_back( 100 );
+
+  for (uint iPT = 0; iPT < PTValues.size(); ++iPT){
+    float PTValue = PTValues[iPT];
+    TString PTStr = Form("%1.0f", PTValue );
+
+    // hist1DEff["HLTCaloPT_HLTPFPT" + HTStr + "_TurnOn"] = new TEfficiency("HLTCalo_HLTPFHT" + HTStr + "_TurnOn",
+    // 									 "HLTCalo H_{T} turn on (HLTPF H_{T} > " + HTStr + ");Efficiency", 
+    // 									 40,0,800);
+    // hist1DEff["HLTCaloPT_GenPT" + HTStr + "_TurnOn"]   = new TEfficiency("HLTCalo_GenHT" + HTStr + "_TurnOn",
+    // 									 "HLTCalo H_{T} turn on (Gen H_{T} > " + HTStr + ");Efficiency",  
+    // 									 40,0,800);
+    // hist1DEff["HLTPFPT_GenPT" + HTStr + "_TurnOn"]     = new TEfficiency("HLTPF_GenHT" + HTStr + "_TurnOn",
+    // 									 "HLTPF H_{T} turn on (Gen H_{T} > " + HTStr + ");Efficiency",  
+    // 									 40,0,800);
+  }
+
   
+  // ************************************************************
+  // Correlations
+  // ************************************************************
+  histMatch2D["HLTCaloHT_vs_HLTPFHT"]  = new TH2D("HLTCaloHT_vs_HLTPFHT", 
+						  "HLTCalo H_{T} vs HLTPF H_{T};H_{T}^{HLTPF} (GeV);H_{T}^{HLTCalo} (GeV)",    
+						  40,0,1000, 40,0,1000 );
+  histMatch2D["HLTCaloHT_vs_GenHT"]    = new TH2D("HLTCaloHT_vs_GenHT",   
+						  "HLTCalo H_{T} vs Gen H_{T};H_{T}^{Gen} (GeV);H_{T}^{HLTCalo} (GeV)",   
+						  40,0,1000, 40,0,1000 );
+  histMatch2D["HLTPFHT_vs_GenHT"]      = new TH2D("HLTPFHT_vs_GenHT",     
+						  "HLTPF H_{T} vs Gen H_{T};H_{T}^{Gen} (GeV);H_{T}^{HLTPF} (GeV)",    
+						  40,0,1000, 40,0,1000 );
+
+
+  // AlphaT Correlations 
+  histMatch2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]      = new TH2D("HLTCaloAlphaT_vs_HLTPFAlphaT",  
+							 "HLTCalo #alpha_{T} vs HLTPF #alpha_{T};#alpha_{T}^{HLTPF};#alpha_{T}^{HLTCalo}",
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
+  histMatch2D["HLTCaloAlphaT_vs_GenAlphaT"]        = new TH2D("HLTCaloAlphaT_vs_GenAlphaT",
+							 "HLTPF #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{HLTCalo}",    
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
+  histMatch2D["HLTPFAlphaT_vs_GenAlphaT"]          = new TH2D("HLTPFAlphaT_vs_GenAlphaT",
+							 "HLTPF #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{HLTPF}",    
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
+
+  histMatch2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] = new TH2D("CaloAlphaT_vs_CaloAlphaTDyn",   
+							 "HLTCalo #alpha_{T} vs dynamic HLTCalo #alpha_{T};#alpha_{T}^{Dynamic HLTCalo};#alpha_{T}^{HLTCalo}",    
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
+  histMatch2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   = new TH2D("HLTCaloAlphaTDyn_vs_HLTPFAlphaT",  
+							 "Dynamic HLTCalo #alpha_{T} vs HLTPF #alpha_{T};#alpha_{T}^{HLTPF};#alpha_{T}^{Dynamic HLTCalo}",
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
+  histMatch2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     = new TH2D("HLTCaloAlphaTDyn_vs_GenAlphaT",
+							 "Dynamic HLTPF #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{Dynamic HLTCalo}",    
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
+
+  histMatch2D["GenAlphaT_vs_GenHT"]                = new TH2D("GenAlphaT_vs_GenHT",  
+							 "Gen #alpha_{T} vs Gen H_{T};Gen H_{T} (GeV);#alpha_{T}^{Gen}",
+							 40,0,1000, alphaTBins,alphaTMin,alphaTMax); 
+
 
 
 #endif
@@ -1006,6 +1101,13 @@ void makeSUSYHLTAlphaT(){
     sigChain->SetBranchAddress("genAk4For_Eta",        &pfJetForEta);
 
     sigChain->SetBranchAddress("genMetCalo_MetPt",     &pfMET);
+
+
+    sigChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
+    sigChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
+    sigChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
+    //sigChain->SetBranchAddress("hltAk4Calo_Phi",     &hltCaloJetPhi);
+    sigChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
 
 #ifdef HLT_CALOJET
     // HLT CaloJet
@@ -1079,17 +1181,16 @@ void makeSUSYHLTAlphaT(){
 #ifdef SIGNAL
 
   // Loop over the tree
-  //  for ( unsigned int iEvent = 0; iEvent < nEvents; ++iEvent ){
   for ( unsigned int iEvent = signalEventLow; iEvent < signalEventHigh; ++iEvent ){
     
     sigChain->GetEntry( iEvent );
 
-
-
     float pfAlphaTStandard(0);
-
     float caloAlphaTStandard(0);
     float caloAlphaTDynamic(0);
+    float hltCaloAlphaTStandard(0);
+    float hltCaloAlphaTDynamic(0);
+
     // float caloHTDynamic(0);
     //    std::pair<float,float> caloAlphaTHTDynamic;
     
@@ -1106,6 +1207,18 @@ void makeSUSYHLTAlphaT(){
     // bool l1Trig6 = ( (uctHT >= 200)  || (uctMET >= 70) || ((uctHT >= 130) && (uctMHToverHT >= 0.32)) );
     // bool l1Trig7 = ( (uctHT >= 200)  || (uctMET >= 70) || ((uctHT >= 120) && (uctMHToverHT >= 0.36)) );
 
+
+    // HLTCalo
+    int hltCaloJetsAboveThresh(0);
+    hltCaloHT = 0;
+    for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
+      if( (*hltCaloJetPT)[iJet] < caloJetThreshold ) break;
+      hltCaloHT += (*hltCaloJetPT)[iJet];
+      hltCaloJetsAboveThresh++;
+    }
+    if ( hltCaloJetsAboveThresh > MAX_JETS ){
+      hltCaloJetsAboveThresh = MAX_JETS;
+    }
 
     // calculate HT and jet multiplicity for new jet threshold
     int caloJetsAboveThresh(0);
@@ -1134,7 +1247,6 @@ void makeSUSYHLTAlphaT(){
     if ( pfJetsAboveThresh > MAX_JETS ){
       pfJetsAboveThresh = MAX_JETS;
     }
-    //    TString nPFJetsStr = Form("%d", pfJetsAboveThresh );
     TString pfJetBinStr     = TString(Form( "%d", pfJetsAboveThresh)) + TString("Jets");
 
 
@@ -1150,23 +1262,24 @@ void makeSUSYHLTAlphaT(){
     bool passesOffVetoes(false);
 
 
-    pfAlphaTStandard    = calculateAlphaT( pfJetPT, pfJetPx, pfJetPy, pfJetThreshold );      
+    pfAlphaTStandard       = calculateAlphaT( pfJetPT, pfJetPx, pfJetPy, pfJetThreshold );      
 
-    caloAlphaTStandard  = calculateAlphaT( caloJetPT, caloJetPx, caloJetPy, caloJetThreshold );    
+    caloAlphaTStandard     = calculateAlphaT( caloJetPT, caloJetPx, caloJetPy, caloJetThreshold );    
+
+    hltCaloAlphaTStandard  = calculateAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, caloJetThreshold );    
+
+
     // Dynamic AlphaT
-    caloAlphaTDynamic   = calculateDynamicAlphaT( caloJetPT, caloJetPx, caloJetPy, //caloJetThreshold, 
-						  maxCaloJet, caloJetDynThreshold, 
-    						  caloJetAlphaThreshold );
-    
-
-
+    hltCaloAlphaTDynamic   = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, 
+						     maxCaloJet, caloJetDynThreshold, 
+						     caloJetAlphaThreshold );
+  
 
 
     // ********************************************************************************
     // *                              Calojets 
     // ********************************************************************************
     if ( pfJetsAboveThresh >= 2 ){
-
       
       // Forward jet veto
       bool forJetVeto(false);
@@ -1197,86 +1310,72 @@ void makeSUSYHLTAlphaT(){
 	float jet2PTCut = jet2PTCuts[ iJet2Cut ];
 	TString jet2PTCutStr = "Jet2gt" + TString(Form("%1.0f", jet2PTCut ));
 	TString stdStr  = "On_AlphaTStd_vs_HT_"  + jet2PTCutStr;
-	// TString dynStr  = "On_AlphaTDyn_vs_HT_"  + jet2PTCutStr;
+	TString dynStr  = "On_AlphaTDyn_vs_HT_"  + jet2PTCutStr;
 	// TString dyn2Str = "On_AlphaTDyn2_vs_HT_" + jet2PTCutStr;
 	// TString dyn3Str = "On_AlphaTDyn3_vs_HT_" + jet2PTCutStr;
 
 	bool passHltSecondJet(false);
+	bool passHltPreFilterSecondJet(false);
 
 	// Second jet threshold
 	if ((*caloJetPT)[1] > jet2PTCut){
-	  passHltSecondJet = true;
+	    passHltSecondJet = true;
 	}
-	// // Inclusive 
-	// hist2DOnEff[stdStr  + "_Inclusive"]       ->Fill( passesOffAll, caloHT,                     caloAlphaTStandard );
-	// hist2DOnEff[dynStr  + "_Inclusive"]       ->Fill( passesOffAll, caloHT,                     caloAlphaTDynamic );
-	// hist2DOnEff[dyn2Str + "_Inclusive"]       ->Fill( passesOffAll, caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	// hist2DOnEff[dyn3Str + "_Inclusive"]       ->Fill( passesOffAll, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-	// // Jet binned
-	// hist2DOnEff[stdStr  + "_" + pfJetBinStr]->Fill( passesOffAll, caloHT,                     caloAlphaTStandard );
-	// hist2DOnEff[dynStr  + "_" + pfJetBinStr]->Fill( passesOffAll, caloHT,                     caloAlphaTDynamic );
-	// hist2DOnEff[dyn2Str + "_" + pfJetBinStr]->Fill( passesOffAll, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	// hist2DOnEff[dyn3Str + "_" + pfJetBinStr]->Fill( passesOffAll, caloAlphaTHTDynamic.second, caloAlphaTStandard ); 
-	
-	
+	if (hltCaloJetsAboveThresh >= 2){	
+	  if ((*hltCaloJetPT)[1] > jet2PTCut){
+	    passHltPreFilterSecondJet = true;
+	  }
+	}
 
-	// Efficiency offline given an HLT path (no L1)
-
+	// Efficiency to PFHLT given CaloHLT prefilter
 	// ********************************************************************************
 	// *                                 HLT triggers                                 *
 	// ********************************************************************************
-	// Rate balanced triggers to 20 Hz
+
+	// Check event passes L1 and PFHLT triggers
 	bool HLT1(false), HLT2(false), HLT3(false), HLT4(false), HLT5(false);
-#ifdef HLT_CALOJET
-	if (jet2PTCut == secondJetThreshold){
-	  HLT1 = ( (caloHT > 240)  && (caloAlphaTStandard > 0.92) );
-	  HLT2 = ( (caloHT > 280)  && (caloAlphaTStandard > 0.71) );
-	  HLT3 = ( (caloHT > 320)  && (caloAlphaTStandard > 0.64) );
-	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.60) );
-	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.58) );
+	if (l1Trig1 && ( (*caloJetPT)[1] > hltPFSecondJetThreshold) ){ // PFHLT triggers
+	    HLT1 = ( (caloHT > 200)  && (caloAlphaTStandard > 0.57) );
+	    HLT2 = ( (caloHT > 250)  && (caloAlphaTStandard > 0.55) );
+	    HLT3 = ( (caloHT > 300)  && (caloAlphaTStandard > 0.53) );
+	    HLT4 = ( (caloHT > 350)  && (caloAlphaTStandard > 0.52) );
+	    HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.51) );
 	}
-	else if(jet2PTCut == caloJetThreshold){
-	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.78) );
-	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.69) );
-	}
-#else
-	if (jet2PTCut == secondJetThreshold){
-	  HLT1 = ( (caloHT > 240)  && (caloAlphaTStandard > 0.90) );
-	  HLT2 = ( (caloHT > 280)  && (caloAlphaTStandard > 0.64) );
-	  HLT3 = ( (caloHT > 320)  && (caloAlphaTStandard > 0.61) );
-	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.57) );
-	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.55) );
-	}
-	else if(jet2PTCut == caloJetThreshold){
-	  HLT3 = ( (caloHT > 320)  && (caloAlphaTStandard > 0.79) );
-	  HLT4 = ( (caloHT > 360)  && (caloAlphaTStandard > 0.64) );
-	  HLT5 = ( (caloHT > 400)  && (caloAlphaTStandard > 0.59) );
-	}
-#endif
-	if (passesOffVetoes && passesOffJet){
+
+      
+	// ********************************************************************************
+	// *                                   Prefilter                                  *
+	// ********************************************************************************
+	if ( (*caloJetPT)[1] > hltPFSecondJetThreshold ){
 	  TString trigStr  = "";
 	  bool    trigBool = false;
-	  if ( (jet2PTCut == secondJetThreshold) || (jet2PTCut == pfJetThreshold) ){
+	  
+	  if ( passHltPreFilterSecondJet ){
+
 	    trigStr  = "HLT1";
 	    trigBool = HLT1;
-	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, pfHT,                     pfAlphaTStandard );
+	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard );
+	    hist2DHLTEff[trigStr + dynStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic );
 	    trigStr  = "HLT2";
 	    trigBool = HLT2;
-	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, pfHT,                     pfAlphaTStandard );
+	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard );
+	    hist2DHLTEff[trigStr + dynStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic );
 	    trigStr  = "HLT3";
 	    trigBool = HLT3;
-	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, pfHT,                     pfAlphaTStandard );
+	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard );
+	    hist2DHLTEff[trigStr + dynStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic );
 	    trigStr  = "HLT4";
 	    trigBool = HLT4;
-	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, pfHT,                     pfAlphaTStandard );
+	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard );
+	    hist2DHLTEff[trigStr + dynStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic );
 	    trigStr  = "HLT5";
 	    trigBool = HLT5;
-	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, pfHT,                     pfAlphaTStandard );
+	    hist2DHLTEff[trigStr + stdStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard );
+	    hist2DHLTEff[trigStr + dynStr  + "_" + pfJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic );
+  
 	  }
 	}
       
-
-
 
 	// Get offline analysis bin
 	for (uint iHtBin = 0; iHtBin < anaHtBins.size(); ++iHtBin){
@@ -1323,13 +1422,16 @@ void makeSUSYHLTAlphaT(){
 	      trigStr  = "NoL1";
 	      trigBool = passHltSecondJet;
 	      hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
+	      //	      hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
 	      // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
 	      // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
 
 	      trigStr  = "Trig1";
 	      trigBool = l1Trig1 && passHltSecondJet;
 	      hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
+	      //	      hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
+	      // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
+	      // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
 
 	      // ******************************************************************************** 
 	      // Emulate AlphaT HLTrigger 
@@ -1345,12 +1447,11 @@ void makeSUSYHLTAlphaT(){
  	      bool firesLegacyAlphaT = ( legacyAlphaTHT200 || legacyAlphaTHT250 ||
 					 legacyAlphaTHT300 || legacyAlphaTHT350 ||
 					 legacyAlphaTHT400 );
-
 	      // Not including BTAG
 	      bool firesSUSYMenu = ((hltPathFired["HLT_PFMET170_NoiseCleaned_v1"])           || 
-			       //(hltPathFired["HLT_PFMET120_NoiseCleaned_BTagCSV07_v1"]) ||
-			       (hltPathFired["HLT_PFHT350_PFMET120_NoiseCleaned_v1"] )  ||
-			       (hltPathFired["HLT_PFHT900_v1"]) );
+				    //(hltPathFired["HLT_PFMET120_NoiseCleaned_BTagCSV07_v1"]) ||
+				    (hltPathFired["HLT_PFHT350_PFMET120_NoiseCleaned_v1"] )  ||
+				    (hltPathFired["HLT_PFHT900_v1"]) );
 	      // Overlap efficiency with SUSY hadronic menu
 	      hist2DOnEff[trigStr + "SM" + stdStr + suffix]->Fill( (firesSUSYMenu||trigBool), caloHT, caloAlphaTStandard );
 	      // Efficiency of SUSY hadronic menu alone
@@ -1361,7 +1462,6 @@ void makeSUSYHLTAlphaT(){
 	      // *                            Overlaps between menues                           *
 	      // ********************************************************************************
 	      TString effOverlap = jet2PTCutStr + suffix;
-
 
 
 
@@ -1409,54 +1509,6 @@ void makeSUSYHLTAlphaT(){
 
 
 
-
-
-	      // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
-	      // trigStr  = "Trig2";
-	      // trigBool = l1Trig2 && passHltSecondJet;
-	      // hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
-	      // trigStr  = "Trig3";
-	      // trigBool = l1Trig3 && passHltSecondJet;
-	      // hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
-	      // trigStr  = "Trig4";
-	      // trigBool = l1Trig4 && passHltSecondJet;
-	      // hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
-	      // trigStr  = "Trig5";
-	      // trigBool = l1Trig5 && passHltSecondJet;
-	      // hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
-	      // trigStr  = "Trig6";
-	      // trigBool = l1Trig6 && passHltSecondJet;
-	      // hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
-	      // trigStr  = "Trig7";
-	      // trigBool = l1Trig7 && passHltSecondJet;
-	      // hist2DOnEff[trigStr + stdStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTStandard );
-	      // // hist2DOnEff[trigStr + dynStr  + suffix]->Fill( trigBool, caloHT,                     caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn2Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	      // // hist2DOnEff[trigStr + dyn3Str + suffix]->Fill( trigBool, caloAlphaTHTDynamic.second, caloAlphaTStandard );
-
 	      
 	    }// End signal region requirement
 	    
@@ -1467,7 +1519,7 @@ void makeSUSYHLTAlphaT(){
       } // End HLT second jet cut
     } // End offline second jet cut
 
-    
+
 
 #ifdef TEST
     if ( iEvent > maxEvents ){ break; } // Exit early
@@ -1602,10 +1654,6 @@ void makeSUSYHLTAlphaT(){
     // ****************************************************************************************************
     // *                                         Check HLTriggers                                         *
     // ****************************************************************************************************
-    // bool HLT_PFMET170_NoiseCleaned_v1           = (l1ETM70 && hltPathFired["HLT_PFMET170_NoiseCleaned_NoL1_v1"]);
-    // bool HLT_PFMET120_NoiseCleaned_BTagCSV07_v1 = (l1ETM70 && hltPathFired["HLT_PFMET120_NoiseCleaned_BTagCSV07_NoL1_v1"]);
-    // bool HLT_PFHT350_PFMET120_NoiseCleaned_v1   = (l1HT175 && hltPathFired["HLT_PFHT350_PFMET120_NoiseCleaned_NoL1_v1"]);
-    // bool HLT_PFHT900_v1                         = (l1HT175 && hltPathFired["HLT_PFHT900_NoL1_v1"]);
 
     bool firesSUSYMenu                          = ((hltPathFired["HLT_PFMET170_NoiseCleaned_v1"])           ||
 						   (hltPathFired["HLT_PFMET120_NoiseCleaned_BTagCSV07_v1"]) ||
@@ -1662,7 +1710,7 @@ void makeSUSYHLTAlphaT(){
     caloAlphaTDynamic   = calculateDynamicAlphaT( caloJetPT, caloJetPx, caloJetPy, //caloJetThreshold, 
 						  maxCaloJet, caloJetDynThreshold, 
     						  caloJetAlphaThreshold );
-
+    
 
     // Calojets
     int caloJetsAboveThresh(0);
@@ -1774,6 +1822,10 @@ void makeSUSYHLTAlphaT(){
 	  if ( l1Trig1){
 	    trigStr = "Trig1";
 	    hist2DRate[trigStr + stdStr  + "_Inclusive"]           ->Fill( caloHT,                     caloAlphaTStandard );
+	    hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
+	    // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
+	    // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
+
 	    
 	    hist2DRate[trigStr + "_CaloMHT_vs_CaloHT_" + jet2PTCutStr]->Fill( caloHT, caloMHT );
 	    hist2DRate[trigStr + "_CaloMET_vs_CaloHT_" + jet2PTCutStr]->Fill( caloHT, hltCaloMET );
@@ -1783,9 +1835,6 @@ void makeSUSYHLTAlphaT(){
 	      hist2DRate[trigStr + "SM" + stdStr + "_Inclusive"]->Fill( caloHT,                     caloAlphaTStandard );
 	    }
 
-	    hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( caloHT,                     caloAlphaTDynamic );
-	    // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
-	    // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
 	  }
 	  // if ( l1Trig2){
 	  //   trigStr = "Trig2";
@@ -1794,8 +1843,6 @@ void makeSUSYHLTAlphaT(){
 	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTDynamic ); 
 	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( caloAlphaTHTDynamic.second, caloAlphaTStandard );
 	  // }
-
-
 
 	} // End Second jet PT requirement
 
@@ -2096,6 +2143,30 @@ void makeSUSYHLTAlphaT(){
       }
     
     }
+
+
+
+
+
+
+
+
+
+
+    histMatch2D["HLTCaloHT_vs_HLTPFHT"] ->Fill( caloHT, hltCaloHT );
+    histMatch2D["HLTCaloHT_vs_GenHT"]   ->Fill( pfHT, hltCaloHT );
+    histMatch2D["HLTPFHT_vs_GenHT"]     ->Fill( pfHT, caloHT );
+
+    // AlphaT Correlations 
+    // histMatch2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]    ->Fill( caloAlphaT, hltCaloAlphaT );
+    // histMatch2D["HLTCaloAlphaT_vs_GenAlphaT"]        ->Fill( pfAlphaT,   hltCaloAlphaT );
+    // histMatch2D["HLTPFAlphaT_vs_GenAlphaT"]          ->Fill( pfAlphaT,   caloAlphaT );
+    // histMatch2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] ->Fill( hltCaloAlphaTDynamic, hltCaloAlphaT );
+    // histMatch2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   ->Fill( caloAlphaT,           hltCaloAlphaTDynamic );
+    // histMatch2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     ->Fill( pfAlphaT,             hltCaloAlphaTDynamic );
+    
+    //    histMatch2D["GenAlphaT_vs_GenHT"]
+
 #endif
 
 
@@ -2121,8 +2192,11 @@ void makeSUSYHLTAlphaT(){
   
   fOut->mkdir("Raw");
   fOut->mkdir("Raw/Efficiency");
-  fOut->mkdir("Raw/HLTEfficiency");
-  fOut->mkdir("Raw/HLTEfficiencyRaw");
+  fOut->mkdir("Raw/PrefilterEfficiency");
+  fOut->mkdir("Raw/PrefilterEfficiencyRaw");
+  //  fOut->mkdir("Raw/HLTEfficiency");
+  fOut->mkdir("Raw/HLTOverlap");
+  fOut->mkdir("Raw/HLTOverlapRaw");
   fOut->mkdir("Raw/HLTRateRaw");
   fOut->mkdir("Raw/HLTRate");
   fOut->mkdir("Raw/Rate");
@@ -2271,10 +2345,10 @@ void makeSUSYHLTAlphaT(){
   for(std::map<TString, TEfficiency*>::const_iterator itr = hist2DOverlap.begin(); itr != hist2DOverlap.end(); ++itr){
 
     TString histoName = itr->first; //Extract the histogram key                                                                                       
-    fOut->cd("Raw/HLTEfficiencyRaw");
+    fOut->cd("Raw/HLTOverlapRaw");
     itr->second->Write();
 
-    fOut->cd("Raw/HLTEfficiency");
+    fOut->cd("Raw/HLTOverlap");
     TCanvas *c = new TCanvas(histoName);
     TEfficiency* histogramEff = (TEfficiency*)itr->second->Clone();
     histogramEff->Draw("COLZTEXTE");
@@ -2311,7 +2385,45 @@ void makeSUSYHLTAlphaT(){
 
   }
 
- 
+
+
+  std::cout << "\thist2DHLTEff\n";
+  for(std::map<TString, TEfficiency*>::const_iterator itr = hist2DHLTEff.begin(); itr != hist2DHLTEff.end(); ++itr){
+
+    TString histoName = itr->first; //Extract the histogram key 
+    fOut->cd("Raw/PrefilterEfficiencyRaw");
+    //itr->second->Write();
+
+    TEfficiency *eff      = (TEfficiency*)itr->second      ->Clone();
+    TH2* passed           = (TH2*)eff->GetPassedHistogram()->Clone();
+    TH2* passedCumul      = (TH2*)eff->GetPassedHistogram()->Clone();
+    TH2* passedUni        = (TH2*)eff->GetPassedHistogram()->Clone();
+
+    // Uniform
+    TEfficiency *effUniCumul = (TEfficiency*)eff->Clone();
+    reverseCumulative2D( passed, passedCumul, 1 );
+
+    // The numerator contains all the information, the denominator means little, we only consider entries in the numberator!!!
+    fillUniform2D( passedUni, passed->GetEntries() );
+
+    effUniCumul->SetTotalHistogram(  *passedUni,   "" );
+    effUniCumul->SetPassedHistogram( *passedCumul, "" );
+    effUniCumul->SetName( histoName + "_UniCumul" );
+    effUniCumul->Write();
+
+    fOut->cd("Raw/PrefilterEfficiency");
+    TCanvas *c = new TCanvas(histoName);
+    TEfficiency* histogramEff = (TEfficiency*)effUniCumul->Clone();
+    histogramEff->Draw("COLZTEXTE");
+    gPad->Update();
+    histogramEff->GetPaintedHistogram()->SetMaximum(1.0);
+    histogramEff->GetPaintedHistogram()->GetXaxis()->SetRangeUser(0,     500);
+    histogramEff->GetPaintedHistogram()->GetYaxis()->SetRangeUser(0.41, 0.61);
+    histogramEff->GetPaintedHistogram()->Draw("COLZTEXTE");
+    c->Write();
+
+
+  } 
 
   // ********************************************************************************
   // *                                   Matching                                   *
