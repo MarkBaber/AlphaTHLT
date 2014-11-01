@@ -25624,6 +25624,45 @@ HLT_PFJet20_v1   = cms.Path( HLTBeginSequence  +
                              hltSinglePFJet20 + 
                              HLTEndSequence )
 
+
+
+# Custom corrections - No L1FastJet correction
+# --------------------------------------------------------------------------------
+hltESPAK4CaloCorrectionNoFastJet = cms.ESProducer( "JetCorrectionESChain",
+  correctors = cms.vstring( 'hltESPAK4CaloRelativeCorrectionESProducer',
+                            'hltESPAK4CaloAbsoluteCorrectionESProducer' ),
+  appendToDataLabel = cms.string( "" )
+)
+hltAK4CaloJetsCorrectedNoFastJet = cms.EDProducer( "CaloJetCorrectionProducer",
+    src = cms.InputTag( "hltAK4CaloJets" ),
+    correctors = cms.vstring( 'hltESPAK4CaloCorrectionNoFastJet' )
+)
+hltAK4CaloJetsCorrectedIDPassedNoFastJet = cms.EDProducer( "CaloJetCorrectionProducer",
+    src = cms.InputTag( "hltAK4CaloJetsIDPassed" ),
+    correctors = cms.vstring( 'hltESPAK4CaloCorrectionNoFastJet' )
+)
+
+HLTAK4CaloJetsCorrectionSequenceNoFastJet = cms.Sequence( hltAK4CaloJetsCorrectedNoFastJet + hltAK4CaloJetsCorrectedIDPassedNoFastJet )
+HLTAK4CaloJetsSequenceNoFastJet = cms.Sequence( HLTAK4CaloJetsReconstructionSequence + HLTAK4CaloJetsCorrectionSequenceNoFastJet )
+
+hltSingleCaloJet20NoFastJet = cms.EDFilter( "HLT1CaloJet",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( 5.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltAK4CaloJetsCorrectedIDPassedNoFastJet" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 85 )
+)
+HLT_CaloJet20NoFastJet_v1 = cms.Path( HLTBeginSequence +
+                                      HLTAK4CaloJetsSequenceNoFastJet +
+                                      hltSingleCaloJet20NoFastJet +
+                                      HLTEndSequence )
+
+
+
+
 # UCT Jets
 # ------------------------------
 # hltL1sL1SingleS1Jet52 = cms.EDFilter( "HLTLevel1GTSeed",
@@ -26087,7 +26126,7 @@ hlt4CaloJet40 = cms.EDFilter( "HLT1CaloJet",
     triggerType = cms.int32( 0 )
 )
 
-hlt2PFJet80 = cms.EDFilter( "HLT1CaloJet",
+hlt2PFJet80 = cms.EDFilter( "HLT1PFJet",
     saveTags = cms.bool( True ),
     MinPt = cms.double( 80.0 ),
     MinN = cms.int32( 2 ),
@@ -26224,6 +26263,7 @@ HLTSchedule = cms.Schedule( *(HLTriggerFirstPath,
 
                               HLT_CaloJet20_v1,
                               HLT_PFJet20_v1,
+                              HLT_CaloJet20NoFastJet_v1,
 
                               HLT_HT100_v1,
                               HLT_PFHT100_v1,
