@@ -65,8 +65,9 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
 
     # HLT jets
-    srcHLTAk4PF     = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
-    srcHLTAk4Calo   = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")),                           
+    srcHLTAk4PF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
+    srcHLTAk4Calo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")),                           
+    srcHLTAk4CaloNoFastJet = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassedNoFastJet","","")),                           
 #    srcHLTAk4PF     = cms.VInputTag(cms.InputTag("hltAntiKT4PFJets","","")),                           
 #    srcHLTAk4PFNoPU = cms.VInputTag(cms.InputTag("hltAntiKT4PFJetsNoPU","","")),                           
 #    srcHLTAk4Calo   = cms.VInputTag(cms.InputTag("hltCaloJetL1FastJetCorrected","","")),                           
