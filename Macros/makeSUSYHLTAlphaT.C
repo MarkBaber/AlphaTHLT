@@ -3,7 +3,9 @@
 #define NEUTRINO
 //#define HLT_CALOJET
 
-//#define MATCHING
+//#define HLT_NOFASTJET
+
+#define MATCHING
 
 
 // ********************************************************************************
@@ -130,8 +132,10 @@ void makeSUSYHLTAlphaT(){
   // ------------------------------------------------------------------------------------------------------------------------
   TString branch    = "MakeTrees/Ntuple";
 
-  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC, 25ns
+  //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC, 25ns
   //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/22Oct14_50ns/";  // pre8 with correct JEC (needs updating with latest GT), 50ns
+
+  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/01Nov14/";  // 25ns, added NoFastJet calojets
 
   // Automatically determine bunch spacing
   double instLumi(0);
@@ -210,7 +214,7 @@ void makeSUSYHLTAlphaT(){
 
 
   // ------------------------------------------------------------------------------------------------------------------------
-  sample selectedSample =  TTBar; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
+  sample selectedSample =  DYJets; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
 
   // Label QCD ptHat bins
   int samplePTHat = 0;
@@ -272,30 +276,14 @@ void makeSUSYHLTAlphaT(){
   std::map< TString, TH2*>         histMatch2D;
 
 
-  std::vector<float> *genJetPT  = new std::vector<float>();
-  std::vector<float> *genJetPx  = new std::vector<float>();
-  std::vector<float> *genJetPy  = new std::vector<float>();
-  std::vector<float> *genJetEta = new std::vector<float>();
-  std::vector<float> *genJetPhi = new std::vector<float>();
-  std::vector<float> *genJetForPT  = new std::vector<float>();
-  std::vector<float> *genJetForPx  = new std::vector<float>();
-  std::vector<float> *genJetForPy  = new std::vector<float>();
-  std::vector<float> *genJetForEta = new std::vector<float>();
-  //  std::vector<float> *genJetForPhi = new std::vector<float>();
-  float genHT(0), genMET(0), genMHT(0); // pfAlphaT(0),
-  std::vector<float> *hltPFJetPT  = new std::vector<float>();
-  std::vector<float> *hltPFJetPx  = new std::vector<float>();
-  std::vector<float> *hltPFJetPy  = new std::vector<float>();
-  std::vector<float> *hltPFJetEta = new std::vector<float>();
-  std::vector<float> *hltPFJetPhi = new std::vector<float>();
-  float hltPFHT(0), hltPFMET(0), hltPFMHT(0); //, caloAlphaT(0);
 
-  // std::vector<float> *hltPFJetPT  = new std::vector<float>();
-  // std::vector<float> *hltPFJetPx  = new std::vector<float>();
-  // std::vector<float> *hltPFJetPy  = new std::vector<float>();
-  // std::vector<float> *hltPFJetEta = new std::vector<float>();
-  // //  std::vector<float> *hltPFJetPhi = new std::vector<float>();
-  // float hltPFHT(0), hltPFAlphaT(0);
+  // Jet collections for matching studies
+  std::vector<TString> jetColls;
+  jetColls.push_back("PF");
+  jetColls.push_back("Calo");
+  jetColls.push_back("CaloNFJ");
+
+
 
   UInt_t NVTX(0);
   UChar_t genLeptonVeto(false);
@@ -310,21 +298,21 @@ void makeSUSYHLTAlphaT(){
 
 
   // Store HLT paths
-    hltPathNames.push_back("HLT_CaloJet20_v1");
-    hltPathNames.push_back("HLT_PFJet20_v1");
-    hltPathNames.push_back("HLT_HT100_v1");
-    hltPathNames.push_back("HLT_PFHT100_v1");
-    
-    hltPathNames.push_back("HLT_HT200_AlphaT0p57_NoL1_v1");
-    hltPathNames.push_back("HLT_HT250_AlphaT0p55_NoL1_v1");
-    hltPathNames.push_back("HLT_HT300_AlphaT0p53_NoL1_v1");
-    hltPathNames.push_back("HLT_HT350_AlphaT0p52_NoL1_v1");
-    hltPathNames.push_back("HLT_HT400_AlphaT0p51_NoL1_v1");
-    hltPathNames.push_back("HLT_HT200_AlphaT0p57_L1HTT175OrETM70_v1");
-    hltPathNames.push_back("HLT_HT250_AlphaT0p55_L1HTT175OrETM70_v1");
-    hltPathNames.push_back("HLT_HT300_AlphaT0p53_L1HTT175OrETM70_v1");
-    hltPathNames.push_back("HLT_HT350_AlphaT0p52_L1HTT175OrETM70_v1");
-    hltPathNames.push_back("HLT_HT400_AlphaT0p51_L1HTT175OrETM70_v1");
+  hltPathNames.push_back("HLT_CaloJet20_v1");
+  hltPathNames.push_back("HLT_PFJet20_v1");
+  hltPathNames.push_back("HLT_HT100_v1");
+  hltPathNames.push_back("HLT_PFHT100_v1");
+  
+  hltPathNames.push_back("HLT_HT200_AlphaT0p57_NoL1_v1");
+  hltPathNames.push_back("HLT_HT250_AlphaT0p55_NoL1_v1");
+  hltPathNames.push_back("HLT_HT300_AlphaT0p53_NoL1_v1");
+  hltPathNames.push_back("HLT_HT350_AlphaT0p52_NoL1_v1");
+  hltPathNames.push_back("HLT_HT400_AlphaT0p51_NoL1_v1");
+  hltPathNames.push_back("HLT_HT200_AlphaT0p57_L1HTT175OrETM70_v1");
+  hltPathNames.push_back("HLT_HT250_AlphaT0p55_L1HTT175OrETM70_v1");
+  hltPathNames.push_back("HLT_HT300_AlphaT0p53_L1HTT175OrETM70_v1");
+  hltPathNames.push_back("HLT_HT350_AlphaT0p52_L1HTT175OrETM70_v1");
+  hltPathNames.push_back("HLT_HT400_AlphaT0p51_L1HTT175OrETM70_v1");
     
     hltPathNames.push_back("HLT_HT200_AlphaT0p5_NoL1_v1");
     hltPathNames.push_back("HLT_HT250_AlphaT0p5_NoL1_v1");
@@ -380,7 +368,6 @@ void makeSUSYHLTAlphaT(){
   std::vector<float> *uctJetPhi = new std::vector<float>();
   float uctHT(0), uctMHT(0), uctMHToverHT(0), uctMET(0);
 
-
   // ------------------------------------------------------------
   // HLT
   // ------------------------------------------------------------
@@ -389,32 +376,38 @@ void makeSUSYHLTAlphaT(){
   std::vector<float> *hltCaloJetPx  = new std::vector<float>();
   std::vector<float> *hltCaloJetPy  = new std::vector<float>();
   std::vector<float> *hltCaloJetEta = new std::vector<float>();
-  //  std::vector<float> *hltCaloJetPhi = new std::vector<float>();
+  std::vector<float> *hltCaloJetPhi = new std::vector<float>();
   float hltCaloHT(0); //, hltCaloAlphaT(0);
-  // // HLT PF
-  // std::vector<float> *hltPFJetPT  = new std::vector<float>();
-  // std::vector<float> *hltPFJetPx  = new std::vector<float>();
-  // std::vector<float> *hltPFJetPy  = new std::vector<float>();
-  // std::vector<float> *hltPFJetEta = new std::vector<float>();
-  //  std::vector<float> *hltPFJetPhi = new std::vector<float>();
-  //  float hltPFJetHT(0), hltPFJetAlphaT(0);
-  // // HLT PFNoPU
-  // // std::vector<float> *hltPFNoPUPT  = new std::vector<float>();
-  // // std::vector<float> *hltPFNoPUPx  = new std::vector<float>();
-  // // std::vector<float> *hltPFNoPUPy  = new std::vector<float>();
-  // // std::vector<float> *hltPFNoPUEta = new std::vector<float>();
-  // // //  std::vector<float> *hltPFNoPUPhi = new std::vector<float>();
-  // // float hltPFNoPUHT(0), hltPFNoPUAlphaT(0);
+  // HLT CaloJet - No FastJet correction
+  std::vector<float> *hltCaloJetNFJPT  = new std::vector<float>();
+  std::vector<float> *hltCaloJetNFJPx  = new std::vector<float>();
+  std::vector<float> *hltCaloJetNFJPy  = new std::vector<float>();
+  std::vector<float> *hltCaloJetNFJEta = new std::vector<float>();
+  std::vector<float> *hltCaloJetNFJPhi = new std::vector<float>();
+  // HLT PF  
+  std::vector<float> *hltPFJetPT  = new std::vector<float>();
+  std::vector<float> *hltPFJetPx  = new std::vector<float>();
+  std::vector<float> *hltPFJetPy  = new std::vector<float>();
+  std::vector<float> *hltPFJetEta = new std::vector<float>();
+  std::vector<float> *hltPFJetPhi = new std::vector<float>();
+  float hltPFHT(0), hltPFMET(0), hltPFMHT(0); //, caloAlphaT(0);
 
   // ------------------------------------------------------------
   // GEN
   // ------------------------------------------------------------
-  // std::vector<float> *genJetPT  = new std::vector<float>();
-  // std::vector<float> *genJetPx  = new std::vector<float>();
-  // std::vector<float> *genJetPy  = new std::vector<float>();
-  // std::vector<float> *genJetEta = new std::vector<float>();
-  //  std::vector<float> *genJetPhi = new std::vector<float>();
-  //  float genHT(0), genAlphaT(0), genMET(0);
+  // Gen
+  std::vector<float> *genJetPT  = new std::vector<float>();
+  std::vector<float> *genJetPx  = new std::vector<float>();
+  std::vector<float> *genJetPy  = new std::vector<float>();
+  std::vector<float> *genJetEta = new std::vector<float>();
+  std::vector<float> *genJetPhi = new std::vector<float>();
+  // Gen forward
+  std::vector<float> *genJetForPT  = new std::vector<float>();
+  std::vector<float> *genJetForPx  = new std::vector<float>();
+  std::vector<float> *genJetForPy  = new std::vector<float>();
+  std::vector<float> *genJetForEta = new std::vector<float>();
+  //  std::vector<float> *genJetForPhi = new std::vector<float>();
+  float genHT(0), genMET(0), genMHT(0); // pfAlphaT(0),
 
 
 
@@ -1076,18 +1069,42 @@ void makeSUSYHLTAlphaT(){
     // sigChain->SetBranchAddress("hltAk4PF_Eta",         &hltPFJetEta);
    
     
-    // // ------------------------------------------------------------ 
-    // // GEN
-    // // ------------------------------------------------------------ 
-    // sigChain->SetBranchAddress("genAk4_Pt",         &genJetPT); 
-    // sigChain->SetBranchAddress("genAk4_Px",         &genJetPx);
-    // sigChain->SetBranchAddress("genAk4_Py",         &genJetPy);
-    // //sigChain->SetBranchAddress("genAk4_Phi",      &genJetPhi);
-    // sigChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
-    // sigChain->SetBranchAddress("genMetTrue_MetPt", &genMET);
+
+    // ------------------------------------------------------------ 
+    // HLT 
+    // ------------------------------------------------------------ 
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetNFJPhi);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
+
+#ifdef HLT_NOFASTJET
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetPT);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetPx);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetPy);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetPhi);
+    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetEta);
+#else
+    sigChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
+    sigChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
+    sigChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
+    sigChain->SetBranchAddress("hltAk4Calo_Phi",     &hltCaloJetPhi); 
+    sigChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
+#endif 
+
+    // HLT PF
+    sigChain->SetBranchAddress("hltAk4PF_Pt",        &hltPFJetPT);
+    sigChain->SetBranchAddress("hltAk4PF_Px",        &hltPFJetPx);
+    sigChain->SetBranchAddress("hltAk4PF_Py",        &hltPFJetPy);
+    sigChain->SetBranchAddress("hltAk4PF_Phi",       &hltPFJetPhi);
+    sigChain->SetBranchAddress("hltAk4PF_Eta",       &hltPFJetEta);
 
 
-    // TEMPORARY - REPLACE NAMES FOR MEETING IN 1.5 hours
+    // ------------------------------------------------------------ 
+    // GEN
+    // ------------------------------------------------------------ 
+
     sigChain->SetBranchAddress("genAk4_Pt",         &genJetPT);
     sigChain->SetBranchAddress("genAk4_Px",         &genJetPx);
     sigChain->SetBranchAddress("genAk4_Py",         &genJetPy);
@@ -1101,41 +1118,6 @@ void makeSUSYHLTAlphaT(){
     sigChain->SetBranchAddress("genAk4For_Eta",        &genJetForEta);
 
     sigChain->SetBranchAddress("genMetCalo_MetPt",     &genMET);
-
-
-    sigChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
-    sigChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
-    sigChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
-    //sigChain->SetBranchAddress("hltAk4Calo_Phi",     &hltCaloJetPhi);
-    sigChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
-
-#ifdef HLT_CALOJET
-    // HLT CaloJet
-    sigChain->SetBranchAddress("hltAk4Calo_Pt",        &caloJetPT);
-    sigChain->SetBranchAddress("hltAk4Calo_Px",        &caloJetPx);
-    sigChain->SetBranchAddress("hltAk4Calo_Py",        &caloJetPy);
-    //sigChain->SetBranchAddress("hltAk4Calo_Phi",       &caloJetPhi);
-    sigChain->SetBranchAddress("hltAk4Calo_Eta",       &caloJetEta);
-
-    // sigChain->SetBranchAddress("hltAk4CaloFor_Pt",        &caloJetForPT);
-    // sigChain->SetBranchAddress("hltAk4CaloFor_Px",        &caloJetForPx);
-    // sigChain->SetBranchAddress("hltAk4CaloFor_Py",        &caloJetForPy);
-    // //sigChain->SetBranchAddress("hltAk4CaloFor_Phi",       &caloJetForPhi);
-    // sigChain->SetBranchAddress("hltAk4CaloFor_Eta",       &caloJetForEta);
-#else
-    // HLT PFJet
-    sigChain->SetBranchAddress("hltAk4PF_Pt",        &hltPFJetPT);
-    sigChain->SetBranchAddress("hltAk4PF_Px",        &hltPFJetPx);
-    sigChain->SetBranchAddress("hltAk4PF_Py",        &hltPFJetPy);
-    //sigChain->SetBranchAddress("hltAk4PF_Phi",       &hltPFJetPhi);
-    sigChain->SetBranchAddress("hltAk4PF_Eta",       &hltPFJetEta);
-
-    // sigChain->SetBranchAddress("hltAk4PFFor_Pt",        &caloJetForPT);
-    // sigChain->SetBranchAddress("hltAk4PFFor_Px",        &caloJetForPx);
-    // sigChain->SetBranchAddress("hltAk4PFFor_Py",        &caloJetForPy);
-    // //sigChain->SetBranchAddress("hltAk4PFFor_Phi",       &caloJetForPhi);
-    // sigChain->SetBranchAddress("hltAk4PFFor_Eta",       &caloJetForEta);
-#endif
 
 
     // Trigger bits
@@ -1176,18 +1158,20 @@ void makeSUSYHLTAlphaT(){
   std::cout << "Sample xs (cms2)       = " << sampleXS                        << "\n";
   std::cout << "Rate scalefactor       = " << rateScaleFactor                 << "\n";
   std::cout << "Rate scalefactor error = " << rateScaleFactor*sqrt(nuNEvents) << "\n\n";
+  std::cout << "--------------------------------------------------------------------------------\n";
 
 
 #ifdef SIGNAL
 
   // Loop over the tree
+  std::cout << "Starting efficiency loop:\n";
   for ( unsigned int iEvent = signalEventLow; iEvent < signalEventHigh; ++iEvent ){
     
     sigChain->GetEntry( iEvent );
 
-    float pfAlphaTStandard(0);
+    float genAlphaTStandard(0);
     float hltPFAlphaTStandard(0);
-    float hltPFAlphaTDynamic(0);
+    //    float hltPFAlphaTDynamic(0);
     float hltCaloAlphaTStandard(0);
     float hltCaloAlphaTDynamic(0);
 
@@ -1250,19 +1234,12 @@ void makeSUSYHLTAlphaT(){
     TString genJetBinStr     = TString(Form( "%d", genJetsAboveThresh)) + TString("Jets");
 
 
-    // Calo HLT cuts
-    // bool passesATStandard(false), passesATDynamic(false), passesATDynamic2(false), passesATDynamic3(false);
-    // bool passesHTStandard(false), passesHTDynamic(false);
-    //    bool passesJet2_50(false), passesJet2_60(false), passesJet2_70(false), passesJet2_80(false), passesJet2_90(false), passesJet2_100(false);
-    //    bool passesDynJet2_100(false);    
-
-    //    bool passesOffHT(false), passesOffAT(false), passesOffJet(false), passesOffAll(false);
     bool passesOffJet(false);
     bool passesAnaBinOffAT(false), passesAnaBinOffJet(false), passesAnaBinOffAll(false);
     bool passesOffVetoes(false);
 
 
-    pfAlphaTStandard       = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );      
+    genAlphaTStandard       = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );      
 
     hltPFAlphaTStandard    = calculateAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold );    
 
@@ -1270,6 +1247,10 @@ void makeSUSYHLTAlphaT(){
 
 
     // Dynamic AlphaT
+    // hltPFAlphaTDynamic     = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, 
+    // 						     maxCaloJet, hltPFJetThreshold, 
+    // 						     caloJetAlphaThreshold );
+
     hltCaloAlphaTDynamic   = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, 
 						     maxCaloJet, hltCaloJetThreshold, 
 						     caloJetAlphaThreshold );
@@ -1277,7 +1258,7 @@ void makeSUSYHLTAlphaT(){
 
 
     // ********************************************************************************
-    // *                              hltPFjets 
+    // *                              >= 2 Gen jets
     // ********************************************************************************
     if ( genJetsAboveThresh >= 2 ){
       
@@ -1298,7 +1279,7 @@ void makeSUSYHLTAlphaT(){
       }
 
       // Check individual offline cuts
-      if ( (genJetsAboveThresh >= 2 ) && ((*genJetPT)[1] > genJet2PTThreshold) )          { passesOffJet    = true; }
+      if ( (genJetsAboveThresh >= 2 ) && ((*genJetPT)[1] > genJet2PTThreshold) )       { passesOffJet    = true; }
       if ( !(genLeptonVeto) && !(forJetVeto) && !(mhtOverMetVeto) )                    { passesOffVetoes = true; }
       // Check full offline selection
       //      if ( passesOffHT && passesOffAT && passesOffJet && passesOffVetoes )     { passesOffAll    = true; }
@@ -1390,10 +1371,10 @@ void makeSUSYHLTAlphaT(){
 	  // Check individual offline cuts
 	  // --------------------------------------------------------------------------------
 	  // NOTE: HT is already satisfied by binning
-	  if ( pfAlphaTStandard > alphaT)                                        { passesAnaBinOffAT  = true; }
+	  if ( genAlphaTStandard > alphaT)                                          { passesAnaBinOffAT  = true; }
 	  if ( (genJetsAboveThresh >= 2 ) && ((*genJetPT)[1] > genJet2PTThreshold) ){ passesAnaBinOffJet = true; }
 	  // Check full offline selection
-	  if ( passesAnaBinOffAT && passesAnaBinOffJet )                         { passesAnaBinOffAll = true; }
+	  if ( passesAnaBinOffAT && passesAnaBinOffJet )                            { passesAnaBinOffAll = true; }
 
 	  // Get jet bin
 	  for (uint iJetBin = 0; iJetBin < anaJetBins.size(); ++iJetBin){
@@ -1526,7 +1507,7 @@ void makeSUSYHLTAlphaT(){
 
   } // End event loop
 #endif
-
+  std::cout << "Ending efficiency loop\n\n";
 
 
 
@@ -1549,63 +1530,53 @@ void makeSUSYHLTAlphaT(){
     rateChain->SetBranchAddress("gct_MetPt",       &uctMET);
 
 
-    // // ------------------------------------------------------------ 
-    // // HLT 
-    // // ------------------------------------------------------------ 
-    // // HLT CaloJet
-    // rateChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
-    // rateChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
-    // rateChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
-    // //rateChain->SetBranchAddress("hltAk4Calo_Phi",       &hltCaloJetPhi);
-    // rateChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
-  
-    // // HLT PF 
-    // rateChain->SetBranchAddress("hltAk4PF_Pt",          &hltPFJetPT); 
-    // rateChain->SetBranchAddress("hltAk4PF_Px",          &hltPFJetPx);
-    // rateChain->SetBranchAddress("hltAk4PF_Py",          &hltPFJetPy);
-    // //rateChain->SetBranchAddress("hltAk4PF_Phi",         &hltPFJetPhi);
-    // rateChain->SetBranchAddress("hltAk4PF_Eta",         &hltPFJetEta);
+
+
+    // ------------------------------------------------------------ 
+    // HLT 
+    // ------------------------------------------------------------ 
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetNFJPhi);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
+
+#ifdef HLT_NOFASTJET
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetPT);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetPx);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetPy);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetPhi);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetEta);
+#else
+    rateChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
+    rateChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
+    rateChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
+    rateChain->SetBranchAddress("hltAk4Calo_Phi",     &hltCaloJetPhi); 
+    rateChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
+#endif 
+ 
+    // HLT PF 
+    rateChain->SetBranchAddress("hltAk4PF_Pt",          &hltPFJetPT); 
+    rateChain->SetBranchAddress("hltAk4PF_Px",          &hltPFJetPx);
+    rateChain->SetBranchAddress("hltAk4PF_Py",          &hltPFJetPy);
+    rateChain->SetBranchAddress("hltAk4PF_Phi",         &hltPFJetPhi);
+    rateChain->SetBranchAddress("hltAk4PF_Eta",         &hltPFJetEta);
    
     
-    // // ------------------------------------------------------------ 
-    // // GEN
-    // // ------------------------------------------------------------ 
-    // rateChain->SetBranchAddress("genAk4_Pt",         &genJetPT); 
-    // rateChain->SetBranchAddress("genAk4_Px",         &genJetPx);
-    // rateChain->SetBranchAddress("genAk4_Py",         &genJetPy);
-    // //rateChain->SetBranchAddress("genAk4_Phi",      &genJetPhi);
-    // rateChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
-
-
-    // TEMPORARY - REPLACE NAMES FOR MEETING IN 1.5 hours
+    // ------------------------------------------------------------ 
+    // GEN
+    // ------------------------------------------------------------ 
     rateChain->SetBranchAddress("genAk4_Pt",         &genJetPT); 
     rateChain->SetBranchAddress("genAk4_Px",         &genJetPx);
     rateChain->SetBranchAddress("genAk4_Py",         &genJetPy);
     rateChain->SetBranchAddress("genAk4_Phi",      &genJetPhi);
     rateChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
 
-#ifdef HLT_CALOJET
-    // HLT CaloJet
-    rateChain->SetBranchAddress("hltAk4Calo_Pt",        &caloJetPT);
-    rateChain->SetBranchAddress("hltAk4Calo_Px",        &caloJetPx);
-    rateChain->SetBranchAddress("hltAk4Calo_Py",        &caloJetPy);
-    rateChain->SetBranchAddress("hltAk4Calo_Phi",       &caloJetPhi);
-    rateChain->SetBranchAddress("hltAk4Calo_Eta",       &caloJetEta);
-
-    // rateChain->SetBranchAddress("hltAk4PF_Pt",        &hltPFJetPT);
-    // rateChain->SetBranchAddress("hltAk4PF_Px",        &hltPFJetPx);
-    // rateChain->SetBranchAddress("hltAk4PF_Py",        &hltPFJetPy);
-    // //rateChain->SetBranchAddress("hltAk4PF_Phi",       &hltPFJetPhi);
-    // rateChain->SetBranchAddress("hltAk4PF_Eta",       &hltPFJetEta);
-
-#else
-    // HLT PFJet
-    rateChain->SetBranchAddress("hltAk4PF_Pt",        &hltPFJetPT);
-    rateChain->SetBranchAddress("hltAk4PF_Px",        &hltPFJetPx);
-    rateChain->SetBranchAddress("hltAk4PF_Py",        &hltPFJetPy);
-    rateChain->SetBranchAddress("hltAk4PF_Phi",       &hltPFJetPhi);
-    rateChain->SetBranchAddress("hltAk4PF_Eta",       &hltPFJetEta);
-#endif
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetNFJPhi); 
+    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
 
 
     rateChain->SetBranchAddress("genMetCaloAndNonPrompt_MetPt", &genMET);
@@ -1629,9 +1600,8 @@ void makeSUSYHLTAlphaT(){
 #ifdef NEUTRINO
 
     // Loop over the tree
+    std::cout << "Starting rate loop:\n";
     for ( unsigned int iEvent = nuEventLow; iEvent < nuEventHigh; ++iEvent ){
-
-
 
     rateChain->GetEntry( iEvent );
 
@@ -1699,22 +1669,30 @@ void makeSUSYHLTAlphaT(){
     // ********************************************************************************
     // *                              Calojets 
     // ********************************************************************************
-    float hltPFAlphaTStandard(0), hltPFAlphaTDynamic(0);
+    float genAlphaTStandard(0), hltPFAlphaTStandard(0), hltPFAlphaTDynamic(0), hltCaloAlphaTStandard(0), hltCaloAlphaTDynamic(0);
     hltPFHT        = 0;
     hltPFMHT       = 0;
-    hltPFAlphaTStandard  = calculateAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold );
-    // Dynamic AlphaT
-    hltPFAlphaTDynamic   = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, //caloJetThreshold, 
-						  maxCaloJet, hltPFJetThreshold, 
-    						  caloJetAlphaThreshold );
+
+    genAlphaTStandard      = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );
+    hltPFAlphaTStandard    = calculateAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold );
+
+    hltCaloAlphaTStandard  = calculateAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltPFJetThreshold );
+
+    // Dynamic AlphaT 
+    hltPFAlphaTDynamic     = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy,
+						     maxCaloJet, hltPFJetThreshold,
+						     caloJetAlphaThreshold );
     
+    hltCaloAlphaTDynamic   = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy,
+                                                     maxCaloJet, hltCaloJetThreshold,
+                                                     caloJetAlphaThreshold );
 
     // HLT PFJets
     int hltPFJetsAboveThresh(0);
     float hltPFMHTx(0), hltPFMHTy(0);
     for(uint iJet = 0;iJet < hltPFJetPT->size(); ++iJet ){
       if( (*hltPFJetPT)[iJet] < hltPFJetThreshold ) break;
-      hltPFHT    += (*hltPFJetPT)[iJet];
+      hltPFHT        += (*hltPFJetPT)[iJet];
       hltPFMHTx      += (*hltPFJetPx)[iJet];
       hltPFMHTy      += (*hltPFJetPy)[iJet];
 
@@ -1914,10 +1892,6 @@ void makeSUSYHLTAlphaT(){
     // ****************************************************************************************************
 
 #ifdef MATCHING  
-
-    // std::vector<TLorentzVector> genVec, hltVec;
-
-    // for ( uint iJet = 0; iJet < genJetPT->size(); ++iJet ){
     //   float jetPt  = (*genJetPT)[iJet];
     //   float jetEta = (*genJetEta)[iJet];
     //   float jetPhi = (*genJetPhi)[iJet];
@@ -1936,233 +1910,232 @@ void makeSUSYHLTAlphaT(){
     //   hltVec.push_back( hltJet );
     // }
 
-    // Perform matching
-    std::vector<pair_info> pairs = make_pairs( genJetPT, genJetEta, genJetPhi, hltPFJetPT, hltPFJetEta, hltPFJetPhi, 20., 20. );
-    std::sort(pairs.begin(), pairs.end(), sortDR);
-    std::vector<int> HLTMatchedIndex = analyse_pairs(pairs, hltPFJetPT->size(), maxDeltaR);
-
-    // Number of pileup jets that pass analysis jet threshold
-    int nPileup(0);
-
-    // Count number of analysis pileup jets
-    for(unsigned int iHLT = 0; iHLT < HLTMatchedIndex.size(); ++iHLT ) {
-      float hltPt  = (*hltPFJetPT)[iHLT];
-      int iGEN = HLTMatchedIndex[iHLT];
-      if ( iGEN == -1 ){ 
-	if (hltPt > hltPFJetThreshold ){
-	  nPileup++; // Count analysis jets attributed to pileup
-	}
-      }
-    }
+    // Create dynamic jet collection containers
+    std::vector<float> *hltCollPT   = new std::vector<float>();
+    std::vector<float> *hltCollEta  = new std::vector<float>();
+    std::vector<float> *hltCollPhi  = new std::vector<float>();
     
+    // Loop through jet collections to compare with Gen
+    for (uint iColl = 0; iColl < jetColls.size(); ++iColl){
 
-    // Iterate through HLT jets
-    for(unsigned int iHLT = 0; iHLT < HLTMatchedIndex.size(); ++iHLT ) {
+      // Load the relevant jet collection
+      TString jetColl = jetColls[ iColl ];
+      if ( jetColl == "PF" )       { hltCollPT = hltPFJetPT;      hltCollEta = hltPFJetEta;      hltCollPhi = hltPFJetPhi;      }
+      if ( jetColl == "Calo" )     { hltCollPT = hltCaloJetPT;    hltCollEta = hltCaloJetEta;    hltCollPhi = hltCaloJetPhi;    }
+      if ( jetColl == "CaloNFJPF" ){ hltCollPT = hltCaloJetNFJPT; hltCollEta = hltCaloJetNFJEta; hltCollPhi = hltCaloJetNFJPhi; }
 
-      float hltPt  = (*hltPFJetPT)[iHLT];
-      float hltEta = (*hltPFJetEta)[iHLT];
-      float hltPhi = (*hltPFJetPhi)[iHLT];
-      // dR matched
-      float dRGenPt  = 0;
-      float dRGenEta = 0;
-      float dRGenPhi = 0;
-      // rank matched
-      float rGenPt  = 0;
-      float rGenEta = 0;
-      float rGenPhi = 0;
-      // Pileup or matched to gen
-      TString jetID = "";
-      // Jet leading/sub-leading rank - Jet1 or Jet2
-      TString rank = "";
-      
-      // Find corresponding GEN jet match if it exists
-      int iGEN = HLTMatchedIndex[iHLT];
-      bool matched(true);
-      if ( iGEN == -1 ){ matched = false; }
+      // Perform matching
+      std::vector<pair_info> pairs = make_pairs( genJetPT, genJetEta, genJetPhi, hltCollPT, hltCollEta, hltCollPhi, 20., 20. );
+      std::sort(pairs.begin(), pairs.end(), sortDR);
+      std::vector<int> HLTMatchedIndex = analyse_pairs(pairs, hltCollPT->size(), maxDeltaR);
 
+      // Number of pileup jets that pass analysis jet threshold
+      int nPileup(0);
 
+      // Count number of analysis pileup jets
+      for(unsigned int iHLT = 0; iHLT < HLTMatchedIndex.size(); ++iHLT ) {
+	float hltPt  = (*hltCollPT)[iHLT];
+	int iGEN = HLTMatchedIndex[iHLT];
 
-      histMatch["Inclusive_AllJets_JetPT"] ->Fill( hltPt );
-      histMatch["Inclusive_AllJets_JetEta"]->Fill( hltEta );
-      if (iHLT < 2){
-	rank = TString("Jet") + Form("%d", (iHLT + 1) );
-
-	histMatch["Inclusive_" + rank + "_JetPT"] ->Fill( hltPt );
-	histMatch["Inclusive_" + rank + "_JetEta"]->Fill( hltEta );
-      }
-      if (matched){
-	jetID = "Matched";
-	dRGenPt  = (*genJetPT)[iGEN];
-	dRGenEta = (*genJetEta)[iGEN];
-	dRGenPhi = (*genJetPhi)[iGEN];
-
-	histMatch["Matched_AllJets_JetPT"] ->Fill( hltPt );
-	histMatch["Matched_AllJets_JetEta"]->Fill( hltEta );
-	if (iHLT < 2){
-	  histMatch["Matched_" + rank + "_JetPT"] ->Fill( hltPt );
-	  histMatch["Matched_" + rank + "_JetEta"]->Fill( hltEta );
-	}
-      }
-      else{
-	// Make assumption non-matched jets are attributed to pileup      
-	jetID = "Pileup";
-
-	histMatch["Pileup_AllJets_JetPT"] ->Fill( hltPt );
-	histMatch["Pileup_AllJets_JetEta"]->Fill( hltEta );
-	if (iHLT < 2){
-	  histMatch["Pileup_" + rank + "_JetPT"] ->Fill( hltPt );
-	  histMatch["Pileup_" + rank + "_JetEta"]->Fill( hltEta );
-	}
-      }
-
-      
-      // ********************************************************************************
-      // Rank matching
-      // ********************************************************************************
-      if (iHLT < genJetPT->size()){
-
-	rGenPt  = (*genJetPT)[iHLT];
-	rGenEta = (*genJetEta)[iHLT];
-	rGenPhi = (*genJetPhi)[iHLT];
-
-	TLorentzVector rGenJet;
-	rGenJet.SetPtEtaPhiM( rGenPt, rGenEta, rGenPhi, 0 );
-	TLorentzVector hltJet;
-	hltJet.SetPtEtaPhiM( hltPt, hltEta, hltPhi, 0 );
-	
-	double rDeltaPt     = (hltPt - rGenPt);
-	double rDeltaPtRel  = (hltPt - rGenPt)/rGenPt;
-	double rJetResponse = hltPt/rGenPt; 
-	double rDeltaEta    = (rGenEta - hltEta); 
-	double rDeltaPhi    = rGenJet.DeltaPhi( hltJet );
-	double rDeltaR      = sqrt( rDeltaEta*rDeltaEta + rDeltaPhi*rDeltaPhi );
-
-	
-	// Iterate through jet types
-	for (uint iJet = 0; iJet < 2; ++iJet){
-	  TString jet = "";
-	  if (iJet == 0){ jet = "Inclusive"; }
-	  else          { jet = jetID; }
-	  
-	  histMatch[  jet + "_AllJets_JetResponse"]        ->Fill(rJetResponse);
-	  histMatch[  jet + "_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-	  histMatch[  jet + "_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
-	  histMatch[  jet + "_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
-	  histMatch[  jet + "_AllJets_DeltaR"]             ->Fill(rDeltaR);
-	  histMatch2D[jet + "_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-	  histMatch2D[jet + "_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-	  histMatch2D[jet + "_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
-
-	  if (iHLT < 2){
-	    histMatch[  jet + "_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
-	    histMatch[  jet + "_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-	    histMatch[  jet + "_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
-	    histMatch[  jet + "_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
-	    histMatch[  jet + "_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
-	    histMatch2D[jet + "_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-	    histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-	    histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	if ( iGEN == -1 ){ 
+	  if (hltPt > hltPFJetThreshold ){
+	    nPileup++; // Count analysis jets attributed to pileup
 	  }
-	
 	}
-      
-	// ********************************************************************************
-	// dR matching
-	// ********************************************************************************
-	if (matched){
-	  // Make dR distribution, correlations
-
-	  TLorentzVector dRGenJet;
-	  dRGenJet.SetPtEtaPhiM( dRGenPt, dRGenEta, dRGenPhi, 0 );
-	
-	  double dRDeltaPt     = (hltPt - dRGenPt);
-	  double dRDeltaPtRel  = (hltPt - dRGenPt)/dRGenPt;
-	  double dRJetResponse = hltPt/dRGenPt; 
-	  double dRDeltaEta    = dRGenEta - hltEta; 
-	  double dRDeltaPhi    = dRGenJet.DeltaPhi( hltJet );
-	  double dRDeltaR      = sqrt( dRDeltaEta*dRDeltaEta + dRDeltaPhi*dRDeltaPhi );
-	  
-	
-	  histMatch[  "dRMatched_AllJets_JetResponse"]        ->Fill(rJetResponse);
-          histMatch[  "dRMatched_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-          histMatch[  "dRMatched_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
-          histMatch[  "dRMatched_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
-          histMatch[  "dRMatched_AllJets_DeltaR"]             ->Fill(rDeltaR);
-          histMatch2D["dRMatched_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-          histMatch2D["dRMatched_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-          histMatch2D["dRMatched_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
-
-          if (iHLT < 2){
-            histMatch[  "dRMatched_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
-            histMatch[  "dRMatched_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-            histMatch[  "dRMatched_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
-            histMatch[  "dRMatched_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
-            histMatch[  "dRMatched_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
-            histMatch2D["dRMatched_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-            histMatch2D["dRMatched_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-            histMatch2D["dRMatched_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
-          }
-	} // End dRMatching
-
-
-
-	
-	// ********************************************************************************
-	// Energy sums matching
-	// ********************************************************************************
-	
-	// By default make events with no offline HT/MHT have value -1.2
-	float deltaHT  = -1.2;
-	float deltaMHT = -1.2;
-	if (pfHT  > 0){ deltaHT  = (hltPFHT  - pfHT  )/pfHT; }
-	if (pfMHT > 0){ deltaMHT = (hltPFMHT - pfMHT )/pfMHT;}
-	
-	float pfAlphaTStandard = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );
-	float deltaAlphaT = -1.2;
-	if (pfAlphaTStandard > 0){ deltaAlphaT = ( hltPFAlphaTStandard - pfAlphaTStandard )/pfAlphaTStandard; }
-	
-
-	histMatch2D["NPileup_vs_NVTX"]       ->Fill( NVTX,  nPileup );
-	histMatch2D["HLTHT_vs_GENHT"]        ->Fill( pfHT,  hltPFHT );
-	histMatch2D["HLTMHT_vs_GENMHT"]      ->Fill( pfMHT, hltPFMHT );
-	histMatch2D["HLTAlphaT_vs_GENAlphaT"]->Fill( pfAlphaTStandard, hltPFAlphaTStandard );
-
-	histMatch2D["DeltaHT_vs_GENHT"]        ->Fill( pfHT,    deltaHT  );
-	histMatch2D["DeltaMHT_vs_GENMHT"]      ->Fill( pfMHT,   deltaMHT );
-	histMatch2D["DeltaAlphaT_vs_GENAlphaT"]->Fill( pfAlphaTStandard, deltaAlphaT );
-	histMatch2D["DeltaHT_vs_NPileup"]      ->Fill( nPileup, deltaHT  );
-	histMatch2D["DeltaMHT_vs_NPileup"]     ->Fill( nPileup, deltaMHT );
-	histMatch2D["DeltaAlphaT_vs_NPileup"]  ->Fill( nPileup, deltaAlphaT );
-
-	
-
-
-      }
+      }     
     
-    }
 
+      // Iterate through HLT jets
+      for(unsigned int iHLT = 0; iHLT < HLTMatchedIndex.size(); ++iHLT ) {
 
+	float hltPt  = (*hltCollPT)[iHLT];
+	float hltEta = (*hltCollEta)[iHLT];
+	float hltPhi = (*hltCollPhi)[iHLT];
+	// dR matched
+	float dRGenPt  = 0;
+	float dRGenEta = 0;
+	float dRGenPhi = 0;
+	// rank matched
+	float rGenPt  = 0;
+	float rGenEta = 0;
+	float rGenPhi = 0;
+	// Pileup or matched to gen
+	TString jetID = "";
+	// Jet leading/sub-leading rank - Jet1 or Jet2
+	TString rank = "";
+      
+	// Find corresponding GEN jet match if it exists
+	int iGEN = HLTMatchedIndex[iHLT];
+	bool matched(true);
+	if ( iGEN == -1 ){ matched = false; }
 
+	histMatch["Inclusive_AllJets_JetPT"] ->Fill( hltPt );
+	histMatch["Inclusive_AllJets_JetEta"]->Fill( hltEta );
+	if (iHLT < 2){
+	  rank = TString("Jet") + Form("%d", (iHLT + 1) );
 
+	  histMatch["Inclusive_" + rank + "_JetPT"] ->Fill( hltPt );
+	  histMatch["Inclusive_" + rank + "_JetEta"]->Fill( hltEta );
+	}
+	if (matched){
+	  jetID = "Matched";
+	  dRGenPt  = (*genJetPT)[iGEN];
+	  dRGenEta = (*genJetEta)[iGEN];
+	  dRGenPhi = (*genJetPhi)[iGEN];
 
+	  histMatch["Matched_AllJets_JetPT"] ->Fill( hltPt );
+	  histMatch["Matched_AllJets_JetEta"]->Fill( hltEta );
+	  if (iHLT < 2){
+	    histMatch["Matched_" + rank + "_JetPT"] ->Fill( hltPt );
+	    histMatch["Matched_" + rank + "_JetEta"]->Fill( hltEta );
+	  }
+	}
+	else{
+	  // Make assumption non-matched jets are attributed to pileup      
+	  jetID = "Pileup";
 
+	  histMatch["Pileup_AllJets_JetPT"] ->Fill( hltPt );
+	  histMatch["Pileup_AllJets_JetEta"]->Fill( hltEta );
+	  if (iHLT < 2){
+	    histMatch["Pileup_" + rank + "_JetPT"] ->Fill( hltPt );
+	    histMatch["Pileup_" + rank + "_JetEta"]->Fill( hltEta );
+	  }
+	}
 
+	// ********************************************************************************
+	// Rank matching
+	// ********************************************************************************
+	if (iHLT < genJetPT->size()){
 
+	  rGenPt  = (*genJetPT)[iHLT];
+	  rGenEta = (*genJetEta)[iHLT];
+	  rGenPhi = (*genJetPhi)[iHLT];
 
+	  TLorentzVector rGenJet;
+	  rGenJet.SetPtEtaPhiM( rGenPt, rGenEta, rGenPhi, 0 );
+	  TLorentzVector hltJet;
+	  hltJet.SetPtEtaPhiM( hltPt, hltEta, hltPhi, 0 );
+	
+	  double rDeltaPt     = (hltPt - rGenPt);
+	  double rDeltaPtRel  = (hltPt - rGenPt)/rGenPt;
+	  double rJetResponse = hltPt/rGenPt; 
+	  double rDeltaEta    = (rGenEta - hltEta); 
+	  double rDeltaPhi    = rGenJet.DeltaPhi( hltJet );
+	  double rDeltaR      = sqrt( rDeltaEta*rDeltaEta + rDeltaPhi*rDeltaPhi );
 
-    histMatch2D["HLTCaloHT_vs_HLTPFHT"] ->Fill( hltPFHT, hltHltPFHT );
-    histMatch2D["HLTCaloHT_vs_GenHT"]   ->Fill( pfHT, hltCaloHT );
-    histMatch2D["HLTPFHT_vs_GenHT"]     ->Fill( pfHT, hltPFHT );
+	
+	  // Iterate through jet types
+	  for (uint iJet = 0; iJet < 2; ++iJet){
+	    TString jet = "";
+	    if (iJet == 0){ jet = "Inclusive"; }
+	    else          { jet = jetID; }
+	  
+	    histMatch[  jet + "_AllJets_JetResponse"]        ->Fill(rJetResponse);
+	    histMatch[  jet + "_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	    histMatch[  jet + "_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
+	    histMatch[  jet + "_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
+	    histMatch[  jet + "_AllJets_DeltaR"]             ->Fill(rDeltaR);
+	    histMatch2D[jet + "_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	    histMatch2D[jet + "_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	    histMatch2D[jet + "_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	    if (iHLT < 2){
+	      histMatch[  jet + "_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
+	      histMatch[  jet + "_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	      histMatch[  jet + "_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
+	      histMatch[  jet + "_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
+	      histMatch[  jet + "_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
+	      histMatch2D[jet + "_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	      histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	      histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	    }
+	
+	  }
 
+	  // ********************************************************************************
+	  // dR matching
+	  // ********************************************************************************
+	  if (matched){
+	    // Make dR distribution, correlations
+
+	    TLorentzVector dRGenJet;
+	    dRGenJet.SetPtEtaPhiM( dRGenPt, dRGenEta, dRGenPhi, 0 );
+	
+	    double dRDeltaPt     = (hltPt - dRGenPt);
+	    double dRDeltaPtRel  = (hltPt - dRGenPt)/dRGenPt;
+	    double dRJetResponse = hltPt/dRGenPt; 
+	    double dRDeltaEta    = dRGenEta - hltEta; 
+	    double dRDeltaPhi    = dRGenJet.DeltaPhi( hltJet );
+	    double dRDeltaR      = sqrt( dRDeltaEta*dRDeltaEta + dRDeltaPhi*dRDeltaPhi );
+  
+	    histMatch[  "dRMatched_AllJets_JetResponse"]        ->Fill(rJetResponse);
+	    histMatch[  "dRMatched_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	    histMatch[  "dRMatched_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
+	    histMatch[  "dRMatched_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
+	    histMatch[  "dRMatched_AllJets_DeltaR"]             ->Fill(rDeltaR);
+	    histMatch2D["dRMatched_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	    histMatch2D["dRMatched_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	    histMatch2D["dRMatched_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+
+	    if (iHLT < 2){
+	      histMatch[  "dRMatched_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
+	      histMatch[  "dRMatched_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	      histMatch[  "dRMatched_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
+	      histMatch[  "dRMatched_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
+	      histMatch[  "dRMatched_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
+	      histMatch2D["dRMatched_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	      histMatch2D["dRMatched_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	      histMatch2D["dRMatched_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	    }
+	  } // End dRMatching
+	
+	  // // ********************************************************************************
+	  // // Energy sums matching
+	  // // ********************************************************************************
+	
+	  // // By default make events with no offline HT/MHT have value -1.2
+	  // float deltaHT  = -1.2;
+	  // float deltaMHT = -1.2;
+	  // if (pfHT  > 0){ deltaHT  = (hltCollHT  - genHT  )/genHT; }
+	  // if (pfMHT > 0){ deltaMHT = (hltCollMHT - genMHT )/genMHT;}
+	
+	  // float genAlphaTStandard = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );
+	  // float deltaAlphaT = -1.2;
+	  // if (genAlphaTStandard > 0){ deltaAlphaT = ( hltPFAlphaTStandard - genAlphaTStandard )/genAlphaTStandard; }
+
+	  // histMatch2D["NPileup_vs_NVTX"]       ->Fill( NVTX,  nPileup );
+	  // histMatch2D["HLTHT_vs_GENHT"]        ->Fill( genHT,  hltPFHT );
+	  // histMatch2D["HLTMHT_vs_GENMHT"]      ->Fill( genMHT, hltPFMHT );
+	  // histMatch2D["HLTAlphaT_vs_GENAlphaT"]->Fill( genAlphaTStandard, hltPFAlphaTStandard );
+
+	  // histMatch2D["DeltaHT_vs_GENHT"]        ->Fill( genHT,    deltaHT  );
+	  // histMatch2D["DeltaMHT_vs_GENMHT"]      ->Fill( genMHT,   deltaMHT );
+	  // histMatch2D["DeltaAlphaT_vs_GENAlphaT"]->Fill( genAlphaTStandard, deltaAlphaT );
+	  // histMatch2D["DeltaHT_vs_NPileup"]      ->Fill( nPileup, deltaHT  );
+	  // histMatch2D["DeltaMHT_vs_NPileup"]     ->Fill( nPileup, deltaMHT );
+	  // histMatch2D["DeltaAlphaT_vs_NPileup"]  ->Fill( nPileup, deltaAlphaT );
+
+	} // End rank matching
+
+      } // End HLT jet loop
+
+    } // End jet collection loop
+    
+    // Jet energy sum correlations
+    histMatch2D["HLTCaloHT_vs_HLTPFHT"] ->Fill( hltPFHT, hltPFHT );
+    histMatch2D["HLTCaloHT_vs_GenHT"]   ->Fill( genHT,    hltCaloHT );
+    histMatch2D["HLTPFHT_vs_GenHT"]     ->Fill( genHT,    hltPFHT );
+    
     // AlphaT Correlations 
-    // histMatch2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]    ->Fill( hltPFAlphaT, hltCaloAlphaT );
-    // histMatch2D["HLTCaloAlphaT_vs_GenAlphaT"]        ->Fill( pfAlphaT,   hltCaloAlphaT );
-    // histMatch2D["HLTPFAlphaT_vs_GenAlphaT"]          ->Fill( pfAlphaT,   hltPFAlphaT );
-    // histMatch2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] ->Fill( hltCaloAlphaTDynamic, hltCaloAlphaT );
-    // histMatch2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   ->Fill( hltPFAlphaT,           hltCaloAlphaTDynamic );
-    // histMatch2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     ->Fill( pfAlphaT,             hltCaloAlphaTDynamic );
+    histMatch2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]      ->Fill( hltPFAlphaTStandard,   hltCaloAlphaTStandard );
+    histMatch2D["HLTCaloAlphaT_vs_GenAlphaT"]        ->Fill( genAlphaTStandard,     hltCaloAlphaTStandard );
+    histMatch2D["HLTPFAlphaT_vs_GenAlphaT"]          ->Fill( genAlphaTStandard,     hltPFAlphaTStandard );
+    histMatch2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] ->Fill( hltCaloAlphaTDynamic,  hltCaloAlphaTStandard );
+    histMatch2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   ->Fill( hltPFAlphaTStandard,   hltCaloAlphaTDynamic );
+    histMatch2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     ->Fill( genAlphaTStandard,     hltCaloAlphaTDynamic );
     
     //    histMatch2D["GenAlphaT_vs_GenHT"]
+    
+
 
 #endif
 
@@ -2177,7 +2150,7 @@ void makeSUSYHLTAlphaT(){
 
 }
 #endif
-
+    std::cout << "Ending rate loop\n\n";
 
 
   // ********************************************************************************
@@ -2185,7 +2158,7 @@ void makeSUSYHLTAlphaT(){
   // ********************************************************************************
 
 
-  std::cout << "Storing histograms\n";
+  std::cout << "Storing histograms:\n";
   
   fOut->mkdir("Raw");
   fOut->mkdir("Raw/Efficiency");
@@ -2419,7 +2392,6 @@ void makeSUSYHLTAlphaT(){
     histogramEff->GetPaintedHistogram()->Draw("COLZTEXTE");
     c->Write();
 
-
   } 
 
   // ********************************************************************************
@@ -2460,6 +2432,9 @@ void makeSUSYHLTAlphaT(){
    
   }
 #endif
+  std::cout << "Saved histograms\n\n";
+
+
 
   exit(0);
 
