@@ -168,10 +168,10 @@ class MakeTrees : public edm::EDAnalyzer {
     std::pair<float,float> hltAk4CaloAlphaTHT40;
     std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT40;
 
-    std::pair<float,float> genAk4AlphaTHT50;
-    std::pair<float,float> hltAk4PFAlphaTHT50;
-    std::pair<float,float> hltAk4CaloAlphaTHT50;
-    std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT50;
+    // std::pair<float,float> genAk4AlphaTHT50;
+    // std::pair<float,float> hltAk4PFAlphaTHT50;
+    // std::pair<float,float> hltAk4CaloAlphaTHT50;
+    // std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT50;
 
     UInt_t maxjet_;
     bool usePU_; 
@@ -309,14 +309,14 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("hltAk4CaloNoFastJet_HT40",     &hltAk4CaloNoFastJetAlphaTHT40.second, "hltAk4CaloNoFastJet_HT40/f");
 
 
-    tree->Branch("genAk4_AlphaT50",     &genAk4AlphaTHT50.first,      "genAk4_AlphaT50/f");
-    tree->Branch("genAk4_HT50",         &genAk4AlphaTHT50.second,     "genAk4_HT50/f");
-    tree->Branch("hltAk4PF_AlphaT50",   &hltAk4PFAlphaTHT50.first,    "hltAk4PF_AlphaT50/f");
-    tree->Branch("hltAk4PF_HT50",       &hltAk4PFAlphaTHT50.second,   "hltAk4PF_HT50/f");
-    tree->Branch("hltAk4Calo_AlphaT50", &hltAk4CaloAlphaTHT50.first,  "hltAk4Calo_AlphaT50/f");
-    tree->Branch("hltAk4Calo_HT50",     &hltAk4CaloAlphaTHT50.second, "hltAk4Calo_HT50/f");
-    tree->Branch("hltAk4CaloNoFastJet_AlphaT50", &hltAk4CaloNoFastJetAlphaTHT50.first,  "hltAk4CaloNoFastJet_AlphaT50/f");
-    tree->Branch("hltAk4CaloNoFastJet_HT50",     &hltAk4CaloNoFastJetAlphaTHT50.second, "hltAk4CaloNoFastJet_HT50/f");
+    // tree->Branch("genAk4_AlphaT50",     &genAk4AlphaTHT50.first,      "genAk4_AlphaT50/f");
+    // tree->Branch("genAk4_HT50",         &genAk4AlphaTHT50.second,     "genAk4_HT50/f");
+    // tree->Branch("hltAk4PF_AlphaT50",   &hltAk4PFAlphaTHT50.first,    "hltAk4PF_AlphaT50/f");
+    // tree->Branch("hltAk4PF_HT50",       &hltAk4PFAlphaTHT50.second,   "hltAk4PF_HT50/f");
+    // tree->Branch("hltAk4Calo_AlphaT50", &hltAk4CaloAlphaTHT50.first,  "hltAk4Calo_AlphaT50/f");
+    // tree->Branch("hltAk4Calo_HT50",     &hltAk4CaloAlphaTHT50.second, "hltAk4Calo_HT50/f");
+    // tree->Branch("hltAk4CaloNoFastJet_AlphaT50", &hltAk4CaloNoFastJetAlphaTHT50.first,  "hltAk4CaloNoFastJet_AlphaT50/f");
+    // tree->Branch("hltAk4CaloNoFastJet_HT50",     &hltAk4CaloNoFastJetAlphaTHT50.second, "hltAk4CaloNoFastJet_HT50/f");
 
     // Energy sums
     tree->Branch("gct_Ht",       &ht_["gct"],      "gct_Ht/f");
@@ -470,8 +470,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcHLTMhtPF_              = pset.getParameter<edm::InputTag>("srcHLTMhtPF");
 
 
-
-
     // Gen particles
     makeGenParticles           = pset.getParameter<bool>("MakeGenParticles");
     srcGenParticles_           = pset.getParameter<edm::InputTag>("srcGenParticles");
@@ -479,7 +477,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     genElectronMaxEta          = pset.getParameter<double>("genElectronMaxEta");
     genMuonMinPt               = pset.getParameter<double>("genMuonMinPt");
     genMuonMaxEta              = pset.getParameter<double>("genMuonMaxEta");
-
 
 
     srcGctMht_        = pset.getParameter<edm::InputTag>("srcGctMht");
@@ -673,27 +670,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 
 
-  // // Get UCT jets
-  // edm::Handle< BXVector<l1t::Jet>> uctCalibJets;
-  // iEvent.getByLabel(srcUctJet_, uctCalibJets);
-
-  // std::vector<const reco::Candidate*> uctCenUnskimmed;
-  // // std::vector<const reco::Candidate*> uctJetAll;
-
-  // std::cout << "UCTBX:\n";
-  // for ( auto itr = uctCalibJets->begin(0); itr != uctCalibJets->end(0); ++itr ) { 
-  //   if(fabs(itr->eta())<=3.0){ 
-
-  //     std::cout <<itr->pt() << "\t" <<  itr->eta() << "\t" << itr->phi() << "\n";
-  //     //      uctCenUnskimmed.push_back(&(*itr)); 
-  //   } 
-  //   //    uctJetAll.push_back(&(*itr)); 
-  // } 
-
-
-  // edm::Handle< BXVector<l1t::Jet>> uctCalibJets;
-  //   srcUctMET_ = pset.getParameter<edm::InputTag>("srcUctMet");
-  //   srcUctMht_ = pset.getParameter<edm::InputTag>("srcUctMht");
 
 
 
@@ -745,7 +721,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 
 
-
   // Extracting triggerRefs
 
   // // get event products
@@ -759,8 +734,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   //   std::cout << "HLTEventAnalyzerRAW::analyze: Error in getting TriggerEventWithRefs product from Event!" << std::endl;
   //   return;
   // }
-
-
 
   // const unsigned int n(hltConfig_.size());
   // const unsigned int triggerIndex(hltConfig_.triggerIndex(triggerName));
@@ -827,31 +800,24 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
   // ------------------------------------------------------------------------------------------------------------------------
   // ------------------------------------------------------------------------------------------------------------------------
-    
+  
     // Input jets without eta or pT requirements
     // --------------------------------------------------------------------------------
-    // std::vector<const reco::Candidate*> s2NopusJetCentral    = getCollections( iEvent, srcS2NopusJetCentral_);
-    // std::vector<const reco::Candidate*> s2GlobalJetCentral    = getCollections( iEvent, srcS2GlobalJetCentral_);
-    // std::vector<const reco::Candidate*> s2DonutJetCentral    = getCollections( iEvent, srcS2DonutJetCentral_);
-    std::vector<const reco::Candidate*> gctCenUnskimmed       = getCollections( iEvent, srcGctJetCentral_);
-    // std::vector<const reco::Candidate*> gctJetAll        = getCollections( iEvent, srcGctJetAll_);
-    std::vector<const reco::Candidate*> genJet4Unskimmed      = getCollections( iEvent, srcGen4Jet_);
-    std::vector<const reco::Candidate*> genJet5Unskimmed      = getCollections( iEvent, srcGen5Jet_);
+    std::vector<const reco::Candidate*> gctCenUnskimmed                 = getCollections( iEvent, srcGctJetCentral_);
+    // std::vector<const reco::Candidate*> gctJetAll                      = getCollections( iEvent, srcGctJetAll_);
+    std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, srcGen4Jet_);
+    std::vector<const reco::Candidate*> genJet5Unskimmed                = getCollections( iEvent, srcGen5Jet_);
+    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed             = getCollections( iEvent, srcHLTAk4Calo );
+    std::vector<const reco::Candidate*> hltAk4CaloNoFastJetUnskimmed    = getCollections( iEvent, srcHLTAk4CaloNoFastJet);
+    std::vector<const reco::Candidate*> hltAk4PFUnskimmed               = getCollections( iEvent, srcHLTAk4PF );
 
 
-    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed            = getCollections( iEvent, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4CaloNoFastJetUnskimmed   = getCollections( iEvent, srcHLTAk4CaloNoFastJet);
-    std::vector<const reco::Candidate*> hltAk4PFUnskimmed              = getCollections( iEvent, srcHLTAk4PF );
-
-
-    std::vector<const reco::Candidate*> gctForUnskimmed          = getCollections( iEvent, srcGctJetForward_);
-    std::vector<const reco::Candidate*> genJet4ForUnskimmed      = getCollections( iEvent, srcGen4Jet_);
-    std::vector<const reco::Candidate*> genJet5ForUnskimmed      = getCollections( iEvent, srcGen5Jet_);
-    std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed   = getCollections( iEvent, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4CaloNoFastJetForUnskimmed   = getCollections( iEvent, srcHLTAk4CaloNoFastJet);
-    std::vector<const reco::Candidate*> hltAk4PFForUnskimmed     = getCollections( iEvent, srcHLTAk4PF );
-
-    //    std::vector<const reco::Candidate*> hltAk4PFNoPUUnskimmed = getCollections( iEvent, srcHLTAk4PFNoPU );
+    std::vector<const reco::Candidate*> gctForUnskimmed                 = getCollections( iEvent, srcGctJetForward_);
+    std::vector<const reco::Candidate*> genJet4ForUnskimmed             = getCollections( iEvent, srcGen4Jet_);
+    std::vector<const reco::Candidate*> genJet5ForUnskimmed             = getCollections( iEvent, srcGen5Jet_);
+    std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed          = getCollections( iEvent, srcHLTAk4Calo );
+    std::vector<const reco::Candidate*> hltAk4CaloNoFastJetForUnskimmed = getCollections( iEvent, srcHLTAk4CaloNoFastJet);
+    std::vector<const reco::Candidate*> hltAk4PFForUnskimmed            = getCollections( iEvent, srcHLTAk4PF );
  
  
 
@@ -861,39 +827,23 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // Central jets
     // --------------------
     std::vector<const reco::Candidate*> gctCen     = skimJets(gctCenUnskimmed,     minPt, minEtaCen, maxEtaCen );
-
-    //    std::cout << gctCen.size() << "\n";
-    //    std::cout << "UCTHLT:\n";
-    // for ( std::vector<const reco::Candidate*>::const_iterator itr = gctCen.begin(); itr != gctCen.end(); ++itr ){
-    //   std::cout << (*itr)->pt() << "\t" <<  (*itr)->eta() << "\t" << (*itr)->phi() << "\n";
-    // }
-    //std::cout << "\n";
-
     //    std::vector<const reco::Candidate*> uctCen  = skimJets(uctCenUnskimmed,  minPt, minEtaCen, maxEtaCen );
-
     std::vector<const reco::Candidate*> genAk4     = skimJets(genJet4Unskimmed,    minPt, minEtaCen, maxEtaCen );
     std::vector<const reco::Candidate*> genAk5     = skimJets(genJet5Unskimmed,    minPt, minEtaCen, maxEtaCen );
-
     std::vector<const reco::Candidate*> hltAk4Calo          = skimJets(hltAk4CaloUnskimmed,          minPt, minEtaCen, maxEtaCen );
     std::vector<const reco::Candidate*> hltAk4CaloNoFastJet = skimJets(hltAk4CaloNoFastJetUnskimmed, minPt, minEtaCen, maxEtaCen );
     std::vector<const reco::Candidate*> hltAk4PF            = skimJets(hltAk4PFUnskimmed,            minPt, minEtaCen, maxEtaCen );
-    //    std::vector<const reco::Candidate*> hltAk4PFNoPU = skimJets(hltAk4PFNoPUUnskimmed, minPt, maxEta );
-    // std::vector<const reco::Candidate*> caloJet  = skimJets(caloJetUnskimmed,  minPt, maxEta );
-    // std::vector<const reco::Candidate*> pfJet    = skimJets(pfJetUnskimmed,    minPt, maxEta );
 
 
     // Forward jets
     // --------------------
     std::vector<const reco::Candidate*> gctFor        = skimJets(gctForUnskimmed,     minPt, minEtaFor, maxEtaFor );
     //    std::vector<const reco::Candidate*> uctCenFor  = skimJets(uctForUnskimmed,  minPt, minEtaFor, maxEtaFor );
-
     std::vector<const reco::Candidate*> genAk4For     = skimJets(genJet4ForUnskimmed,    minPt, minEtaFor, maxEtaFor );
     std::vector<const reco::Candidate*> genAk5For     = skimJets(genJet5ForUnskimmed,    minPt, minEtaFor, maxEtaFor );
-
     std::vector<const reco::Candidate*> hltAk4CaloFor = skimJets(hltAk4CaloForUnskimmed, minPt, minEtaFor, maxEtaFor );
     std::vector<const reco::Candidate*> hltAk4CaloNoFastJetFor = skimJets(hltAk4CaloNoFastJetForUnskimmed, minPt, minEtaFor, maxEtaFor );
     std::vector<const reco::Candidate*> hltAk4PFFor   = skimJets(hltAk4PFForUnskimmed,   minPt, minEtaFor, maxEtaFor );
-
 
 
     // Clear previous event's objects
@@ -905,8 +855,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     genMuonPt ->clear();
     genMuonEta->clear();
     genMuonPhi->clear();
-
-
     
     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
 	jetPt[*iLvl] ->clear(); 
@@ -914,18 +862,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 	jetPy[*iLvl] ->clear(); 
 	jetPhi[*iLvl]->clear();
 	jetEta[*iLvl]->clear();
-	// if(*iLvl=="Uct" || *iLvl=="Gct" )
-	// {
-	//     jetPtsAll_[*iLvl]->clear();
-	//     jetPhisAll_[*iLvl]->clear();
-	//     jetEtasAll_[*iLvl]->clear();
-	// }
     }
-
-    // // Setup meta info
-    // run_ = iEvent.id().run();
-    // lumi_ = iEvent.id().luminosityBlock();
-    // event_ = iEvent.id().event();
 
     // ********************************************************************************
     // *                           Loop over Jet collections                          *
@@ -936,35 +873,27 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     hltAk4CaloNoFastJetAlphaTHT40 = calculateAlphaTHT( hltAk4CaloNoFastJet, 40.);
     hltAk4PFAlphaTHT40            = calculateAlphaTHT( hltAk4PF,   40.);
 
-    genAk4AlphaTHT50              = calculateAlphaTHT( genAk4,     50.);
-    hltAk4CaloAlphaTHT50          = calculateAlphaTHT( hltAk4Calo, 50.);
-    hltAk4CaloNoFastJetAlphaTHT50 = calculateAlphaTHT( hltAk4CaloNoFastJet, 50.);
-    hltAk4PFAlphaTHT50            = calculateAlphaTHT( hltAk4PF,   50.);
-
-    //    std::cout << alphaTHT.first << "\t" << alphaTHT.second << "\n";
+    // genAk4AlphaTHT50              = calculateAlphaTHT( genAk4,     50.);
+    // hltAk4CaloAlphaTHT50          = calculateAlphaTHT( hltAk4Calo, 50.);
+    // hltAk4CaloNoFastJetAlphaTHT50 = calculateAlphaTHT( hltAk4CaloNoFastJet, 50.);
+    // hltAk4PFAlphaTHT50            = calculateAlphaTHT( hltAk4PF,   50.);
 
     // Store jet collections
     // ----------------------------------------
 
-    storeJet( "gctCen", gctCen, jetPt, jetPx, jetPy, jetEta, jetPhi );
-    //    storeJet( "uctCen", uctCen, jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "gctCen",                 gctCen,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "genAk4",                 genAk4,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "genAk5",                 genAk5,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltAk4Calo",             hltAk4Calo,             jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltAk4CaloNoFastJet",    hltAk4CaloNoFastJet,    jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltAk4PF",               hltAk4PF,               jetPt, jetPx, jetPy, jetEta, jetPhi );
 
-    storeJet( "genAk4", genAk4, jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "genAk5", genAk5, jetPt, jetPx, jetPy, jetEta, jetPhi );
-
-    storeJet( "hltAk4Calo",          hltAk4Calo,          jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloNoFastJet", hltAk4CaloNoFastJet, jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4PF",            hltAk4PF,            jetPt, jetPx, jetPy, jetEta, jetPhi );
-    //    storeJet( "hltAk4PFNoPU", hltAk4PFNoPU, jetPt, jetPx, jetPy, jetEta, jetPhi );
-
-
-    storeJet( "gctFor",        gctFor,        jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "genAk4For",     genAk4For,     jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "genAk5For",     genAk5For,     jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloFor", hltAk4CaloFor, jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "gctFor",                 gctFor,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "genAk4For",              genAk4For,              jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "genAk5For",              genAk5For,              jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltAk4CaloFor",          hltAk4CaloFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
     storeJet( "hltAk4CaloNoFastJetFor", hltAk4CaloNoFastJetFor, jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4PFFor",   hltAk4PFFor,   jetPt, jetPx, jetPy, jetEta, jetPhi );
-
+    storeJet( "hltAk4PFFor",            hltAk4PFFor,            jetPt, jetPx, jetPy, jetEta, jetPhi );
 
 
     // Energy sums
@@ -979,7 +908,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     else{
       mhtDivHt_["gct"] = 0;
     }
-
 
     // genMet
     getValue(iEvent, srcGenMetCalo_,             metPt_["genMetCalo"],             metPhi_["genMetCalo"]);
@@ -1030,8 +958,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
       }
     } // End gen particles
-
-
 
     // Fill the trees
     tree->Fill();
