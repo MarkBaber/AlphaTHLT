@@ -168,10 +168,10 @@ class MakeTrees : public edm::EDAnalyzer {
     std::pair<float,float> hltAk4CaloAlphaTHT40;
     std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT40;
 
-    // std::pair<float,float> genAk4AlphaTHT50;
-    // std::pair<float,float> hltAk4PFAlphaTHT50;
-    // std::pair<float,float> hltAk4CaloAlphaTHT50;
-    // std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT50;
+    std::pair<float,float> genAk4AlphaTHT50;
+    std::pair<float,float> hltAk4PFAlphaTHT50;
+    std::pair<float,float> hltAk4CaloAlphaTHT50;
+    std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT50;
 
     UInt_t maxjet_;
     bool usePU_; 
@@ -305,16 +305,16 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("hltAk4PF_HT40",       &hltAk4PFAlphaTHT40.second,   "hltAk4PF_HT40/f");
     tree->Branch("hltAk4Calo_AlphaT40", &hltAk4CaloAlphaTHT40.first,  "hltAk4Calo_AlphaT40/f");
     tree->Branch("hltAk4Calo_HT40",     &hltAk4CaloAlphaTHT40.second, "hltAk4Calo_HT40/f");
-    tree->Branch("hltAk4CaloNoFastJet_AlphaT40", &hltAk4CaloNoFastJetAlphaTHT40.first,  "hltAk4CaloNoFastJet_AlphaT40/f");
-    tree->Branch("hltAk4CaloNoFastJet_HT40",     &hltAk4CaloNoFastJetAlphaTHT40.second, "hltAk4CaloNoFastJet_HT40/f");
+    // tree->Branch("hltAk4CaloNoFastJet_AlphaT40", &hltAk4CaloNoFastJetAlphaTHT40.first,  "hltAk4CaloNoFastJet_AlphaT40/f");
+    // tree->Branch("hltAk4CaloNoFastJet_HT40",     &hltAk4CaloNoFastJetAlphaTHT40.second, "hltAk4CaloNoFastJet_HT40/f");
 
 
-    // tree->Branch("genAk4_AlphaT50",     &genAk4AlphaTHT50.first,      "genAk4_AlphaT50/f");
-    // tree->Branch("genAk4_HT50",         &genAk4AlphaTHT50.second,     "genAk4_HT50/f");
-    // tree->Branch("hltAk4PF_AlphaT50",   &hltAk4PFAlphaTHT50.first,    "hltAk4PF_AlphaT50/f");
-    // tree->Branch("hltAk4PF_HT50",       &hltAk4PFAlphaTHT50.second,   "hltAk4PF_HT50/f");
-    // tree->Branch("hltAk4Calo_AlphaT50", &hltAk4CaloAlphaTHT50.first,  "hltAk4Calo_AlphaT50/f");
-    // tree->Branch("hltAk4Calo_HT50",     &hltAk4CaloAlphaTHT50.second, "hltAk4Calo_HT50/f");
+    tree->Branch("genAk4_AlphaT50",     &genAk4AlphaTHT50.first,      "genAk4_AlphaT50/f");
+    tree->Branch("genAk4_HT50",         &genAk4AlphaTHT50.second,     "genAk4_HT50/f");
+    tree->Branch("hltAk4PF_AlphaT50",   &hltAk4PFAlphaTHT50.first,    "hltAk4PF_AlphaT50/f");
+    tree->Branch("hltAk4PF_HT50",       &hltAk4PFAlphaTHT50.second,   "hltAk4PF_HT50/f");
+    tree->Branch("hltAk4Calo_AlphaT50", &hltAk4CaloAlphaTHT50.first,  "hltAk4Calo_AlphaT50/f");
+    tree->Branch("hltAk4Calo_HT50",     &hltAk4CaloAlphaTHT50.second, "hltAk4Calo_HT50/f");
     // tree->Branch("hltAk4CaloNoFastJet_AlphaT50", &hltAk4CaloNoFastJetAlphaTHT50.first,  "hltAk4CaloNoFastJet_AlphaT50/f");
     // tree->Branch("hltAk4CaloNoFastJet_HT50",     &hltAk4CaloNoFastJetAlphaTHT50.second, "hltAk4CaloNoFastJet_HT50/f");
 
@@ -870,13 +870,13 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
     genAk4AlphaTHT40              = calculateAlphaTHT( genAk4,     40.);
     hltAk4CaloAlphaTHT40          = calculateAlphaTHT( hltAk4Calo, 40.);
-    hltAk4CaloNoFastJetAlphaTHT40 = calculateAlphaTHT( hltAk4CaloNoFastJet, 40.);
+    //hltAk4CaloNoFastJetAlphaTHT40 = calculateAlphaTHT( hltAk4CaloNoFastJet, 40.);
     hltAk4PFAlphaTHT40            = calculateAlphaTHT( hltAk4PF,   40.);
 
-    // genAk4AlphaTHT50              = calculateAlphaTHT( genAk4,     50.);
-    // hltAk4CaloAlphaTHT50          = calculateAlphaTHT( hltAk4Calo, 50.);
-    // hltAk4CaloNoFastJetAlphaTHT50 = calculateAlphaTHT( hltAk4CaloNoFastJet, 50.);
-    // hltAk4PFAlphaTHT50            = calculateAlphaTHT( hltAk4PF,   50.);
+    genAk4AlphaTHT50              = calculateAlphaTHT( genAk4,     50.);
+    hltAk4CaloAlphaTHT50          = calculateAlphaTHT( hltAk4Calo, 50.);
+    //    hltAk4CaloNoFastJetAlphaTHT50 = calculateAlphaTHT( hltAk4CaloNoFastJet, 50.);
+    hltAk4PFAlphaTHT50            = calculateAlphaTHT( hltAk4PF,   50.);
 
     // Store jet collections
     // ----------------------------------------
