@@ -26,8 +26,8 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-#    input = cms.untracked.int32(10)
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(10)
+#    input = cms.untracked.int32(-1)
 )
 
 
@@ -39,7 +39,9 @@ selectedSample = T2tt_300_200 #T2tt_500_250 #T2cc_250_210
 process.source = cms.Source("PoolSource",
 
      # Run on private MC samples (Run 'voms-proxy-init -out ~/myproxy -voms cms' first)
-     fileNames = selectedSample.files,
+#     fileNames = selectedSample.files,
+
+ fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-170to300_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx50_POSTLS162_V2-v1/00000/000CA0BE-4AA6-E311-AA23-00304867918E.root'),
 
 
 # fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-30to50_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/002C6EAF-01A7-E311-A921-0030486790A0.root')
@@ -98,8 +100,11 @@ process.output = cms.OutputModule("PoolOutputModule",
        'keep *_caloStage1FinalDigis_*_*',
        'keep l1extra*_*_*_*',
        # HLT
-       'keep recoPFJets_hltAK4PFJetsCorrected*_*_*',
-       'keep recoCaloJets_hltAK4CaloJetsCorrected*_*_*',
+       # 'keep recoPFJets_hltAK4PFJetsCorrected*_*_*',
+       # 'keep recoCaloJets_hltAK4CaloJetsCorrected*_*_*',
+       'keep recoPFJets_*_*_*',
+       'keep recoCaloJets_hltAK4CaloJets*_*_*',
+
 
        'keep triggerTriggerFilterObjectWithRefs_*_*_HLT2',
        'keep recoMETs_*_*_HLT2',
@@ -242,23 +247,6 @@ process.GenParticleSkimSchedule = cms.Schedule( process.GenParticleSkimmer )
 # ================================================================================
 
 
-
-
-
-
-# Additional output definition
-
-
-
-
-
-
-# # Other statements
-# from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-# #process.GlobalTag = GlobalTag(process.GlobalTag, 'PRE_LS172_V16::All', '')
-# process.GlobalTag = GlobalTag(process.GlobalTag, 'PRE_LS172_V16', '')
-# #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc_GRun', '')
-
 # Path and EndPath definitions
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.output_step = cms.EndPath(process.output)
@@ -284,6 +272,7 @@ process = customisePostLS1(process)
 
 # override the GlobalTag, connection string and pfnPrefix 
 GT = "50ns"
+print "Using GT for:", GT
 
 if GT == "25ns":
     if 'GlobalTag' in process.__dict__:
@@ -298,8 +287,8 @@ if GT == "25ns":
         process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 elif GT == "50ns":
     if 'GlobalTag' in process.__dict__:
-        from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag 
-        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V0A::All') 
+        from Configuration.AlCa.GlobalTag import GlobalTag as customiseGlobalTag 
+        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V2A::All')
         process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
         process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
         for pset in process.GlobalTag.toGet.value():
