@@ -1,11 +1,10 @@
-#define TEST
-#define SIGNAL
+//#define TEST
+//#define SIGNAL
 #define NEUTRINO
-//#define HLT_CALOJET
 
-//#define HLT_NOFASTJET
+#define HLT_NOFASTJET
 
-#define MATCHING
+//#define MATCHING
 
 
 // ********************************************************************************
@@ -274,14 +273,11 @@ void makeSUSYHLTAlphaT(){
 
   std::map< TString, TH1*>         histMatch;
   std::map< TString, TH2*>         histMatch2D;
+  // Correlations
+  std::map< TString, TH2*>         histCorr2D;
 
 
 
-  // Jet collections for matching studies
-  std::vector<TString> jetColls;
-  jetColls.push_back("PF");
-  jetColls.push_back("Calo");
-  jetColls.push_back("CaloNFJ");
 
 
 
@@ -795,78 +791,94 @@ void makeSUSYHLTAlphaT(){
   // ************************************************************************************************************************
 #ifdef MATCHING  
 
-  std::vector<TString> jetTypes;
-  jetTypes.push_back("Inclusive");
-  jetTypes.push_back("Matched");
-  jetTypes.push_back("Pileup");
-  jetTypes.push_back("dRMatched");
+  // Jet collections for matching studies
+  std::vector<TString> jetColls;
+  jetColls.push_back("PF");
+  jetColls.push_back("Calo");
+  jetColls.push_back("CaloNFJ");
 
   std::vector<TString> jetRanks;
   jetRanks.push_back("AllJets");
   jetRanks.push_back("Jet1");
   jetRanks.push_back("Jet2");
 
-  // ************************************************************
-  // Jet ranked distributions
-  // ************************************************************
-  for (uint iRank = 0; iRank < jetRanks.size(); ++iRank){
-    TString rank = jetRanks[ iRank ];
+  std::vector<TString> jetTypes;
+  jetTypes.push_back("Inclusive");
+  jetTypes.push_back("Matched");
+  jetTypes.push_back("Pileup");
+  jetTypes.push_back("dRMatched");
 
-    
-    // ************************************************************
-    // Jet type distributions
-    // ************************************************************
-    
-      for (uint iType = 0; iType < jetTypes.size(); ++iType){
-	TString jet = jetTypes[ iType ];
-	
 
-      histMatch[jet + "_" + rank + "_JetPT"]       = new TH1D(jet + "_" + rank + "_JetPT",  
-							      jet + " " + rank + " - Jet P_{T};P_{T} (GeV);Entries", 
-							      56, 22.5, 302.5);
-      histMatch[jet + "_" + rank + "_JetEta"]      = new TH1D(jet + "_" + rank + "_JetEta",
-							      jet + " " + rank + " - Jet #eta;#eta;Entries",      
-							      31, -3.1, 3.1);
-      
-      // Gen rank matching
-      histMatch[jet + "_" + rank + "_JetResponse"] = new TH1D(jet + "_" + rank + "_JetResponse", 
-							      jet + " " + rank + " - rank matched Jet response;P_{T}^{HLT}/P_{T}^{GEN};Entries", 
-							      200,-0.01, 3.99);
-      histMatch[jet + "_" + rank + "_DeltaPTRel"]  = new TH1D(jet + "_" + rank + "_DeltaPTRel",  
-							      jet + " " + rank + " - rank matched #DeltaP_{T}^{Rel};#DeltaP_{T}^{Rel};Entries", 
-							      30,-1.0,3.0);
-      histMatch[jet + "_" + rank + "_DeltaEta"]    = new TH1D(jet + "_" + rank + "_DeltaEta", 
-							      jet + " " + rank + " - rank matched #Delta#eta;Entries", 
-							      121,-0.605,0.605);
-      histMatch[jet + "_" + rank + "_DeltaPhi"]    = new TH1D(jet + "_" + rank + "_DeltaPhi",  
-							      jet + " " + rank + " - rank matched #Delta#phi;Entries", 
-							      121,-0.605,0.605);
-      histMatch[jet + "_" + rank + "_DeltaR"]      = new TH1D(jet + "_" + rank + "_DeltaR",   
-							      jet + " " + rank + " - rank matched #DeltaR;Entries", 
-							      100,-0.005,0.995);
-      
-      
-      histMatch2D[jet + "_" + rank + "_HLTPT_vs_GENPT"]       = new TH2D(jet + "_" + rank + "_HLTPT_vs_GENPT", 
-									 jet + " " + rank + " - rank matched HLT P_{T} vs Gen P_{T};Gen p_{T} (GeV);HLT P_{T} (GeV)", 
-									 56,22.5,302.5,  56,22.5,302.5);
-      histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_GENPT"]  = new TH2D(jet + "_" + rank + "_DeltaPTRel_vs_GENPT", 
-									 jet + " " + rank + " - rank matched #DeltaP_{T}^{Rel} vs Gen P_{T};Gen p_{T} (GeV);#DeltaP_{T}^{Rel}", 
-									 56,22.5,302.5, 30,-1.0,3.0);
-      histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_NVTX"]   = new TH2D(jet + "_" + rank + "_Matched_DeltaPTRel_vs_NVTX",
-									 jet + " " + rank + " - rank matched #DeltaP_{T}^{Rel} vs Gen P_{T};Gen p_{T} (GeV);#DeltaP_{T}^{Rel}", 
-									 16,0,80, 30,-1.0,3.0);
+  histMatch["Gen_NJet"]      = new TH1D("Gen_NJet",     "Gen number of analysis jets;N_{Jet};Entries",     20,-0.5,20.);
+  histMatch["PF_NJet"]       = new TH1D("PF_NJet",      "PF number of analysis jets;N_{Jet};Entries",      20,-0.5,20.);
+  histMatch["Calo_NJet"]     = new TH1D("Calo_NJet",    "Calo number of analysis jets;N_{Jet};Entries",    20,-0.5,20.);
+  histMatch["CaloNFJ_NJet"]  = new TH1D("CaloNFJ_NJet", "CaloNFJ number of analysis jets;N_{Jet};Entries", 20,-0.5,20.);
+
+  // ************************************************************
+  // Jet collections
+  // ************************************************************
+  for (uint iColl = 0; iColl < jetColls.size(); ++iColl){
+    TString jetColl = jetColls[ iColl ];
+
+    // ************************************************************
+    // Jet ranked distributions
+    // ************************************************************
+    for (uint iRank = 0; iRank < jetRanks.size(); ++iRank){
+      TString rank = jetRanks[ iRank ];
    
+      // ************************************************************
+      // Jet type distributions
+      // ************************************************************
+      for (uint iType = 0; iType < jetTypes.size(); ++iType){
+	TString jet    = jetTypes[ iType ];
+	TString jetStr = jetColl + "_" + jet;
+
+	histMatch[jetStr + "_" + rank + "_JetPT"]       = new TH1D(jetStr + "_" + rank + "_JetPT",  
+								   jetStr + " " + rank + " - Jet P_{T};P_{T} (GeV);Entries", 
+								   60, 20, 300);
+	histMatch[jetStr + "_" + rank + "_JetEta"]      = new TH1D(jetStr + "_" + rank + "_JetEta",
+								   jetStr + " " + rank + " - Jet #eta;#eta;Entries",      
+								   32, -3.1, 3.1);
+	
+	// Gen rank matching
+	histMatch[jetStr + "_" + rank + "_JetResponse"] = new TH1D(jetStr + "_" + rank + "_JetResponse", 
+								   jetStr + " " + rank + " - rank matched Jet response;P_{T}^{HLT}/P_{T}^{GEN};Entries", 
+								   40,0.0,4.0);
+	histMatch[jetStr + "_" + rank + "_DeltaPTRel"]  = new TH1D(jetStr + "_" + rank + "_DeltaPTRel",  
+								   jetStr + " " + rank + " - rank matched #DeltaP_{T}^{Rel};#DeltaP_{T}^{Rel};Entries", 
+								   30,-1.0,3.0);
+	histMatch[jetStr + "_" + rank + "_DeltaEta"]    = new TH1D(jetStr + "_" + rank + "_DeltaEta", 
+								   jetStr + " " + rank + " - rank matched #Delta#eta;Entries", 
+								   60,-0.6,0.6);
+	histMatch[jetStr + "_" + rank + "_DeltaPhi"]    = new TH1D(jetStr + "_" + rank + "_DeltaPhi",  
+								   jetStr + " " + rank + " - rank matched #Delta#phi;Entries", 
+								   60,-0.6,0.6);
+	histMatch[jetStr + "_" + rank + "_DeltaR"]      = new TH1D(jetStr + "_" + rank + "_DeltaR",   
+								   jetStr + " " + rank + " - rank matched #DeltaR;Entries", 
+								   40,0.0,1.0);
+	
+	
+	histMatch2D[jetStr + "_" + rank + "_HLTPT_vs_GENPT"]       = new TH2D(jetStr + "_" + rank + "_HLTPT_vs_GENPT", 
+									      jetStr + " " + rank + " - rank matched HLT P_{T} vs Gen P_{T};Gen p_{T} (GeV);HLT P_{T} (GeV)", 
+									      60,20,300,  60,20,300);
+	histMatch2D[jetStr + "_" + rank + "_DeltaPTRel_vs_GENPT"]  = new TH2D(jetStr + "_" + rank + "_DeltaPTRel_vs_GENPT", 
+									      jetStr + " " + rank + " - rank matched #DeltaP_{T}^{Rel} vs Gen P_{T};Gen p_{T} (GeV);#DeltaP_{T}^{Rel}", 
+									      60,20,300, 30,-1.0,3.0);
+	histMatch2D[jetStr + "_" + rank + "_DeltaPTRel_vs_NVTX"]   = new TH2D(jetStr + "_" + rank + "_Matched_DeltaPTRel_vs_NVTX",
+									      jetStr + " " + rank + " - rank matched #DeltaP_{T}^{Rel} vs Gen P_{T};Gen p_{T} (GeV);#DeltaP_{T}^{Rel}", 
+									      16,0,80, 30,-1.0,3.0);
+	
       
-      // Inter-jet HLT matching 
-      //  ADD : deltaEta, Pt, phi, jet(1,2) in bins of pileup jets in lead two jets vs GEN of the same quantity
+	// Inter-jet HLT matching 
+	//  ADD : deltaEta, Pt, phi, jet(1,2) in bins of pileup jets in lead two jets vs GEN of the same quantity
 
 
-    } // End jet rank
-    // ************************************************************
+      } // End jet rank
+      // ************************************************************
 
-  } // End jet types
+    } // End jet types
 
-
+  }// End jet collections
 
   // ********************************************************************************
   // Resolution of analysis quantities
@@ -987,41 +999,78 @@ void makeSUSYHLTAlphaT(){
   // ************************************************************
   // Correlations
   // ************************************************************
-  histMatch2D["HLTCaloHT_vs_HLTPFHT"]  = new TH2D("HLTCaloHT_vs_HLTPFHT", 
+  histCorr2D["HLTCaloHT_vs_HLTCaloNFJHT"]  = new TH2D("HLTCaloHT_vs_HLTCaloNFJHT", 
+						  "HLTCalo H_{T} vs HLTCaloNFJ H_{T};H_{T}^{HLTCaloNFJ} (GeV);H_{T}^{HLTCalo} (GeV)",    
+						  40,0,1000, 40,0,1000 );
+  histCorr2D["HLTCaloHT_vs_HLTPFHT"]  = new TH2D("HLTCaloHT_vs_HLTPFHT", 
 						  "HLTCalo H_{T} vs HLTPF H_{T};H_{T}^{HLTPF} (GeV);H_{T}^{HLTCalo} (GeV)",    
 						  40,0,1000, 40,0,1000 );
-  histMatch2D["HLTCaloHT_vs_GenHT"]    = new TH2D("HLTCaloHT_vs_GenHT",   
+  histCorr2D["HLTCaloHT_vs_GenHT"]    = new TH2D("HLTCaloHT_vs_GenHT",   
 						  "HLTCalo H_{T} vs Gen H_{T};H_{T}^{Gen} (GeV);H_{T}^{HLTCalo} (GeV)",   
 						  40,0,1000, 40,0,1000 );
-  histMatch2D["HLTPFHT_vs_GenHT"]      = new TH2D("HLTPFHT_vs_GenHT",     
+  histCorr2D["HLTPFHT_vs_GenHT"]      = new TH2D("HLTPFHT_vs_GenHT",     
 						  "HLTPF H_{T} vs Gen H_{T};H_{T}^{Gen} (GeV);H_{T}^{HLTPF} (GeV)",    
 						  40,0,1000, 40,0,1000 );
-
+  histCorr2D["HLTCaloNFJHT_vs_HLTPFHT"]  = new TH2D("HLTCaloNFJHT_vs_HLTPFHT",
+						   "HLTCaloNFJ H_{T} vs HLTPF H_{T};H_{T}^{HLTPF} (GeV);H_{T}^{HLTCaloNFJ} (GeV)",
+						    40,0,1000, 40,0,1000 );
+  histCorr2D["HLTCaloNFJHT_vs_GenHT"]    = new TH2D("HLTCaloNFJHT_vs_GenHT",
+						    "HLTCaloNFJ H_{T} vs Gen H_{T};H_{T}^{Gen} (GeV);H_{T}^{HLTCaloNFJ} (GeV)",
+						    40,0,1000, 40,0,1000 );
 
   // AlphaT Correlations 
-  histMatch2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]      = new TH2D("HLTCaloAlphaT_vs_HLTPFAlphaT",  
+  histCorr2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]       = new TH2D("HLTCaloAlphaT_vs_HLTPFAlphaT",  
 							 "HLTCalo #alpha_{T} vs HLTPF #alpha_{T};#alpha_{T}^{HLTPF};#alpha_{T}^{HLTCalo}",
 							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
-  histMatch2D["HLTCaloAlphaT_vs_GenAlphaT"]        = new TH2D("HLTCaloAlphaT_vs_GenAlphaT",
+  histCorr2D["HLTCaloAlphaT_vs_GenAlphaT"]         = new TH2D("HLTCaloAlphaT_vs_GenAlphaT",
 							 "HLTPF #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{HLTCalo}",    
 							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
-  histMatch2D["HLTPFAlphaT_vs_GenAlphaT"]          = new TH2D("HLTPFAlphaT_vs_GenAlphaT",
+  histCorr2D["HLTCaloNFJAlphaT_vs_HLTPFAlphaT"]    = new TH2D("HLTCaloNFJAlphaT_vs_HLTPFAlphaT",  
+							 "HLTCaloNFJ #alpha_{T} vs HLTPF #alpha_{T};#alpha_{T}^{HLTPF};#alpha_{T}^{HLTCaloNFJ}",
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
+  histCorr2D["HLTCaloNFJAlphaT_vs_HLTCaloAlphaT"]  = new TH2D("HLTCaloNFJAlphaT_vs_HLTCaloAlphaT",  
+							 "HLTCaloNFJ #alpha_{T} vs HLTCalo #alpha_{T};#alpha_{T}^{HLTCalo};#alpha_{T}^{HLTCaloNFJ}",
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
+  histCorr2D["HLTCaloNFJAlphaT_vs_HLTCaloAlphaTDyn"]  = new TH2D("HLTCaloNFJAlphaT_vs_HLTCaloAlphaTDyn",  
+							 "HLTCaloNFJ #alpha_{T} vs HLTCalo dynamic #alpha_{T};#alpha_{T}^{HLTCalo dynamic};#alpha_{T}^{HLTCaloNFJ}",
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
+
+
+  histCorr2D["HLTCaloNFJAlphaT_vs_GenAlphaT"]      = new TH2D("HLTCaloNFJAlphaT_vs_GenAlphaT",
+							 "HLTCaloNFJ #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{HLTCaloNFJ}",    
+							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
+
+  histCorr2D["HLTPFAlphaT_vs_GenAlphaT"]          = new TH2D("HLTPFAlphaT_vs_GenAlphaT",
 							 "HLTPF #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{HLTPF}",    
 							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
 
-  histMatch2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] = new TH2D("CaloAlphaT_vs_CaloAlphaTDyn",   
+  histCorr2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] = new TH2D("CaloAlphaT_vs_CaloAlphaTDyn",   
 							 "HLTCalo #alpha_{T} vs dynamic HLTCalo #alpha_{T};#alpha_{T}^{Dynamic HLTCalo};#alpha_{T}^{HLTCalo}",    
 							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
-  histMatch2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   = new TH2D("HLTCaloAlphaTDyn_vs_HLTPFAlphaT",  
+  histCorr2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   = new TH2D("HLTCaloAlphaTDyn_vs_HLTPFAlphaT",  
 							 "Dynamic HLTCalo #alpha_{T} vs HLTPF #alpha_{T};#alpha_{T}^{HLTPF};#alpha_{T}^{Dynamic HLTCalo}",
 							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax); 
-  histMatch2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     = new TH2D("HLTCaloAlphaTDyn_vs_GenAlphaT",
+  histCorr2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     = new TH2D("HLTCaloAlphaTDyn_vs_GenAlphaT",
 							 "Dynamic HLTPF #alpha_{T} vs Gen #alpha_{T};#alpha_{T}^{Gen};#alpha_{T}^{Dynamic HLTCalo}",    
 							 alphaTBins,alphaTMin,alphaTMax, alphaTBins,alphaTMin,alphaTMax);
 
-  histMatch2D["GenAlphaT_vs_GenHT"]                = new TH2D("GenAlphaT_vs_GenHT",  
-							 "Gen #alpha_{T} vs Gen H_{T};Gen H_{T} (GeV);#alpha_{T}^{Gen}",
-							 40,0,1000, alphaTBins,alphaTMin,alphaTMax); 
+  // AlphaT vs HT
+  histCorr2D["GenAlphaT_vs_GenHT"]                = new TH2D("GenAlphaT_vs_GenHT",  
+							     "Gen #alpha_{T} vs Gen H_{T};Gen H_{T} (GeV);#alpha_{T}^{Gen}",
+							     40,0,1000, alphaTBins,alphaTMin,alphaTMax); 
+  histCorr2D["HLTCaloAlphaT_vs_HLTCaloHT"]        = new TH2D("HLTCaloAlphaT_vs_HLTCaloHT",
+                                                             "HLTCalo #alpha_{T} vs HLTCalo H_{T};HLTCalo H_{T} (GeV);#alpha_{T}^{HLTCalo}",
+                                                             40,0,1000, alphaTBins,alphaTMin,alphaTMax);
+  histCorr2D["HLTCaloNFJAlphaT_vs_HLTCaloNFJHT"]        = new TH2D("HLTCaloNFJAlphaT_vs_HLTCaloNFJHT",
+                                                             "HLTCaloNFJ #alpha_{T} vs HLTCaloNFJ H_{T};HLTCaloNFJ H_{T} (GeV);#alpha_{T}^{HLTCaloNFJ}",
+                                                             40,0,1000, alphaTBins,alphaTMin,alphaTMax);
+
+  histCorr2D["HLTCaloAlphaTDyn_vs_HLTCaloHT"]     = new TH2D("HLTCaloAlphaTDyn_vs_HLTCaloHT",
+                                                             "HLTCalo #alpha_{T} dynamic vs HLTCalo H_{T};HLTCalo H_{T} (GeV);#alpha_{T}^{HLTCalo dynamic}",
+                                                             40,0,1000, alphaTBins,alphaTMin,alphaTMax);
+  histCorr2D["HLTPFAlphaT_vs_HLTPFHT"]            = new TH2D("HLTPFAlphaT_vs_HLTPFHT",
+							     "HLTPF #alpha_{T} vs HLTPF H_{T};HLTPF H_{T} (GeV);#alpha_{T}^{HLTPF}",
+							     40,0,1000, alphaTBins,alphaTMin,alphaTMax);
 
 
 
@@ -1030,102 +1079,83 @@ void makeSUSYHLTAlphaT(){
 
 
 
-
+  
   // ********************************************************************************
   // *                                  Efficiency                                  *
   // ********************************************************************************
 
-
-    sigChain->SetBranchAddress("genLeptonVeto", &genLeptonVeto);
-
-
-    // ------------------------------------------------------------ 
-    // UCT 
-    // ------------------------------------------------------------ 
-    
-    // NOTE: Currently with HLT emulation the lx1extra GCT products are replaced with UCT so this is a labeling problem
-    sigChain->SetBranchAddress("gctCen_Pt",       &uctJetPT);
-    sigChain->SetBranchAddress("gctCen_Phi",      &uctJetPhi);
-    sigChain->SetBranchAddress("gct_Ht",          &uctHT);
-    sigChain->SetBranchAddress("gct_MhtPt",       &uctMHT);
-    sigChain->SetBranchAddress("gct_MhtDivHt",    &uctMHToverHT);
-    sigChain->SetBranchAddress("gct_MetPt",       &uctMET);
-
-    // // ------------------------------------------------------------ 
-    // // HLT 
-    // // ------------------------------------------------------------ 
-    // // HLT CaloJet
-    // sigChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
-    // sigChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
-    // sigChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
-    // //sigChain->SetBranchAddress("hltAk4Calo_Phi",       &hltCaloJetPhi);
-    // sigChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
-  
-    // // HLT PF 
-    // sigChain->SetBranchAddress("hltAk4PF_Pt",          &hltPFJetPT); 
-    // sigChain->SetBranchAddress("hltAk4PF_Px",          &hltPFJetPx);
-    // sigChain->SetBranchAddress("hltAk4PF_Py",          &hltPFJetPy);
-    // //sigChain->SetBranchAddress("hltAk4PF_Phi",         &hltPFJetPhi);
-    // sigChain->SetBranchAddress("hltAk4PF_Eta",         &hltPFJetEta);
+  // ------------------------------------------------------------ 
+  // UCT 
+  // ------------------------------------------------------------ 
    
-    
+  // NOTE: Currently with HLT emulation the lx1extra GCT products are replaced with UCT so this is a labeling problem
+  sigChain->SetBranchAddress("gctCen_Pt",       &uctJetPT);
+  sigChain->SetBranchAddress("gctCen_Phi",      &uctJetPhi);
+  sigChain->SetBranchAddress("gct_Ht",          &uctHT);
+  sigChain->SetBranchAddress("gct_MhtPt",       &uctMHT);
+  sigChain->SetBranchAddress("gct_MhtDivHt",    &uctMHToverHT);
+  sigChain->SetBranchAddress("gct_MetPt",       &uctMET);
 
-    // ------------------------------------------------------------ 
-    // HLT 
-    // ------------------------------------------------------------ 
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetNFJPhi);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
+  // ------------------------------------------------------------ 
+  // HLT 
+  // ------------------------------------------------------------ 
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",       &hltCaloJetNFJPhi);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
 
 #ifdef HLT_NOFASTJET
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetPT);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetPx);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetPy);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetPhi);
-    sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetEta);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetPT);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetPx);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetPy);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",       &hltCaloJetPhi);
+  sigChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetEta);
 #else
-    sigChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
-    sigChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
-    sigChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
-    sigChain->SetBranchAddress("hltAk4Calo_Phi",     &hltCaloJetPhi); 
-    sigChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
+  sigChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
+  sigChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
+  sigChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
+  sigChain->SetBranchAddress("hltAk4Calo_Phi",       &hltCaloJetPhi); 
+  sigChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
 #endif 
 
-    // HLT PF
-    sigChain->SetBranchAddress("hltAk4PF_Pt",        &hltPFJetPT);
-    sigChain->SetBranchAddress("hltAk4PF_Px",        &hltPFJetPx);
-    sigChain->SetBranchAddress("hltAk4PF_Py",        &hltPFJetPy);
-    sigChain->SetBranchAddress("hltAk4PF_Phi",       &hltPFJetPhi);
-    sigChain->SetBranchAddress("hltAk4PF_Eta",       &hltPFJetEta);
+  // HLT PF
+  sigChain->SetBranchAddress("hltAk4PF_Pt",        &hltPFJetPT);
+  sigChain->SetBranchAddress("hltAk4PF_Px",        &hltPFJetPx);
+  sigChain->SetBranchAddress("hltAk4PF_Py",        &hltPFJetPy);
+  sigChain->SetBranchAddress("hltAk4PF_Phi",       &hltPFJetPhi);
+  sigChain->SetBranchAddress("hltAk4PF_Eta",       &hltPFJetEta);
 
 
-    // ------------------------------------------------------------ 
-    // GEN
-    // ------------------------------------------------------------ 
+  // ------------------------------------------------------------ 
+  // GEN
+  // ------------------------------------------------------------ 
 
-    sigChain->SetBranchAddress("genAk4_Pt",         &genJetPT);
-    sigChain->SetBranchAddress("genAk4_Px",         &genJetPx);
-    sigChain->SetBranchAddress("genAk4_Py",         &genJetPy);
-    //sigChain->SetBranchAddress("genAk4_Phi",      &genJetPhi);
-    sigChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
+  sigChain->SetBranchAddress("genAk4_Pt",         &genJetPT);
+  sigChain->SetBranchAddress("genAk4_Px",         &genJetPx);
+  sigChain->SetBranchAddress("genAk4_Py",         &genJetPy);
+  //sigChain->SetBranchAddress("genAk4_Phi",      &genJetPhi);
+  sigChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
 
-    sigChain->SetBranchAddress("genAk4For_Pt",         &genJetForPT);
-    sigChain->SetBranchAddress("genAk4For_Px",         &genJetForPx);
-    sigChain->SetBranchAddress("genAk4For_Py",         &genJetForPy);
-    //sigChain->SetBranchAddress("genAk4For_Phi",      &genJetForPhi);
-    sigChain->SetBranchAddress("genAk4For_Eta",        &genJetForEta);
+  sigChain->SetBranchAddress("genAk4For_Pt",         &genJetForPT);
+  sigChain->SetBranchAddress("genAk4For_Px",         &genJetForPx);
+  sigChain->SetBranchAddress("genAk4For_Py",         &genJetForPy);
+  //sigChain->SetBranchAddress("genAk4For_Phi",      &genJetForPhi);
+  sigChain->SetBranchAddress("genAk4For_Eta",        &genJetForEta);
 
-    sigChain->SetBranchAddress("genMetCalo_MetPt",     &genMET);
+  sigChain->SetBranchAddress("genMetCalo_MetPt",     &genMET);
 
 
-    // Trigger bits
-    for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
-      TString path = hltPathNames[ iPath ];
-      hltPathFired[ path ] = false;
-      sigChain->SetBranchAddress( path, &hltPathFired[ path ]);
-    }
+  sigChain->SetBranchAddress("genLeptonVeto", &genLeptonVeto);
+
+
+
+  // Trigger bits
+  for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
+    TString path = hltPathNames[ iPath ];
+    hltPathFired[ path ] = false;
+    sigChain->SetBranchAddress( path, &hltPathFired[ path ]);
+  }
 
 
 
@@ -1511,7 +1541,7 @@ void makeSUSYHLTAlphaT(){
 
 
 
-
+  
   // ********************************************************************************
   // *                                      Rate                                    *
   // ********************************************************************************
@@ -1521,76 +1551,67 @@ void makeSUSYHLTAlphaT(){
   // UCT 
   // ------------------------------------------------------------ 
 
-    // NOTE: Currently with HLT emulation the lx1extra GCT products are replaced with UCT so this is a labeling problem
-    rateChain->SetBranchAddress("gctCen_Pt",       &uctJetPT);
-    rateChain->SetBranchAddress("gctCen_Phi",      &uctJetPhi);
-    rateChain->SetBranchAddress("gct_Ht",          &uctHT);
-    rateChain->SetBranchAddress("gct_MhtPt",       &uctMHT);
-    rateChain->SetBranchAddress("gct_MhtDivHt",    &uctMHToverHT);
-    rateChain->SetBranchAddress("gct_MetPt",       &uctMET);
+  // NOTE: Currently with HLT emulation the lx1extra GCT products are replaced with UCT so this is a labeling problem
+  rateChain->SetBranchAddress("gctCen_Pt",       &uctJetPT);
+  rateChain->SetBranchAddress("gctCen_Phi",      &uctJetPhi);
+  rateChain->SetBranchAddress("gct_Ht",          &uctHT);
+  rateChain->SetBranchAddress("gct_MhtPt",       &uctMHT);
+  rateChain->SetBranchAddress("gct_MhtDivHt",    &uctMHToverHT);
+  rateChain->SetBranchAddress("gct_MetPt",       &uctMET);
 
-
-
-
-    // ------------------------------------------------------------ 
-    // HLT 
-    // ------------------------------------------------------------ 
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetNFJPhi);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
+  // ------------------------------------------------------------ 
+  // HLT 
+  // ------------------------------------------------------------ 
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",       &hltCaloJetNFJPhi);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
 
 #ifdef HLT_NOFASTJET
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetPT);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetPx);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetPy);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetPhi);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetEta);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetPT);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetPx);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetPy);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",       &hltCaloJetPhi);
+  rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetEta);
 #else
-    rateChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
-    rateChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
-    rateChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
-    rateChain->SetBranchAddress("hltAk4Calo_Phi",     &hltCaloJetPhi); 
-    rateChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
+  rateChain->SetBranchAddress("hltAk4Calo_Pt",        &hltCaloJetPT);
+  rateChain->SetBranchAddress("hltAk4Calo_Px",        &hltCaloJetPx);
+  rateChain->SetBranchAddress("hltAk4Calo_Py",        &hltCaloJetPy);
+  rateChain->SetBranchAddress("hltAk4Calo_Phi",       &hltCaloJetPhi); 
+  rateChain->SetBranchAddress("hltAk4Calo_Eta",       &hltCaloJetEta);
 #endif 
  
-    // HLT PF 
-    rateChain->SetBranchAddress("hltAk4PF_Pt",          &hltPFJetPT); 
-    rateChain->SetBranchAddress("hltAk4PF_Px",          &hltPFJetPx);
-    rateChain->SetBranchAddress("hltAk4PF_Py",          &hltPFJetPy);
-    rateChain->SetBranchAddress("hltAk4PF_Phi",         &hltPFJetPhi);
-    rateChain->SetBranchAddress("hltAk4PF_Eta",         &hltPFJetEta);
+  // HLT PF 
+  rateChain->SetBranchAddress("hltAk4PF_Pt",          &hltPFJetPT); 
+  rateChain->SetBranchAddress("hltAk4PF_Px",          &hltPFJetPx);
+  rateChain->SetBranchAddress("hltAk4PF_Py",          &hltPFJetPy);
+  rateChain->SetBranchAddress("hltAk4PF_Phi",         &hltPFJetPhi);
+  rateChain->SetBranchAddress("hltAk4PF_Eta",         &hltPFJetEta);
    
     
-    // ------------------------------------------------------------ 
-    // GEN
-    // ------------------------------------------------------------ 
-    rateChain->SetBranchAddress("genAk4_Pt",         &genJetPT); 
-    rateChain->SetBranchAddress("genAk4_Px",         &genJetPx);
-    rateChain->SetBranchAddress("genAk4_Py",         &genJetPy);
-    rateChain->SetBranchAddress("genAk4_Phi",      &genJetPhi);
-    rateChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
-
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Pt",        &hltCaloJetNFJPT);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Px",        &hltCaloJetNFJPx);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Py",        &hltCaloJetNFJPy);
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Phi",     &hltCaloJetNFJPhi); 
-    rateChain->SetBranchAddress("hltAk4CaloNoFastJet_Eta",       &hltCaloJetNFJEta);
+  // ------------------------------------------------------------ 
+  // GEN
+  // ------------------------------------------------------------ 
+  rateChain->SetBranchAddress("genAk4_Pt",         &genJetPT); 
+  rateChain->SetBranchAddress("genAk4_Px",         &genJetPx);
+  rateChain->SetBranchAddress("genAk4_Py",         &genJetPy);
+  rateChain->SetBranchAddress("genAk4_Phi",        &genJetPhi);
+  rateChain->SetBranchAddress("genAk4_Eta",        &genJetEta);
 
 
-    rateChain->SetBranchAddress("genMetCaloAndNonPrompt_MetPt", &genMET);
-    rateChain->SetBranchAddress("hltMetCalo_MetPT",             &hltCaloMET);
+  rateChain->SetBranchAddress("genMetCaloAndNonPrompt_MetPt", &genMET);
+  rateChain->SetBranchAddress("hltMetCalo_MetPT",             &hltCaloMET);
 
 
-    // Trigger bits
-    for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
-      TString path = hltPathNames[ iPath ];
-      hltPathFired[ path ] = false;
-      rateChain->SetBranchAddress( path, &hltPathFired[ path ]);
-    }
+  // Trigger bits
+  for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
+    TString path = hltPathNames[ iPath ];
+    hltPathFired[ path ] = false;
+    rateChain->SetBranchAddress( path, &hltPathFired[ path ]);
+  }
 
-    rateChain->SetBranchAddress("NVTX", &NVTX);
+  rateChain->SetBranchAddress("NVTX", &NVTX);
 
 
 
@@ -1669,26 +1690,47 @@ void makeSUSYHLTAlphaT(){
     // ********************************************************************************
     // *                              Calojets 
     // ********************************************************************************
-    float genAlphaTStandard(0), hltPFAlphaTStandard(0), hltPFAlphaTDynamic(0), hltCaloAlphaTStandard(0), hltCaloAlphaTDynamic(0);
+    float genAlphaTStandard(0), hltPFAlphaTStandard(0), hltPFAlphaTDynamic(0), hltCaloAlphaTStandard(0), hltCaloAlphaTDynamic(0), hltCaloNFJAlphaTStandard(0);
     hltPFHT        = 0;
     hltPFMHT       = 0;
 
-    genAlphaTStandard      = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );
-    hltPFAlphaTStandard    = calculateAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold );
-
-    hltCaloAlphaTStandard  = calculateAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltPFJetThreshold );
+    genAlphaTStandard        = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );
+    hltPFAlphaTStandard      = calculateAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold );
+    hltCaloAlphaTStandard    = calculateAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltPFJetThreshold );
+    hltCaloNFJAlphaTStandard = calculateAlphaT( hltCaloJetNFJPT, hltCaloJetNFJPx, hltCaloJetNFJPy, hltPFJetThreshold );
 
     // Dynamic AlphaT 
-    hltPFAlphaTDynamic     = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy,
+    hltPFAlphaTDynamic       = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy,
 						     maxCaloJet, hltPFJetThreshold,
 						     caloJetAlphaThreshold );
-    
-    hltCaloAlphaTDynamic   = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy,
+    hltCaloAlphaTDynamic     = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy,
                                                      maxCaloJet, hltCaloJetThreshold,
                                                      caloJetAlphaThreshold );
 
+    // HLTCalo 
+    int hltCaloJetsAboveThresh(0), hltCaloJetsAboveThreshTrue(0);
+    hltCaloHT = 0;
+    for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
+      if( (*hltCaloJetPT)[iJet] < hltCaloJetThreshold ) break;
+      hltCaloHT += (*hltCaloJetPT)[iJet];
+      hltCaloJetsAboveThresh++;
+    }
+    hltCaloJetsAboveThreshTrue = hltCaloJetsAboveThresh;
+    if ( hltCaloJetsAboveThresh > MAX_JETS ){
+      hltCaloJetsAboveThresh = MAX_JETS;
+    }
+    // HLTCaloNFJ 
+    int hltCaloNFJJetsAboveThresh(0), hltCaloNFJJetsAboveThreshTrue(0);
+    float hltCaloNFJHT = 0;
+    for(uint iJet = 0;iJet < hltCaloJetNFJPT->size(); ++iJet ){
+      if( (*hltCaloJetNFJPT)[iJet] < hltCaloJetThreshold ) break;
+      hltCaloNFJHT += (*hltCaloJetNFJPT)[iJet];
+      hltCaloNFJJetsAboveThresh++;
+    }
+    hltCaloNFJJetsAboveThreshTrue = hltCaloNFJJetsAboveThresh;
+
     // HLT PFJets
-    int hltPFJetsAboveThresh(0);
+    int hltPFJetsAboveThresh(0), hltPFJetsAboveThreshTrue(0);
     float hltPFMHTx(0), hltPFMHTy(0);
     for(uint iJet = 0;iJet < hltPFJetPT->size(); ++iJet ){
       if( (*hltPFJetPT)[iJet] < hltPFJetThreshold ) break;
@@ -1699,11 +1741,12 @@ void makeSUSYHLTAlphaT(){
       hltPFJetsAboveThresh++;
     }
     hltPFMHT = sqrt( hltPFMHTx*hltPFMHTx + hltPFMHTy*hltPFMHTy);
+    hltPFJetsAboveThreshTrue = hltPFJetsAboveThresh;
     if ( hltPFJetsAboveThresh > MAX_JETS ){
       hltPFJetsAboveThresh = MAX_JETS;
     }
 
-    int genJetsAboveThresh(0);
+    int genJetsAboveThresh(0), genJetsAboveThreshTrue(0);
     float genMHTX(0), genMHTY(0);
     genHT = 0;
     for(uint iJet = 0;iJet < genJetPT->size(); ++iJet ){
@@ -1713,6 +1756,7 @@ void makeSUSYHLTAlphaT(){
       genMHTY += (*genJetPy)[iJet];
       genJetsAboveThresh++;
     }
+    genJetsAboveThreshTrue = genJetsAboveThresh;
     genMHT = sqrt( genMHTX*genMHTX + genMHTY*genMHTY);
 
 
@@ -1791,15 +1835,11 @@ void makeSUSYHLTAlphaT(){
 	  trigStr = "NoL1";
 	  hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( hltPFHT,                     hltPFAlphaTStandard );
 	  hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( hltPFHT,                     hltPFAlphaTDynamic );
-	  // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( hltPFAlphaTHTDynamic.second, hltPFAlphaTDynamic ); 
-	  // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( hltPFAlphaTHTDynamic.second, hltPFAlphaTStandard );
 
 	  if ( l1Trig1){
 	    trigStr = "Trig1";
-	    hist2DRate[trigStr + stdStr  + "_Inclusive"]           ->Fill( hltPFHT,                     hltPFAlphaTStandard );
+	    hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( hltPFHT,                     hltPFAlphaTStandard );
 	    hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( hltPFHT,                     hltPFAlphaTDynamic );
-	    // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( hltPFAlphaTHTDynamic.second, hltPFAlphaTDynamic ); 
-	    // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( hltPFAlphaTHTDynamic.second, hltPFAlphaTStandard );
 
 	    
 	    hist2DRate[trigStr + "_CaloMHT_vs_CaloHT_" + jet2PTCutStr]->Fill( hltPFHT, hltPFMHT );
@@ -1811,13 +1851,6 @@ void makeSUSYHLTAlphaT(){
 	    }
 
 	  }
-	  // if ( l1Trig2){
-	  //   trigStr = "Trig2";
-	  //   hist2DRate[trigStr + stdStr  + "_Inclusive"]       ->Fill( hltPFHT,                     hltPFAlphaTStandard );
-	  //   // hist2DRate[trigStr + dynStr  + "_Inclusive"]       ->Fill( hltPFHT,                     hltPFAlphaTDynamic );
-	  //   // hist2DRate[trigStr + dyn2Str + "_Inclusive"]       ->Fill( hltPFAlphaTHTDynamic.second, hltPFAlphaTDynamic ); 
-	  //   // hist2DRate[trigStr + dyn3Str + "_Inclusive"]       ->Fill( hltPFAlphaTHTDynamic.second, hltPFAlphaTStandard );
-	  // }
 
 	} // End Second jet PT requirement
 
@@ -1910,6 +1943,13 @@ void makeSUSYHLTAlphaT(){
     //   hltVec.push_back( hltJet );
     // }
 
+
+    // NJet distributions
+    histMatch["Gen_NJet"]    ->Fill( genJetsAboveThreshTrue   );
+    histMatch["PF_NJet"]     ->Fill( hltPFJetsAboveThreshTrue );
+    histMatch["Calo_NJet"]   ->Fill( hltCaloJetsAboveThreshTrue );
+    histMatch["CaloNFJ_NJet"]->Fill( hltCaloNFJJetsAboveThreshTrue );
+
     // Create dynamic jet collection containers
     std::vector<float> *hltCollPT   = new std::vector<float>();
     std::vector<float> *hltCollEta  = new std::vector<float>();
@@ -1920,9 +1960,10 @@ void makeSUSYHLTAlphaT(){
 
       // Load the relevant jet collection
       TString jetColl = jetColls[ iColl ];
-      if ( jetColl == "PF" )       { hltCollPT = hltPFJetPT;      hltCollEta = hltPFJetEta;      hltCollPhi = hltPFJetPhi;      }
-      if ( jetColl == "Calo" )     { hltCollPT = hltCaloJetPT;    hltCollEta = hltCaloJetEta;    hltCollPhi = hltCaloJetPhi;    }
-      if ( jetColl == "CaloNFJPF" ){ hltCollPT = hltCaloJetNFJPT; hltCollEta = hltCaloJetNFJEta; hltCollPhi = hltCaloJetNFJPhi; }
+      if      ( jetColl == "PF" )     { hltCollPT = hltPFJetPT;      hltCollEta = hltPFJetEta;      hltCollPhi = hltPFJetPhi;      }
+      else if ( jetColl == "Calo" )   { hltCollPT = hltCaloJetPT;    hltCollEta = hltCaloJetEta;    hltCollPhi = hltCaloJetPhi;    }
+      else if ( jetColl == "CaloNFJ" ){ hltCollPT = hltCaloJetNFJPT; hltCollEta = hltCaloJetNFJEta; hltCollPhi = hltCaloJetNFJPhi; }
+      else{ std::cout << "Error, jet collection '" << jetColl << "' not recognised.\n"; exit(1); }
 
       // Perform matching
       std::vector<pair_info> pairs = make_pairs( genJetPT, genJetEta, genJetPhi, hltCollPT, hltCollEta, hltCollPhi, 20., 20. );
@@ -1943,7 +1984,6 @@ void makeSUSYHLTAlphaT(){
 	  }
 	}
       }     
-    
 
       // Iterate through HLT jets
       for(unsigned int iHLT = 0; iHLT < HLTMatchedIndex.size(); ++iHLT ) {
@@ -1968,37 +2008,38 @@ void makeSUSYHLTAlphaT(){
 	int iGEN = HLTMatchedIndex[iHLT];
 	bool matched(true);
 	if ( iGEN == -1 ){ matched = false; }
+	histMatch[jetColl + "_Inclusive_AllJets_JetPT"] ->Fill( hltPt );
+	histMatch[jetColl + "_Inclusive_AllJets_JetEta"]->Fill( hltEta );
 
-	histMatch["Inclusive_AllJets_JetPT"] ->Fill( hltPt );
-	histMatch["Inclusive_AllJets_JetEta"]->Fill( hltEta );
 	if (iHLT < 2){
 	  rank = TString("Jet") + Form("%d", (iHLT + 1) );
 
-	  histMatch["Inclusive_" + rank + "_JetPT"] ->Fill( hltPt );
-	  histMatch["Inclusive_" + rank + "_JetEta"]->Fill( hltEta );
+	  histMatch[jetColl + "_Inclusive_" + rank + "_JetPT"] ->Fill( hltPt );
+	  histMatch[jetColl + "_Inclusive_" + rank + "_JetEta"]->Fill( hltEta );
 	}
+
 	if (matched){
 	  jetID = "Matched";
 	  dRGenPt  = (*genJetPT)[iGEN];
 	  dRGenEta = (*genJetEta)[iGEN];
 	  dRGenPhi = (*genJetPhi)[iGEN];
 
-	  histMatch["Matched_AllJets_JetPT"] ->Fill( hltPt );
-	  histMatch["Matched_AllJets_JetEta"]->Fill( hltEta );
+	  histMatch[jetColl + "_Matched_AllJets_JetPT"] ->Fill( hltPt );
+	  histMatch[jetColl + "_Matched_AllJets_JetEta"]->Fill( hltEta );
 	  if (iHLT < 2){
-	    histMatch["Matched_" + rank + "_JetPT"] ->Fill( hltPt );
-	    histMatch["Matched_" + rank + "_JetEta"]->Fill( hltEta );
+	    histMatch[jetColl + "_Matched_" + rank + "_JetPT"] ->Fill( hltPt );
+	    histMatch[jetColl + "_Matched_" + rank + "_JetEta"]->Fill( hltEta );
 	  }
 	}
 	else{
 	  // Make assumption non-matched jets are attributed to pileup      
 	  jetID = "Pileup";
 
-	  histMatch["Pileup_AllJets_JetPT"] ->Fill( hltPt );
-	  histMatch["Pileup_AllJets_JetEta"]->Fill( hltEta );
+	  histMatch[jetColl + "_Pileup_AllJets_JetPT"] ->Fill( hltPt );
+	  histMatch[jetColl + "_Pileup_AllJets_JetEta"]->Fill( hltEta );
 	  if (iHLT < 2){
-	    histMatch["Pileup_" + rank + "_JetPT"] ->Fill( hltPt );
-	    histMatch["Pileup_" + rank + "_JetEta"]->Fill( hltEta );
+	    histMatch[jetColl + "_Pileup_" + rank + "_JetPT"] ->Fill( hltPt );
+	    histMatch[jetColl + "_Pileup_" + rank + "_JetEta"]->Fill( hltEta );
 	  }
 	}
 
@@ -2022,33 +2063,33 @@ void makeSUSYHLTAlphaT(){
 	  double rDeltaEta    = (rGenEta - hltEta); 
 	  double rDeltaPhi    = rGenJet.DeltaPhi( hltJet );
 	  double rDeltaR      = sqrt( rDeltaEta*rDeltaEta + rDeltaPhi*rDeltaPhi );
-
 	
 	  // Iterate through jet types
 	  for (uint iJet = 0; iJet < 2; ++iJet){
 	    TString jet = "";
 	    if (iJet == 0){ jet = "Inclusive"; }
 	    else          { jet = jetID; }
-	  
-	    histMatch[  jet + "_AllJets_JetResponse"]        ->Fill(rJetResponse);
-	    histMatch[  jet + "_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-	    histMatch[  jet + "_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
-	    histMatch[  jet + "_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
-	    histMatch[  jet + "_AllJets_DeltaR"]             ->Fill(rDeltaR);
-	    histMatch2D[jet + "_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-	    histMatch2D[jet + "_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-	    histMatch2D[jet + "_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	    TString jetStr = jetColl + "_" + jet;
+
+	    histMatch[  jetStr + "_AllJets_JetResponse"]        ->Fill(rJetResponse);
+	    histMatch[  jetStr + "_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	    histMatch[  jetStr + "_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
+	    histMatch[  jetStr + "_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
+	    histMatch[  jetStr + "_AllJets_DeltaR"]             ->Fill(rDeltaR);
+	    histMatch2D[jetStr + "_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	    histMatch2D[jetStr + "_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	    histMatch2D[jetStr + "_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+
 	    if (iHLT < 2){
-	      histMatch[  jet + "_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
-	      histMatch[  jet + "_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-	      histMatch[  jet + "_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
-	      histMatch[  jet + "_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
-	      histMatch[  jet + "_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
-	      histMatch2D[jet + "_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-	      histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-	      histMatch2D[jet + "_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	      histMatch[  jetStr + "_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
+	      histMatch[  jetStr + "_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	      histMatch[  jetStr + "_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
+	      histMatch[  jetStr + "_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
+	      histMatch[  jetStr + "_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
+	      histMatch2D[jetStr + "_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	      histMatch2D[jetStr + "_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	      histMatch2D[jetStr + "_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
 	    }
-	
 	  }
 
 	  // ********************************************************************************
@@ -2066,25 +2107,25 @@ void makeSUSYHLTAlphaT(){
 	    double dRDeltaEta    = dRGenEta - hltEta; 
 	    double dRDeltaPhi    = dRGenJet.DeltaPhi( hltJet );
 	    double dRDeltaR      = sqrt( dRDeltaEta*dRDeltaEta + dRDeltaPhi*dRDeltaPhi );
-  
-	    histMatch[  "dRMatched_AllJets_JetResponse"]        ->Fill(rJetResponse);
-	    histMatch[  "dRMatched_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-	    histMatch[  "dRMatched_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
-	    histMatch[  "dRMatched_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
-	    histMatch[  "dRMatched_AllJets_DeltaR"]             ->Fill(rDeltaR);
-	    histMatch2D["dRMatched_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-	    histMatch2D["dRMatched_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-	    histMatch2D["dRMatched_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+
+	    histMatch[  jetColl + "_dRMatched_AllJets_JetResponse"]        ->Fill(rJetResponse);
+	    histMatch[  jetColl + "_dRMatched_AllJets_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	    histMatch[  jetColl + "_dRMatched_AllJets_DeltaEta"]           ->Fill(rDeltaEta);
+	    histMatch[  jetColl + "_dRMatched_AllJets_DeltaPhi"]           ->Fill(rDeltaPhi);
+	    histMatch[  jetColl + "_dRMatched_AllJets_DeltaR"]             ->Fill(rDeltaR);
+	    histMatch2D[jetColl + "_dRMatched_AllJets_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	    histMatch2D[jetColl + "_dRMatched_AllJets_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	    histMatch2D[jetColl + "_dRMatched_AllJets_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
 
 	    if (iHLT < 2){
-	      histMatch[  "dRMatched_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
-	      histMatch[  "dRMatched_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
-	      histMatch[  "dRMatched_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
-	      histMatch[  "dRMatched_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
-	      histMatch[  "dRMatched_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
-	      histMatch2D["dRMatched_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
-	      histMatch2D["dRMatched_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
-	      histMatch2D["dRMatched_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
+	      histMatch[  jetColl + "_dRMatched_" + rank + "_JetResponse"]        ->Fill(rJetResponse);
+	      histMatch[  jetColl + "_dRMatched_" + rank + "_DeltaPTRel"]         ->Fill(rDeltaPtRel);
+	      histMatch[  jetColl + "_dRMatched_" + rank + "_DeltaEta"]           ->Fill(rDeltaEta);
+	      histMatch[  jetColl + "_dRMatched_" + rank + "_DeltaPhi"]           ->Fill(rDeltaPhi);
+	      histMatch[  jetColl + "_dRMatched_" + rank + "_DeltaR"]             ->Fill(rDeltaR);
+	      histMatch2D[jetColl + "_dRMatched_" + rank + "_HLTPT_vs_GENPT"]     ->Fill(rGenPt, hltPt);
+	      histMatch2D[jetColl + "_dRMatched_" + rank + "_DeltaPTRel_vs_GENPT"]->Fill(rGenPt, rDeltaPtRel);
+	      histMatch2D[jetColl + "_dRMatched_" + rank + "_DeltaPTRel_vs_NVTX"] ->Fill(NVTX,   rDeltaPtRel);
 	    }
 	  } // End dRMatching
 	
@@ -2120,20 +2161,36 @@ void makeSUSYHLTAlphaT(){
 
     } // End jet collection loop
     
+
+
     // Jet energy sum correlations
-    histMatch2D["HLTCaloHT_vs_HLTPFHT"] ->Fill( hltPFHT, hltPFHT );
-    histMatch2D["HLTCaloHT_vs_GenHT"]   ->Fill( genHT,    hltCaloHT );
-    histMatch2D["HLTPFHT_vs_GenHT"]     ->Fill( genHT,    hltPFHT );
-    
+    histCorr2D["HLTCaloHT_vs_HLTCaloNFJHT"]->Fill( hltCaloNFJHT, hltCaloHT );
+    histCorr2D["HLTCaloHT_vs_HLTPFHT"]     ->Fill( hltPFHT,      hltCaloHT );
+    histCorr2D["HLTCaloHT_vs_GenHT"]       ->Fill( genHT,        hltCaloHT );
+    histCorr2D["HLTPFHT_vs_GenHT"]         ->Fill( genHT,        hltPFHT   );
+
+    histCorr2D["HLTCaloNFJHT_vs_HLTPFHT"]->Fill( hltPFHT, hltCaloNFJHT );
+    histCorr2D["HLTCaloNFJHT_vs_GenHT"]  ->Fill( genHT,   hltCaloNFJHT );    
+
     // AlphaT Correlations 
-    histMatch2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]      ->Fill( hltPFAlphaTStandard,   hltCaloAlphaTStandard );
-    histMatch2D["HLTCaloAlphaT_vs_GenAlphaT"]        ->Fill( genAlphaTStandard,     hltCaloAlphaTStandard );
-    histMatch2D["HLTPFAlphaT_vs_GenAlphaT"]          ->Fill( genAlphaTStandard,     hltPFAlphaTStandard );
-    histMatch2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] ->Fill( hltCaloAlphaTDynamic,  hltCaloAlphaTStandard );
-    histMatch2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   ->Fill( hltPFAlphaTStandard,   hltCaloAlphaTDynamic );
-    histMatch2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     ->Fill( genAlphaTStandard,     hltCaloAlphaTDynamic );
-    
-    //    histMatch2D["GenAlphaT_vs_GenHT"]
+    histCorr2D["HLTCaloAlphaT_vs_HLTPFAlphaT"]        ->Fill( hltPFAlphaTStandard,   hltCaloAlphaTStandard );
+    histCorr2D["HLTCaloAlphaT_vs_GenAlphaT"]          ->Fill( genAlphaTStandard,     hltCaloAlphaTStandard );
+    histCorr2D["HLTCaloNFJAlphaT_vs_HLTPFAlphaT"]     ->Fill( hltPFAlphaTStandard,   hltCaloNFJAlphaTStandard );
+    histCorr2D["HLTCaloNFJAlphaT_vs_HLTCaloAlphaT"]   ->Fill( hltCaloAlphaTStandard, hltCaloNFJAlphaTStandard );
+    histCorr2D["HLTCaloNFJAlphaT_vs_HLTCaloAlphaTDyn"]->Fill( hltCaloAlphaTDynamic,  hltCaloNFJAlphaTStandard );
+    histCorr2D["HLTCaloNFJAlphaT_vs_GenAlphaT"]       ->Fill( genAlphaTStandard,     hltCaloNFJAlphaTStandard );
+    histCorr2D["HLTPFAlphaT_vs_GenAlphaT"]            ->Fill( genAlphaTStandard,     hltPFAlphaTStandard );
+
+
+    histCorr2D["HLTCaloAlphaT_vs_HLTCaloAlphaTDyn"] ->Fill( hltCaloAlphaTDynamic,  hltCaloAlphaTStandard );
+    histCorr2D["HLTCaloAlphaTDyn_vs_HLTPFAlphaT"]   ->Fill( hltPFAlphaTStandard,   hltCaloAlphaTDynamic );
+    histCorr2D["HLTCaloAlphaTDyn_vs_GenAlphaT"]     ->Fill( genAlphaTStandard,     hltCaloAlphaTDynamic );
+
+    histCorr2D["GenAlphaT_vs_GenHT"]                 ->Fill( genHT,        genAlphaTStandard     );
+    histCorr2D["HLTCaloAlphaT_vs_HLTCaloHT"]         ->Fill( hltCaloHT,    hltCaloAlphaTStandard );
+    histCorr2D["HLTCaloNFJAlphaT_vs_HLTCaloNFJHT"]   ->Fill( hltCaloNFJHT, hltCaloNFJAlphaTStandard );
+    histCorr2D["HLTCaloAlphaTDyn_vs_HLTCaloHT"]      ->Fill( hltCaloHT,    hltCaloAlphaTDynamic  );
+    histCorr2D["HLTPFAlphaT_vs_HLTPFHT"]             ->Fill( hltPFHT,      hltPFAlphaTStandard   );
     
 
 
@@ -2399,14 +2456,15 @@ void makeSUSYHLTAlphaT(){
   // ********************************************************************************
 
 #ifdef MATCHING
-  fOut->mkdir("Raw/MatchRaw");
   fOut->mkdir("Raw/Match");
+  fOut->mkdir("Raw/Match/Raw");
+  fOut->mkdir("Raw/Correlations");
 
   std::cout << "\thistMatch\n";
   for(std::map<TString, TH1*>::const_iterator itr = histMatch.begin(); itr != histMatch.end(); ++itr){
 
     TString histoName = itr->first; //Extract the histogram key 
-    fOut->cd("Raw/MatchRaw");
+    fOut->cd("Raw/Match/Raw");
     itr->second->Write();
 
     fOut->cd("Raw/Match");
@@ -2421,7 +2479,7 @@ void makeSUSYHLTAlphaT(){
   for(std::map<TString, TH2*>::const_iterator itr = histMatch2D.begin(); itr != histMatch2D.end(); ++itr){
 
     TString histoName = itr->first; //Extract the histogram key 
-    fOut->cd("Raw/MatchRaw");
+    fOut->cd("Raw/Match/Raw");
     itr->second->Write();
 
     fOut->cd("Raw/Match");
@@ -2430,6 +2488,13 @@ void makeSUSYHLTAlphaT(){
     rateHist->Scale( rateScaleFactor );
     rateHist->Write();
    
+  }
+
+  std::cout << "\thistCorr2D\n";
+  for(std::map<TString, TH2*>::const_iterator itr = histCorr2D.begin(); itr != histCorr2D.end(); ++itr){
+    TString histoName = itr->first; //Extract the histogram key 
+    fOut->cd("Raw/Correlations");
+    itr->second->Write();
   }
 #endif
   std::cout << "Saved histograms\n\n";

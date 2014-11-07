@@ -5,27 +5,10 @@
 
 
 
-/* float calculateAlphaT( std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold ); */
-/* float calculateDynamicAlphaT(std::vector<float> *jetPT, std::vector<float> *jetPx,  */
-/* 			     std::vector<float> *jetPy, //float jetThreshold,  */
-/* 			     uint maxJets,  */
-/* 			     float dynamicJetThreshold, float dynamicAlphaTThreshold); */
-/* std::pair<float,float> calculateDynamicAlphaTHT(std::vector<float> *jetPT, std::vector<float> *jetPx,  */
-/* 						std::vector<float> *jetPy, //float jetThreshold,  */
-/* 						uint maxJets, */
-/*                                                 float dynamicJetThreshold, float dynamicAlphaTThreshold, float dynamicHTThreshold); */
-
-/* std::vector<std::pair<float,float> > calculateDynamicAlphaTPairs(std::vector<float> *jetPT, std::vector<float> *jetPx,  */
-/* 								 std::vector<float> *jetPy, //float jetThreshold,  */
-/* 								 uint maxJets, float dynamicJetThreshold); */
-
-
-
-
-
-
-
 float calculateAlphaT( std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold ){
+
+  int maxJets = 15;
+
 
   // check the size of the input collection
   if (jetPT->size() <= 1){
@@ -48,6 +31,12 @@ float calculateAlphaT( std::vector<float> *jetPT, std::vector<float> *jetPx, std
     sum_px += (*jetPx)[iJet];
     sum_py += (*jetPy)[iJet];
     
+  }
+
+
+  // Keep event if it contains many jets
+  if (jetPTNew.size() >= maxJets){
+    return 10.;
   }
 
   // check the size of the new input collection
