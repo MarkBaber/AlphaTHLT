@@ -1,8 +1,8 @@
-#define TEST
+//#define TEST
 //#define SIGNAL
 #define NEUTRINO
 
-#define HLT_NOFASTJET
+//#define HLT_NOFASTJET
 
 //#define MATCHING
 
@@ -1721,11 +1721,17 @@ void makeSUSYHLTAlphaT(){
     // HLTCalo 
     int hltCaloJetsAboveThresh(0), hltCaloJetsAboveThreshTrue(0);
     hltCaloHT = 0;
+    float hltCaloMHT = 0;
+    float hltCaloMHTx(0), hltCaloMHTy(0);
     for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
       if( (*hltCaloJetPT)[iJet] < hltCaloJetThreshold ) break;
-      hltCaloHT += (*hltCaloJetPT)[iJet];
+      hltCaloHT      += (*hltCaloJetPT)[iJet];
+      hltCaloMHTx    += (*hltCaloJetPx)[iJet];
+      hltCaloMHTy    += (*hltCaloJetPy)[iJet];
+
       hltCaloJetsAboveThresh++;
     }
+    hltCaloMHT = sqrt( hltCaloMHTx*hltCaloMHTx + hltCaloMHTy*hltCaloMHTy);
     hltCaloJetsAboveThreshTrue = hltCaloJetsAboveThresh;
     if ( hltCaloJetsAboveThresh > MAX_JETS ){
       hltCaloJetsAboveThresh = MAX_JETS;
