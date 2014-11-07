@@ -1,4 +1,4 @@
-//#define TEST
+#define TEST
 //#define SIGNAL
 #define NEUTRINO
 
@@ -1852,12 +1852,14 @@ void makeSUSYHLTAlphaT(){
 	    hist2DRate[trigStr + "PF"   + stdStr  + "_Inclusive"]     ->Fill( hltPFHT,   hltPFAlphaTStandard );
 	    hist2DRate[trigStr + "PF"   + dynStr  + "_Inclusive"]     ->Fill( hltPFHT,   hltPFAlphaTDynamic );
 	    
-	    hist2DRate[trigStr + "_CaloMHT_vs_CaloHT_" + jet2PTCutStr]->Fill( hltPFHT, hltPFMHT );
-	    hist2DRate[trigStr + "_CaloMET_vs_CaloHT_" + jet2PTCutStr]->Fill( hltPFHT, hltPFMET );
+	    hist2DRate[trigStr + "_CaloMHT_vs_CaloHT_" + jet2PTCutStr]->Fill( hltCaloHT, hltCaloMHT );
+	    hist2DRate[trigStr + "_CaloMET_vs_CaloHT_" + jet2PTCutStr]->Fill( hltCaloHT, hltCaloMET );
+	    hist2DRate[trigStr + "_PFMHT_vs_PFHT_"     + jet2PTCutStr]->Fill( hltPFHT,   hltPFMHT );
+	    hist2DRate[trigStr + "_PFMET_vs_PFHT_"     + jet2PTCutStr]->Fill( hltPFHT,   hltPFMET );
 
 	    // Exclude overlap rate with SUSY hadronic menu - assuming SUSY menu has same HTT175||MET70 trigger
 	    if ( !( firesSUSYMenu ) ){
-	      hist2DRate[trigStr + "SM" + stdStr + "_Inclusive"]->Fill( hltPFHT,                     hltPFAlphaTStandard );
+	      hist2DRate[trigStr + "SM" + stdStr + "_Inclusive"]      ->Fill( hltPFHT,   hltPFAlphaTStandard );
 	    }
 
 	  }
