@@ -1,6 +1,6 @@
-//#define TEST
+#define TEST
 #define SIGNAL
-//#define NEUTRINO
+#define NEUTRINO
 
 //#define HLT_NOFASTJET
 
@@ -377,20 +377,22 @@ void makeSUSYHLTAlphaT(){
   std::vector<float> *hltCaloJetPy  = new std::vector<float>();
   std::vector<float> *hltCaloJetEta = new std::vector<float>();
   std::vector<float> *hltCaloJetPhi = new std::vector<float>();
-  float hltCaloHT(0); //, hltCaloAlphaT(0);
+  float hltCaloHT(0), hltCaloMHT(0), hltCaloMHTOverHT(0);
   // HLT CaloJet - No FastJet correction
   std::vector<float> *hltCaloJetNFJPT  = new std::vector<float>();
   std::vector<float> *hltCaloJetNFJPx  = new std::vector<float>();
   std::vector<float> *hltCaloJetNFJPy  = new std::vector<float>();
   std::vector<float> *hltCaloJetNFJEta = new std::vector<float>();
   std::vector<float> *hltCaloJetNFJPhi = new std::vector<float>();
+  float hltCaloNFJHT(0), hltCaloNFJMHT(0), hltCaloNFJMHTOverHT(0);
   // HLT PF  
   std::vector<float> *hltPFJetPT  = new std::vector<float>();
   std::vector<float> *hltPFJetPx  = new std::vector<float>();
   std::vector<float> *hltPFJetPy  = new std::vector<float>();
   std::vector<float> *hltPFJetEta = new std::vector<float>();
   std::vector<float> *hltPFJetPhi = new std::vector<float>();
-  float hltPFHT(0), hltPFMET(0), hltPFMHT(0); //, caloAlphaT(0);
+  float hltPFHT(0), hltPFMHT(0), hltPFMHTOverHT(0);
+  float hltPFMET(0);
 
   // ------------------------------------------------------------
   // GEN
@@ -407,7 +409,8 @@ void makeSUSYHLTAlphaT(){
   std::vector<float> *genJetForPy  = new std::vector<float>();
   std::vector<float> *genJetForEta = new std::vector<float>();
   //  std::vector<float> *genJetForPhi = new std::vector<float>();
-  float genHT(0), genMET(0), genMHT(0); // pfAlphaT(0),
+  float genHT(0), genMHT(0), genMHTOverHT(0);
+  float genMET(0); 
 
 
 
@@ -1217,8 +1220,12 @@ void makeSUSYHLTAlphaT(){
     float hltCaloAlphaTDynamic(0);
 
     float hltCaloNFJAlphaTStandard(0);
-    float hltCaloAlphaTMHTOverHT(0);
+    //    float hltCaloAlphaTMHTOverHT(0);
+
+    float hltCaloNFJAlphaTPrime(0);
     float hltCaloAlphaTPrime(0);
+    float hltPFAlphaTPrime(0);
+    float genAlphaTPrime(0);
    
 
     // ********************************************************************************
@@ -1233,77 +1240,44 @@ void makeSUSYHLTAlphaT(){
     // bool l1Trig6 = ( (uctHT >= 200)  || (uctMET >= 70) || ((uctHT >= 130) && (uctMHToverHT >= 0.32)) );
     // bool l1Trig7 = ( (uctHT >= 200)  || (uctMET >= 70) || ((uctHT >= 120) && (uctMHToverHT >= 0.36)) );
 
+
+    // ********************************************************************************
+    // *                               Event variables                                *
+    // ********************************************************************************
+
     // HLTCalo
+    // ----------------------------------------
     int hltCaloJetsAboveThreshTrue(0), hltCaloJetsAboveThresh(0);
-    hltCaloHT = 0;
-    float hltCaloMHT = 0;
-    // float hltCaloMHTx(0), hltCaloMHTy(0);
-
-    // for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
-    //   if( (*hltCaloJetPT)[iJet] < hltCaloJetThreshold ) break;
-    //   hltCaloHT      += (*hltCaloJetPT)[iJet];
-    //   hltCaloMHTx    += (*hltCaloJetPx)[iJet];
-    //   hltCaloMHTy    += (*hltCaloJetPy)[iJet];
-    //   hltCaloJetsAboveThresh++;
-    // }
-    // hltCaloMHT = sqrt( hltCaloMHTx*hltCaloMHTx + hltCaloMHTy*hltCaloMHTy);
-    // if (hltCaloHT > 0){
-    //   hltCaloAlphaTMHTOverHT = hltCaloMHT/hltCaloHT;
-    // }
-    // hltCaloAlphaTPrime = 0.5*( 1/sqrt( 1 - hltCaloAlphaTMHTOverHT*hltCaloAlphaTMHTOverHT )  );
-
-    // if ( hltCaloJetsAboveThresh > MAX_JETS ){
-    //   hltCaloJetsAboveThresh = MAX_JETS;
-    // }
-
-
-    float hltCaloMHTOverHT(0);
-    // HLT CaloJet
     getAnalysisVariables( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltCaloJetThreshold,
 			  hltCaloJetsAboveThreshTrue, hltCaloJetsAboveThresh, hltCaloHT, hltCaloMHT, hltCaloMHTOverHT, hltCaloAlphaTPrime);
 
+    // HLTCaloNFJ 
+    // ---------------------------------------- 
+    int hltCaloNFJJetsAboveThreshTrue(0), hltCaloNFJJetsAboveThresh(0);
+    getAnalysisVariables( hltCaloJetNFJPT, hltCaloJetNFJPx, hltCaloJetNFJPy, hltCaloJetThreshold,
+                          hltCaloNFJJetsAboveThreshTrue, hltCaloNFJJetsAboveThresh, hltCaloNFJHT, hltCaloNFJMHT,
+                          hltCaloNFJMHTOverHT, hltCaloNFJAlphaTPrime);
 
-    // calculate HT and jet multiplicity for new jet threshold
-    int hltPFJetsAboveThresh(0);
-    hltPFHT = 0;
-    for(uint iJet = 0;iJet < hltPFJetPT->size(); ++iJet ){
-      if( (*hltPFJetPT)[iJet] < hltPFJetThreshold ) break;
-      hltPFHT += (*hltPFJetPT)[iJet];
-      hltPFJetsAboveThresh++;
-    }
-    if ( hltPFJetsAboveThresh > MAX_JETS ){ 
-      hltPFJetsAboveThresh = MAX_JETS; 
-    }
+    // HLTPF
+    // ----------------------------------------
+    int hltPFJetsAboveThreshTrue(0), hltPFJetsAboveThresh(0);
+    getAnalysisVariables( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold,
+			  hltPFJetsAboveThreshTrue, hltPFJetsAboveThresh, hltPFHT, hltPFMHT, hltPFMHTOverHT, hltPFAlphaTPrime);
     TString nhltPFJetsStr = Form("%d", hltPFJetsAboveThresh );
-    int genJetsAboveThresh(0);
-    float genMHTX(0), genMHTY(0);
-    genHT  = 0;
-    genMHT = 0;
-    for(uint iJet = 0;iJet < genJetPT->size(); ++iJet ){
-      if( (*genJetPT)[iJet] < genJetThreshold ) break;
-      genHT   += (*genJetPT)[iJet];
-      genMHTX += (*genJetPx)[iJet];
-      genMHTY += (*genJetPy)[iJet];
-      genJetsAboveThresh++;
-    }
-    genMHT = sqrt( genMHTX*genMHTX + genMHTY*genMHTY);
-    if ( genJetsAboveThresh > MAX_JETS ){
-      genJetsAboveThresh = MAX_JETS;
-    }
-    TString genJetBinStr     = TString(Form( "%d", genJetsAboveThresh)) + TString("Jets");
+
+    // Gen
+    // ----------------------------------------
+    int genJetsAboveThreshTrue(0), genJetsAboveThresh(0);
+    getAnalysisVariables( genJetPT, genJetPx, genJetPy, genJetThreshold,
+                          genJetsAboveThreshTrue, genJetsAboveThresh, genHT, genMHT, genMHTOverHT, genAlphaTPrime);
+    TString genJetBinStr = TString(Form( "%d", genJetsAboveThresh)) + TString("Jets");
 
 
-    bool passesOffJet(false);
-    bool passesAnaBinOffAT(false), passesAnaBinOffJet(false), passesAnaBinOffAll(false);
-    bool passesOffVetoes(false);
-
-
-    genAlphaTStandard       = calculateAlphaT( genJetPT, genJetPx, genJetPy, genJetThreshold );      
-
-    hltPFAlphaTStandard    = calculateAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold );    
-
-    hltCaloAlphaTStandard  = calculateAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltPFJetThreshold );    
-
+    // AlphaT
+    // ----------------------------------------
+    genAlphaTStandard      = calculateAlphaT( genJetPT,     genJetPx,     genJetPy,     genJetThreshold   ); 
+    hltPFAlphaTStandard    = calculateAlphaT( hltPFJetPT,   hltPFJetPx,   hltPFJetPy,   hltPFJetThreshold ); 
+    hltCaloAlphaTStandard  = calculateAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltPFJetThreshold ); 
 
     // Dynamic AlphaT
     // hltPFAlphaTDynamic     = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy, 
@@ -1314,6 +1288,10 @@ void makeSUSYHLTAlphaT(){
 						     maxCaloJet, hltCaloJetThreshold, 
 						     caloJetAlphaThreshold );
   
+
+    bool passesOffJet(false);
+    bool passesAnaBinOffAT(false), passesAnaBinOffJet(false), passesAnaBinOffAll(false);
+    bool passesOffVetoes(false);
 
 
     // ********************************************************************************
@@ -1721,11 +1699,48 @@ void makeSUSYHLTAlphaT(){
 
 
     // ********************************************************************************
-    // *                              Calojets 
+    // *                               Event variables                                *
     // ********************************************************************************
+
+    float hltCaloNFJAlphaTPrime(0);
+    float hltCaloAlphaTPrime(0);
+    float hltPFAlphaTPrime(0);
+    float genAlphaTPrime(0);
+
+
+    // HLTCalo
+    // ----------------------------------------
+    int hltCaloJetsAboveThreshTrue(0), hltCaloJetsAboveThresh(0);
+    getAnalysisVariables( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltCaloJetThreshold,
+			  hltCaloJetsAboveThreshTrue, hltCaloJetsAboveThresh, hltCaloHT, hltCaloMHT, hltCaloMHTOverHT, hltCaloAlphaTPrime);
+
+    // HLTCaloNFJ
+    // ----------------------------------------
+    int hltCaloNFJJetsAboveThreshTrue(0), hltCaloNFJJetsAboveThresh(0);
+    getAnalysisVariables( hltCaloJetNFJPT, hltCaloJetNFJPx, hltCaloJetNFJPy, hltCaloJetThreshold,
+			  hltCaloNFJJetsAboveThreshTrue, hltCaloNFJJetsAboveThresh, hltCaloNFJHT, hltCaloNFJMHT, 
+			  hltCaloNFJMHTOverHT, hltCaloNFJAlphaTPrime);
+
+    // HLTPF
+    // ----------------------------------------
+    int hltPFJetsAboveThreshTrue(0), hltPFJetsAboveThresh(0);
+    getAnalysisVariables( hltPFJetPT, hltPFJetPx, hltPFJetPy, hltPFJetThreshold,
+			  hltPFJetsAboveThreshTrue, hltPFJetsAboveThresh, hltPFHT, hltPFMHT, hltPFMHTOverHT, hltPFAlphaTPrime);
+    TString nhltPFJetsStr = Form("%d", hltPFJetsAboveThresh );
+
+    // Gen
+    // ----------------------------------------
+    int genJetsAboveThreshTrue(0), genJetsAboveThresh(0);
+    getAnalysisVariables( genJetPT, genJetPx, genJetPy, genJetThreshold,
+                          genJetsAboveThreshTrue, genJetsAboveThresh, genHT, genMHT, genMHTOverHT, genAlphaTPrime);
+    TString genJetBinStr = TString(Form( "%d", genJetsAboveThresh)) + TString("Jets");
+
+
+
+
+    // AlphaT
+    // ----------------------------------------
     float genAlphaTStandard(0), hltPFAlphaTStandard(0), hltPFAlphaTDynamic(0), hltCaloAlphaTStandard(0), hltCaloAlphaTDynamic(0), hltCaloNFJAlphaTStandard(0);
-    hltPFHT        = 0;
-    hltPFMHT       = 0;
 
     // Standard AlphaT
     genAlphaTStandard        = calculateAlphaT( genJetPT,        genJetPx,        genJetPy,        genJetThreshold   );
@@ -1739,65 +1754,11 @@ void makeSUSYHLTAlphaT(){
     hltCaloAlphaTDynamic     = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy,
 						       maxCaloJet, hltCaloJetThreshold,
 						       caloJetAlphaThreshold );
+
+
+
+
     
-    // HLTCalo 
-    int hltCaloJetsAboveThresh(0), hltCaloJetsAboveThreshTrue(0);
-    hltCaloHT = 0;
-    float hltCaloMHT = 0;
-    float hltCaloMHTx(0), hltCaloMHTy(0);
-    for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
-      if( (*hltCaloJetPT)[iJet] < hltCaloJetThreshold ) break;
-      hltCaloHT      += (*hltCaloJetPT)[iJet];
-      hltCaloMHTx    += (*hltCaloJetPx)[iJet];
-      hltCaloMHTy    += (*hltCaloJetPy)[iJet];
-
-      hltCaloJetsAboveThresh++;
-    }
-    hltCaloMHT = sqrt( hltCaloMHTx*hltCaloMHTx + hltCaloMHTy*hltCaloMHTy);
-    hltCaloJetsAboveThreshTrue = hltCaloJetsAboveThresh;
-    if ( hltCaloJetsAboveThresh > MAX_JETS ){
-      hltCaloJetsAboveThresh = MAX_JETS;
-    }
-    // HLTCaloNFJ 
-    int hltCaloNFJJetsAboveThresh(0), hltCaloNFJJetsAboveThreshTrue(0);
-    float hltCaloNFJHT = 0;
-    for(uint iJet = 0;iJet < hltCaloJetNFJPT->size(); ++iJet ){
-      if( (*hltCaloJetNFJPT)[iJet] < hltCaloJetThreshold ) break;
-      hltCaloNFJHT += (*hltCaloJetNFJPT)[iJet];
-      hltCaloNFJJetsAboveThresh++;
-    }
-    hltCaloNFJJetsAboveThreshTrue = hltCaloNFJJetsAboveThresh;
-
-    // HLT PFJets
-    int hltPFJetsAboveThresh(0), hltPFJetsAboveThreshTrue(0);
-    float hltPFMHTx(0), hltPFMHTy(0);
-    for(uint iJet = 0;iJet < hltPFJetPT->size(); ++iJet ){
-      if( (*hltPFJetPT)[iJet] < hltPFJetThreshold ) break;
-      hltPFHT        += (*hltPFJetPT)[iJet];
-      hltPFMHTx      += (*hltPFJetPx)[iJet];
-      hltPFMHTy      += (*hltPFJetPy)[iJet];
-
-      hltPFJetsAboveThresh++;
-    }
-    hltPFMHT = sqrt( hltPFMHTx*hltPFMHTx + hltPFMHTy*hltPFMHTy);
-    hltPFJetsAboveThreshTrue = hltPFJetsAboveThresh;
-    if ( hltPFJetsAboveThresh > MAX_JETS ){
-      hltPFJetsAboveThresh = MAX_JETS;
-    }
-
-    int genJetsAboveThresh(0), genJetsAboveThreshTrue(0);
-    float genMHTX(0), genMHTY(0);
-    genHT = 0;
-    for(uint iJet = 0;iJet < genJetPT->size(); ++iJet ){
-      if( (*genJetPT)[iJet] < genJetThreshold ) break;
-      genHT   += (*genJetPT)[iJet];
-      genMHTX += (*genJetPx)[iJet];
-      genMHTY += (*genJetPy)[iJet];
-      genJetsAboveThresh++;
-    }
-    genJetsAboveThreshTrue = genJetsAboveThresh;
-    genMHT = sqrt( genMHTX*genMHTX + genMHTY*genMHTY);
-
 
 
     
