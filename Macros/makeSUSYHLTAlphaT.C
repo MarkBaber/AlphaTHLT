@@ -136,7 +136,7 @@ void makeSUSYHLTAlphaT(){
   TString branch    = "MakeTrees/Ntuple";
 
   TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/01Nov14/";       // 25ns, added NoFastJet calojets
-  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/06Nov14_50ns/";  // 50ns, latest GT
+  //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/06Nov14_50ns/";  // 50ns, latest GT
 
   // Automatically determine bunch spacing
   double instLumi(0);
