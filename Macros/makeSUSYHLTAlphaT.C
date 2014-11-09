@@ -1,6 +1,6 @@
 //#define TEST
-//#define SIGNAL
-#define NEUTRINO
+#define SIGNAL
+//#define NEUTRINO
 
 //#define HLT_NOFASTJET
 
@@ -84,6 +84,10 @@ void clearRectangleX( TH1* histogram, float cut );
 
 void fillUniformY( TH2* histogram, TH2* rCumulHist);
 void reverseCumulativeY( TH2* histogram, TH2* rCumulHist, double scale);
+
+void getAnalysisVariables(std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold,
+			  int jetsAboveThresh, int jetBin, float HT, float MHT, float MHTOverHT, float alphaTPrime);
+
 
 
 
@@ -1212,9 +1216,10 @@ void makeSUSYHLTAlphaT(){
     float hltCaloAlphaTStandard(0);
     float hltCaloAlphaTDynamic(0);
 
-    // float caloHTDynamic(0);
-    //    std::pair<float,float> caloAlphaTHTDynamic;
-    
+    float hltCaloNFJAlphaTStandard(0);
+    float hltCaloAlphaTMHTOverHT(0);
+    float hltCaloAlphaTPrime(0);
+   
 
     // ********************************************************************************
     // *                                 UCT triggers                                 *
@@ -1228,18 +1233,35 @@ void makeSUSYHLTAlphaT(){
     // bool l1Trig6 = ( (uctHT >= 200)  || (uctMET >= 70) || ((uctHT >= 130) && (uctMHToverHT >= 0.32)) );
     // bool l1Trig7 = ( (uctHT >= 200)  || (uctMET >= 70) || ((uctHT >= 120) && (uctMHToverHT >= 0.36)) );
 
-
     // HLTCalo
-    int hltCaloJetsAboveThresh(0);
+    int hltCaloJetsAboveThreshTrue(0), hltCaloJetsAboveThresh(0);
     hltCaloHT = 0;
-    for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
-      if( (*hltCaloJetPT)[iJet] < hltCaloJetThreshold ) break;
-      hltCaloHT += (*hltCaloJetPT)[iJet];
-      hltCaloJetsAboveThresh++;
-    }
-    if ( hltCaloJetsAboveThresh > MAX_JETS ){
-      hltCaloJetsAboveThresh = MAX_JETS;
-    }
+    float hltCaloMHT = 0;
+    // float hltCaloMHTx(0), hltCaloMHTy(0);
+
+    // for(uint iJet = 0;iJet < hltCaloJetPT->size(); ++iJet ){
+    //   if( (*hltCaloJetPT)[iJet] < hltCaloJetThreshold ) break;
+    //   hltCaloHT      += (*hltCaloJetPT)[iJet];
+    //   hltCaloMHTx    += (*hltCaloJetPx)[iJet];
+    //   hltCaloMHTy    += (*hltCaloJetPy)[iJet];
+    //   hltCaloJetsAboveThresh++;
+    // }
+    // hltCaloMHT = sqrt( hltCaloMHTx*hltCaloMHTx + hltCaloMHTy*hltCaloMHTy);
+    // if (hltCaloHT > 0){
+    //   hltCaloAlphaTMHTOverHT = hltCaloMHT/hltCaloHT;
+    // }
+    // hltCaloAlphaTPrime = 0.5*( 1/sqrt( 1 - hltCaloAlphaTMHTOverHT*hltCaloAlphaTMHTOverHT )  );
+
+    // if ( hltCaloJetsAboveThresh > MAX_JETS ){
+    //   hltCaloJetsAboveThresh = MAX_JETS;
+    // }
+
+
+    float hltCaloMHTOverHT(0);
+    // HLT CaloJet
+    getAnalysisVariables( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, hltCaloJetThreshold,
+			  hltCaloJetsAboveThreshTrue, hltCaloJetsAboveThresh, hltCaloHT, hltCaloMHT, hltCaloMHTOverHT, hltCaloAlphaTPrime);
+
 
     // calculate HT and jet multiplicity for new jet threshold
     int hltPFJetsAboveThresh(0);
@@ -2710,3 +2732,38 @@ void fillUniform2D( TH2* histogram, double value){
 }
 
 
+
+
+
+void getAnalysisVariables(std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold,
+			  int jetsAboveThresh, int jetBin, float HT, float MHT, float MHTOverHT, float alphaTPrime){
+
+  jetsAboveThresh = 0;
+  jetBin          = 0;
+  HT              = 0;
+  MHT             = 0;
+  MHTOverHT       = 0;
+  alphaTPrime     = 0;
+
+  float MHTx(0), MHTy(0);
+
+    for(uint iJet = 0;iJet < jetPT->size(); ++iJet ){
+      if( (*jetPT)[iJet] < jetThreshold ) break;
+      HT      += (*jetPT)[iJet];
+      MHTx    += (*jetPx)[iJet];
+      MHTy    += (*jetPy)[iJet];
+      jetsAboveThresh++;
+    }
+    MHT = sqrt( MHTx*MHTx + MHTy*MHTy);
+    if (HT > 0){
+      MHTOverHT = MHT/HT;
+    }
+    alphaTPrime = 0.5*( 1/sqrt( 1 - MHTOverHT*MHTOverHT )  );
+
+    jetBin = jetsAboveThresh;
+    if ( jetBin > MAX_JETS ){
+     jetBin = MAX_JETS;
+    }
+
+
+}
