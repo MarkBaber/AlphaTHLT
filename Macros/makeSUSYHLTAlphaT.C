@@ -135,10 +135,8 @@ void makeSUSYHLTAlphaT(){
   // ------------------------------------------------------------------------------------------------------------------------
   TString branch    = "MakeTrees/Ntuple";
 
-  //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/17Oct14/";  // pre8 with correct JEC, 25ns
-  //  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/22Oct14_50ns/";  // pre8 with correct JEC (needs updating with latest GT), 50ns
-
-  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/01Nov14/";  // 25ns, added NoFastJet calojets
+  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/01Nov14/";       // 25ns, added NoFastJet calojets
+  TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/06Nov14_50ns/";  // 50ns, latest GT
 
   // Automatically determine bunch spacing
   double instLumi(0);
