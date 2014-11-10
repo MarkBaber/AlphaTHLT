@@ -1,6 +1,6 @@
-#define TEST
+//#define TEST
 #define SIGNAL
-#define NEUTRINO
+//#define NEUTRINO
 
 //#define HLT_NOFASTJET
 
@@ -86,7 +86,7 @@ void fillUniformY( TH2* histogram, TH2* rCumulHist);
 void reverseCumulativeY( TH2* histogram, TH2* rCumulHist, double scale);
 
 void getAnalysisVariables(std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold,
-			  int jetsAboveThresh, int jetBin, float HT, float MHT, float MHTOverHT, float alphaTPrime);
+			  int &jetsAboveThresh, int &jetBin, float &HT, float &MHT, float &MHTOverHT, float &alphaTPrime);
 
 
 
@@ -1224,7 +1224,6 @@ void makeSUSYHLTAlphaT(){
     float hltCaloAlphaTPrime(0);
     float hltPFAlphaTPrime(0);
     float genAlphaTPrime(0);
-   
 
     // ********************************************************************************
     // *                                 UCT triggers                                 *
@@ -1285,12 +1284,10 @@ void makeSUSYHLTAlphaT(){
     hltCaloAlphaTDynamic   = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, 
 						     maxCaloJet, hltCaloJetThreshold, 
 						     caloJetAlphaThreshold );
-  
-
+ 
     bool passesOffJet(false);
     bool passesAnaBinOffAT(false), passesAnaBinOffJet(false), passesAnaBinOffAll(false);
     bool passesOffVetoes(false);
-
 
     // ********************************************************************************
     // *                              >= 2 Gen jets
@@ -1313,6 +1310,7 @@ void makeSUSYHLTAlphaT(){
 	if (MHToverMET > 1.25){ mhtOverMetVeto = true; }
       }
 
+
       // Check individual offline cuts
       if ( (genJetsAboveThresh >= 2 ) && ((*genJetPT)[1] > genJet2PTThreshold) )       { passesOffJet    = true; }
       if ( !(genLeptonVeto) && !(forJetVeto) && !(mhtOverMetVeto) )                    { passesOffVetoes = true; }
@@ -1325,6 +1323,7 @@ void makeSUSYHLTAlphaT(){
 	TString jet2PTCutStr = "Jet2gt" + TString(Form("%1.0f", jet2PTCut ));
 	TString stdStr  = "On_AlphaTStd_vs_HT_"  + jet2PTCutStr;
 	TString dynStr  = "On_AlphaTDyn_vs_HT_"  + jet2PTCutStr;
+
 
 	bool passHltSecondJet(false);
 	bool passHltPreFilterSecondJet(false);
@@ -2695,7 +2694,7 @@ void fillUniform2D( TH2* histogram, double value){
 
 
 void getAnalysisVariables(std::vector<float> *jetPT, std::vector<float> *jetPx, std::vector<float> *jetPy, float jetThreshold,
-			  int jetsAboveThresh, int jetBin, float HT, float MHT, float MHTOverHT, float alphaTPrime){
+			  int &jetsAboveThresh, int &jetBin, float &HT, float &MHT, float &MHTOverHT, float &alphaTPrime){
 
   jetsAboveThresh = 0;
   jetBin          = 0;
