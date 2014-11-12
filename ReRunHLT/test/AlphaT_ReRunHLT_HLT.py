@@ -271,7 +271,7 @@ from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
 process = customisePostLS1(process)
 
 # override the GlobalTag, connection string and pfnPrefix 
-GT = "50ns"
+GT = "25ns"
 print "Using GT for:", GT
 
 if GT == "25ns":
@@ -297,6 +297,16 @@ elif GT == "50ns":
         process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
         process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
+
+# FIX incorrect HCAL tower configurations
+process.GlobalTag.toGet.append(
+    cms.PSet(
+        record  = cms.string( 'HcalRecoParamsRcd' ),
+        label   = cms.untracked.string( '' ),
+        connect = cms.untracked.string( 'frontier://FrontierProd/CMS_COND_44X_HCAL' ),
+        tag     = cms.string( 'HcalRecoParams_v8.0_mc' )
+    ) 
+)
 
 # customize the L1 emulator to run customiseL1EmulatorFromRaw with HLT to switchToSimStage1Digis 
 process.load( 'Configuration.StandardSequences.RawToDigi_cff' )
