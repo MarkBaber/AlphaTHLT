@@ -26062,39 +26062,22 @@ HLT_PFMET120_NoiseCleaned_BTagCSV07_v1 = cms.Path( HLTBeginSequence + hltL1sL1ET
 # ------------------------------------------------------------------------------------------------------------------------
 
 
-# hltL1sL1SingleS1Jet52 = cms.EDFilter( "HLTLevel1GTSeed", 
-#     L1SeedsLogicalExpression = cms.string( "L1_SingleJet52" ), 
-#     saveTags = cms.bool( True ), 
-#     L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" ), 
-#     L1UseL1TriggerObjectMaps = cms.bool( True ), 
-#     L1UseAliasesForSeeding = cms.bool( True ), 
-#     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ), 
-#     L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ), 
-#     L1NrBxInEvent = cms.int32( 3 ), 
-#     L1GtObjectMapTag = cms.InputTag( "hltL1GtObjectMap" ), 
-#     L1TechTriggerSeeding = cms.bool( False ) 
-# )   
-
-hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 = cms.EDFilter("HLTLevel1GTSeed",
+hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 = cms.EDFilter( "HLTLevel1GTSeed",
     L1SeedsLogicalExpression = cms.string( "L1_HTT175 OR L1_SingleJet200 OR L1_DoubleJetC100 OR L1_QuadJetC60" ),
-    saveTags = cms.bool( True ), 
-    L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" ), 
-    L1UseL1TriggerObjectMaps = cms.bool( True ), 
-    L1UseAliasesForSeeding = cms.bool( True ), 
-    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ), 
-    L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ), 
-    L1NrBxInEvent = cms.int32( 3 ), 
-    L1GtObjectMapTag = cms.InputTag( "hltL1GtObjectMap" ), 
-    L1TechTriggerSeeding = cms.bool( False ) 
+    saveTags = cms.bool( True ),
+    L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" ),
+    L1UseL1TriggerObjectMaps = cms.bool( True ),
+    L1UseAliasesForSeeding = cms.bool( True ),
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ),
+    L1NrBxInEvent = cms.int32( 3 ),
+    L1GtObjectMapTag = cms.InputTag( "hltL1GtObjectMap" ),
+    L1TechTriggerSeeding = cms.bool( False )
 )
-
-
 hltPreRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
     offset = cms.uint32( 0 )
 )
-
-
 hlt1CaloJet70 = cms.EDFilter( "HLT1CaloJet",
     saveTags = cms.bool( True ),
     MinPt = cms.double( 70.0 ),
@@ -26115,17 +26098,29 @@ hlt2CaloJet60 = cms.EDFilter( "HLT1CaloJet",
     MinE = cms.double( -1.0 ),
     triggerType = cms.int32( 0 )
 )
-hlt4CaloJet40 = cms.EDFilter( "HLT1CaloJet",
-    saveTags = cms.bool( True ),
-    MinPt = cms.double( 40.0 ),
-    MinN = cms.int32( 4 ),
-    MaxEta = cms.double( 3.0 ),
-    MinMass = cms.double( -1.0 ),
+hltRHemisphereCalo = cms.EDFilter( "HLTRHemisphere",
+    acceptNJ = cms.bool( True ),
+    maxEta = cms.double( 3.0 ),
     inputTag = cms.InputTag( "hltAK4CaloJetsCorrected" ),
-    MinE = cms.double( -1.0 ),
-    triggerType = cms.int32( 0 )
+    maxMuonEta = cms.double( 2.1 ),
+    muonTag = cms.InputTag( "" ),
+    minJetPt = cms.double( 30.0 ),
+    doMuonCorrection = cms.bool( False ),
+    maxNJ = cms.int32( 9 )
 )
-
+hltRsqMR200Rsq0p01MR100Calo = cms.EDFilter( "HLTRFilter",
+    acceptNJ = cms.bool( True ),
+    saveTags = cms.bool( False ),
+    doRPrime = cms.bool( False ),
+    R2Offset = cms.double( -0.25 ),
+    inputTag = cms.InputTag( "hltRHemisphereCalo" ),
+    inputMetTag = cms.InputTag( "hltMet" ),
+    RMRCut = cms.double( 200.0 ),
+    MROffset = cms.double( -300.0 ),
+    doMuonCorrection = cms.bool( False ),
+    minMR = cms.double( 100.0 ),
+    minR = cms.double( 0.1 )
+)
 hlt2PFJet80 = cms.EDFilter( "HLT1PFJet",
     saveTags = cms.bool( True ),
     MinPt = cms.double( 80.0 ),
@@ -26136,9 +26131,66 @@ hlt2PFJet80 = cms.EDFilter( "HLT1PFJet",
     MinE = cms.double( -1.0 ),
     triggerType = cms.int32( 0 )
 )
-hlt4PFJet60 = cms.EDFilter( "HLT1PFJet",
+hltRHemisphere = cms.EDFilter( "HLTRHemisphere",
+    acceptNJ = cms.bool( True ),
+    maxEta = cms.double( 3.0 ),
+    inputTag = cms.InputTag( "hltAK4PFJetsCorrected" ),
+    maxMuonEta = cms.double( 2.1 ),
+    muonTag = cms.InputTag( "" ),
+    minJetPt = cms.double( 40.0 ),
+    doMuonCorrection = cms.bool( False ),
+    maxNJ = cms.int32( 9 )
+)
+hltRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTRFilter",
+    acceptNJ = cms.bool( True ),
+    saveTags = cms.bool( False ),
+    doRPrime = cms.bool( False ),
+    R2Offset = cms.double( -0.25 ),
+    inputTag = cms.InputTag( "hltRHemisphere" ),
+    inputMetTag = cms.InputTag( "hltPFMETProducer" ),
+    RMRCut = cms.double( 300.0 ),
+    MROffset = cms.double( -300.0 ),
+    doMuonCorrection = cms.bool( False ),
+    minMR = cms.double( 200.0 ),
+    minR = cms.double( 0.3 )
+)
+hltPreRsqMR300Rsq0p09MR2004jet = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    offset = cms.uint32( 0 )
+)
+hlt2CaloJet40 = cms.EDFilter( "HLT1CaloJet",
     saveTags = cms.bool( True ),
-    MinPt = cms.double( 60.0 ),
+    MinPt = cms.double( 40.0 ),
+    MinN = cms.int32( 2 ),
+    MaxEta = cms.double( 3.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltAK4CaloJetsCorrected" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 0 )
+)
+hlt4CaloJet30 = cms.EDFilter( "HLT1CaloJet",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 30.0 ),
+    MinN = cms.int32( 4 ),
+    MaxEta = cms.double( 3.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltAK4CaloJetsCorrected" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 0 )
+)
+hlt2PFJet50 = cms.EDFilter( "HLT1PFJet",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 50.0 ),
+    MinN = cms.int32( 2 ),
+    MaxEta = cms.double( 3.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltAK4PFJetsCorrected" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 0 )
+)
+hlt4PFJet40 = cms.EDFilter( "HLT1PFJet",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 40.0 ),
     MinN = cms.int32( 4 ),
     MaxEta = cms.double( 3.0 ),
     MinMass = cms.double( -1.0 ),
@@ -26146,81 +26198,26 @@ hlt4PFJet60 = cms.EDFilter( "HLT1PFJet",
     MinE = cms.double( -1.0 ),
     triggerType = cms.int32( 0 )
 )
-
-
-hltRHemisphere = cms.EDFilter("HLTRHemisphere",
-    acceptNJ = cms.bool(True),
-    maxEta = cms.double(3.0),
-    inputTag = cms.InputTag("hltAK4PFJetsCorrected"),
-    maxMuonEta = cms.double(2.1),
-    muonTag = cms.InputTag(""),
-    minJetPt = cms.double(40.0),
-    doMuonCorrection = cms.bool(False),
-    maxNJ = cms.int32(9)
-)
-hltRHemisphereCalo = cms.EDFilter("HLTRHemisphere",
-    acceptNJ = cms.bool(True),
-    maxEta = cms.double(3.0),
-    inputTag = cms.InputTag("hltAK4CaloJetsCorrected"),
-    maxMuonEta = cms.double(2.1),
-    muonTag = cms.InputTag(""),
-    minJetPt = cms.double(30.0),
-    doMuonCorrection = cms.bool(False),
-    maxNJ = cms.int32(9)
-)
-hltPreRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTPrescaler",
-    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
-    offset = cms.uint32( 0 )
-)
-hltPreRsqMR260Rsq0p09MR2004jet = cms.EDFilter( "HLTPrescaler",
-    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
-    offset = cms.uint32( 0 )
-)
 hltPreRsq0p36 = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
     offset = cms.uint32( 0 )
 )
-
-hltRsqMR180Rsq0p0144MR150Calo = cms.EDFilter( "HLTRFilter",
+hltRsq0p16Calo = cms.EDFilter( "HLTRFilter",
     acceptNJ = cms.bool( True ),
+    saveTags = cms.bool( False ),
     doRPrime = cms.bool( False ),
-    R2Offset = cms.double( -0.25 ),
+    R2Offset = cms.double( 0.0 ),
     inputTag = cms.InputTag( "hltRHemisphereCalo" ),
     inputMetTag = cms.InputTag( "hltMet" ),
-    RMRCut = cms.double( 180.0 ),
-    MROffset = cms.double( -300.0 ),
-    doMuonCorrection = cms.bool( False ),
-    minMR = cms.double( 150.0 ),
-    minR = cms.double( 0.12 )
-)
-hltRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTRFilter",
-    acceptNJ = cms.bool( True ),
-    doRPrime = cms.bool( False ),
-    R2Offset = cms.double( -0.25 ),
-    inputTag = cms.InputTag( "hltRHemisphere" ),
-    inputMetTag = cms.InputTag( "hltPFMETProducer" ),
     RMRCut = cms.double( -999999.0 ),
     MROffset = cms.double( 0.0 ),
     doMuonCorrection = cms.bool( False ),
     minMR = cms.double( -1.0 ),
-    minR = cms.double( 0.2 )
+    minR = cms.double( 0.4 )
 )
-hltRsqMR260Rsq0p09MR200 = cms.EDFilter( "HLTRFilter",
-    acceptNJ = cms.bool( True ),
-    doRPrime = cms.bool( False ),
-    R2Offset = cms.double( -0.25 ),
-    inputTag = cms.InputTag( "hltRHemisphere" ),
-    inputMetTag = cms.InputTag( "hltPFMETProducer" ),
-    RMRCut = cms.double( 260.0 ),
-    MROffset = cms.double( -300.0 ),
-    doMuonCorrection = cms.bool( False ),
-    minMR = cms.double( 200.0 ),
-    minR = cms.double( 0.3 )
-)
-
-
 hltRsq0p36 = cms.EDFilter( "HLTRFilter",
     acceptNJ = cms.bool( True ),
+    saveTags = cms.bool( False ),
     doRPrime = cms.bool( False ),
     R2Offset = cms.double( 0.0 ),
     inputTag = cms.InputTag( "hltRHemisphere" ),
@@ -26231,30 +26228,191 @@ hltRsq0p36 = cms.EDFilter( "HLTRFilter",
     minMR = cms.double( -1.0 ),
     minR = cms.double( 0.6 )
 )
-hltRsq0p04Calo = cms.EDFilter( "HLTRFilter",
-    acceptNJ = cms.bool( True ),
-    doRPrime = cms.bool( False ),
-    R2Offset = cms.double( 0.0 ),
-    inputTag = cms.InputTag( "hltRHemisphereCalo" ),
-    inputMetTag = cms.InputTag( "hltMet" ),
-    RMRCut = cms.double( -999999.0 ),
-    MROffset = cms.double( 0.0 ),
-    doMuonCorrection = cms.bool( False ),
-    minMR = cms.double( -1.0 ),
-    minR = cms.double( 0.2 )
-)
 
 
-HLT_RsqMR300_Rsq0p09_MR200_NoL1_v1 = cms.Path( HLTBeginSequence + HLTAK4CaloJetsSequence + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR180Rsq0p0144MR150Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
-HLT_RsqMR260_Rsq0p09_MR200_4jet_NoL1_v1 = cms.Path( HLTBeginSequence + HLTAK4CaloJetsSequence + hlt4CaloJet40 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR180Rsq0p0144MR150Calo + HLTAK4PFJetsSequence + hlt4PFJet60 + hltPFMETProducer + hltRHemisphere + hltRsqMR260Rsq0p09MR200 + HLTEndSequence )
-HLT_Rsq0p36_NoL1_v1 = cms.Path( HLTBeginSequence + HLTAK4CaloJetsSequence + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsq0p04Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsq0p36 + HLTEndSequence )
 
-HLT_RsqMR300_Rsq0p09_MR200_v1 = cms.Path( HLTBeginSequence + hltL1sL1HTT175 + hltPreRsqMR300Rsq0p09MR200 + HLTAK4CaloJetsSequence + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR180Rsq0p0144MR150Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
-HLT_RsqMR260_Rsq0p09_MR200_4jet_v1 = cms.Path( HLTBeginSequence + hltL1sL1HTT175 + hltPreRsqMR260Rsq0p09MR2004jet + HLTAK4CaloJetsSequence + hlt4CaloJet40 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR180Rsq0p0144MR150Calo + HLTAK4PFJetsSequence + hlt4PFJet60 + hltPFMETProducer + hltRHemisphere + hltRsqMR260Rsq0p09MR200 + HLTEndSequence )
-HLT_Rsq0p36_v1 = cms.Path( HLTBeginSequence + hltL1sL1HTT175OrETM70 + hltPreRsq0p36 + HLTAK4CaloJetsSequence + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsq0p04Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsq0p36 + HLTEndSequence )
-  
+# hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 = cms.EDFilter("HLTLevel1GTSeed",
+#     L1SeedsLogicalExpression = cms.string( "L1_HTT175 OR L1_SingleJet200 OR L1_DoubleJetC100 OR L1_QuadJetC60" ),
+#     saveTags = cms.bool( True ), 
+#     L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" ), 
+#     L1UseL1TriggerObjectMaps = cms.bool( True ), 
+#     L1UseAliasesForSeeding = cms.bool( True ), 
+#     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ), 
+#     L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ), 
+#     L1NrBxInEvent = cms.int32( 3 ), 
+#     L1GtObjectMapTag = cms.InputTag( "hltL1GtObjectMap" ), 
+#     L1TechTriggerSeeding = cms.bool( False ) 
+# )
 
 
+# hltPreRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTPrescaler",
+#     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+#     offset = cms.uint32( 0 )
+# )
+
+
+# hlt1CaloJet70 = cms.EDFilter( "HLT1CaloJet",
+#     saveTags = cms.bool( True ),
+#     MinPt = cms.double( 70.0 ),
+#     MinN = cms.int32( 1 ),
+#     MaxEta = cms.double( 3.0 ),
+#     MinMass = cms.double( -1.0 ),
+#     inputTag = cms.InputTag( "hltAK4CaloJetsCorrected" ),
+#     MinE = cms.double( -1.0 ),
+#     triggerType = cms.int32( 0 )
+# )
+# hlt2CaloJet60 = cms.EDFilter( "HLT1CaloJet",
+#     saveTags = cms.bool( True ),
+#     MinPt = cms.double( 60.0 ),
+#     MinN = cms.int32( 2 ),
+#     MaxEta = cms.double( 3.0 ),
+#     MinMass = cms.double( -1.0 ),
+#     inputTag = cms.InputTag( "hltAK4CaloJetsCorrected" ),
+#     MinE = cms.double( -1.0 ),
+#     triggerType = cms.int32( 0 )
+# )
+# hlt4CaloJet40 = cms.EDFilter( "HLT1CaloJet",
+#     saveTags = cms.bool( True ),
+#     MinPt = cms.double( 40.0 ),
+#     MinN = cms.int32( 4 ),
+#     MaxEta = cms.double( 3.0 ),
+#     MinMass = cms.double( -1.0 ),
+#     inputTag = cms.InputTag( "hltAK4CaloJetsCorrected" ),
+#     MinE = cms.double( -1.0 ),
+#     triggerType = cms.int32( 0 )
+# )
+
+# hlt2PFJet80 = cms.EDFilter( "HLT1PFJet",
+#     saveTags = cms.bool( True ),
+#     MinPt = cms.double( 80.0 ),
+#     MinN = cms.int32( 2 ),
+#     MaxEta = cms.double( 3.0 ),
+#     MinMass = cms.double( -1.0 ),
+#     inputTag = cms.InputTag( "hltAK4PFJetsCorrected" ),
+#     MinE = cms.double( -1.0 ),
+#     triggerType = cms.int32( 0 )
+# )
+# hlt4PFJet60 = cms.EDFilter( "HLT1PFJet",
+#     saveTags = cms.bool( True ),
+#     MinPt = cms.double( 60.0 ),
+#     MinN = cms.int32( 4 ),
+#     MaxEta = cms.double( 3.0 ),
+#     MinMass = cms.double( -1.0 ),
+#     inputTag = cms.InputTag( "hltAK4PFJetsCorrected" ),
+#     MinE = cms.double( -1.0 ),
+#     triggerType = cms.int32( 0 )
+# )
+
+
+# hltRHemisphere = cms.EDFilter("HLTRHemisphere",
+#     acceptNJ = cms.bool(True),
+#     maxEta = cms.double(3.0),
+#     inputTag = cms.InputTag("hltAK4PFJetsCorrected"),
+#     maxMuonEta = cms.double(2.1),
+#     muonTag = cms.InputTag(""),
+#     minJetPt = cms.double(40.0),
+#     doMuonCorrection = cms.bool(False),
+#     maxNJ = cms.int32(9)
+# )
+# hltRHemisphereCalo = cms.EDFilter("HLTRHemisphere",
+#     acceptNJ = cms.bool(True),
+#     maxEta = cms.double(3.0),
+#     inputTag = cms.InputTag("hltAK4CaloJetsCorrected"),
+#     maxMuonEta = cms.double(2.1),
+#     muonTag = cms.InputTag(""),
+#     minJetPt = cms.double(30.0),
+#     doMuonCorrection = cms.bool(False),
+#     maxNJ = cms.int32(9)
+# )
+# hltPreRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTPrescaler",
+#     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+#     offset = cms.uint32( 0 )
+# )
+# hltPreRsqMR260Rsq0p09MR2004jet = cms.EDFilter( "HLTPrescaler",
+#     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+#     offset = cms.uint32( 0 )
+# )
+# hltPreRsq0p36 = cms.EDFilter( "HLTPrescaler",
+#     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+#     offset = cms.uint32( 0 )
+# )
+
+# hltRsqMR180Rsq0p0144MR150Calo = cms.EDFilter( "HLTRFilter",
+#     acceptNJ = cms.bool( True ),
+#     doRPrime = cms.bool( False ),
+#     R2Offset = cms.double( -0.25 ),
+#     inputTag = cms.InputTag( "hltRHemisphereCalo" ),
+#     inputMetTag = cms.InputTag( "hltMet" ),
+#     RMRCut = cms.double( 180.0 ),
+#     MROffset = cms.double( -300.0 ),
+#     doMuonCorrection = cms.bool( False ),
+#     minMR = cms.double( 150.0 ),
+#     minR = cms.double( 0.12 )
+# )
+# hltRsqMR300Rsq0p09MR200 = cms.EDFilter( "HLTRFilter",
+#     acceptNJ = cms.bool( True ),
+#     doRPrime = cms.bool( False ),
+#     R2Offset = cms.double( -0.25 ),
+#     inputTag = cms.InputTag( "hltRHemisphere" ),
+#     inputMetTag = cms.InputTag( "hltPFMETProducer" ),
+#     RMRCut = cms.double( -999999.0 ),
+#     MROffset = cms.double( 0.0 ),
+#     doMuonCorrection = cms.bool( False ),
+#     minMR = cms.double( -1.0 ),
+#     minR = cms.double( 0.2 )
+# )
+# hltRsqMR260Rsq0p09MR200 = cms.EDFilter( "HLTRFilter",
+#     acceptNJ = cms.bool( True ),
+#     doRPrime = cms.bool( False ),
+#     R2Offset = cms.double( -0.25 ),
+#     inputTag = cms.InputTag( "hltRHemisphere" ),
+#     inputMetTag = cms.InputTag( "hltPFMETProducer" ),
+#     RMRCut = cms.double( 260.0 ),
+#     MROffset = cms.double( -300.0 ),
+#     doMuonCorrection = cms.bool( False ),
+#     minMR = cms.double( 200.0 ),
+#     minR = cms.double( 0.3 )
+# )
+
+
+# hltRsq0p36 = cms.EDFilter( "HLTRFilter",
+#     acceptNJ = cms.bool( True ),
+#     doRPrime = cms.bool( False ),
+#     R2Offset = cms.double( 0.0 ),
+#     inputTag = cms.InputTag( "hltRHemisphere" ),
+#     inputMetTag = cms.InputTag( "hltPFMETProducer" ),
+#     RMRCut = cms.double( -999999.0 ),
+#     MROffset = cms.double( 0.0 ),
+#     doMuonCorrection = cms.bool( False ),
+#     minMR = cms.double( -1.0 ),
+#     minR = cms.double( 0.6 )
+# )
+# hltRsq0p04Calo = cms.EDFilter( "HLTRFilter",
+#     acceptNJ = cms.bool( True ),
+#     doRPrime = cms.bool( False ),
+#     R2Offset = cms.double( 0.0 ),
+#     inputTag = cms.InputTag( "hltRHemisphereCalo" ),
+#     inputMetTag = cms.InputTag( "hltMet" ),
+#     RMRCut = cms.double( -999999.0 ),
+#     MROffset = cms.double( 0.0 ),
+#     doMuonCorrection = cms.bool( False ),
+#     minMR = cms.double( -1.0 ),
+#     minR = cms.double( 0.2 )
+# )
+
+
+
+
+
+
+
+
+
+
+
+HLT_RsqMR300_Rsq0p09_MR200_v1      = cms.Path( HLTBeginSequence + hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 + hltPreRsqMR300Rsq0p09MR200 + HLTAK4CaloJetsSequence + hlt1CaloJet70 + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR200Rsq0p01MR100Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
+HLT_RsqMR300_Rsq0p09_MR200_4jet_v1 = cms.Path( HLTBeginSequence + hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 + hltPreRsqMR300Rsq0p09MR2004jet + HLTAK4CaloJetsSequence + hlt2CaloJet40 + hlt4CaloJet30 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR200Rsq0p01MR100Calo + HLTAK4PFJetsSequence + hlt2PFJet50 + hlt4PFJet40 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
+HLT_Rsq0p36_v1                     = cms.Path( HLTBeginSequence + hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 + hltPreRsq0p36 + HLTAK4CaloJetsSequence + hlt1CaloJet70 + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsq0p16Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsq0p36 + HLTEndSequence )
 
 
 
@@ -26330,22 +26488,9 @@ HLTSchedule = cms.Schedule( *(HLTriggerFirstPath,
 
                               # Razor triggers
                               # ----------------------------------------
-                              HLT_RsqMR300_Rsq0p09_MR200_NoL1_v1,
-                              HLT_RsqMR260_Rsq0p09_MR200_4jet_NoL1_v1,
-                              HLT_Rsq0p36_NoL1_v1,
                               HLT_RsqMR300_Rsq0p09_MR200_v1,
-                              HLT_RsqMR260_Rsq0p09_MR200_4jet_v1,
+                              HLT_RsqMR300_Rsq0p09_MR200_4jet_v1,
                               HLT_Rsq0p36_v1,
-
-
-
-
-                              # VBF
-                              #HLT_PFJet40_v1,
-                              #HLT_PFMET180_NoiseCleaned_v1,
-                              #HLT_PFchMET90_NoiseCleaned_v1,
-                              #HLT_Photon135_VBF_v1,
-                              #HLT_MET80_VBF40_v1,
 
 
 
