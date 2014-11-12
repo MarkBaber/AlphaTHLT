@@ -26409,6 +26409,9 @@ hltRsq0p36 = cms.EDFilter( "HLTRFilter",
 
 
 
+HLT_RsqMR300_Rsq0p09_MR200_NoL1_v1      = cms.Path( HLTBeginSequence + hltPreRsqMR300Rsq0p09MR200 + HLTAK4CaloJetsSequence + hlt1CaloJet70 + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR200Rsq0p01MR100Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
+HLT_RsqMR300_Rsq0p09_MR200_4jet_NoL1_v1 = cms.Path( HLTBeginSequence + hltPreRsqMR300Rsq0p09MR2004jet + HLTAK4CaloJetsSequence + hlt2CaloJet40 + hlt4CaloJet30 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR200Rsq0p01MR100Calo + HLTAK4PFJetsSequence + hlt2PFJet50 + hlt4PFJet40 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
+HLT_Rsq0p36_NoL1_v1                     = cms.Path( HLTBeginSequence + hltPreRsq0p36 + HLTAK4CaloJetsSequence + hlt1CaloJet70 + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsq0p16Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsq0p36 + HLTEndSequence )
 
 HLT_RsqMR300_Rsq0p09_MR200_v1      = cms.Path( HLTBeginSequence + hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 + hltPreRsqMR300Rsq0p09MR200 + HLTAK4CaloJetsSequence + hlt1CaloJet70 + hlt2CaloJet60 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR200Rsq0p01MR100Calo + HLTAK4PFJetsSequence + hlt2PFJet80 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
 HLT_RsqMR300_Rsq0p09_MR200_4jet_v1 = cms.Path( HLTBeginSequence + hltL1sL1HTT175OrSingleJet200OrDoubleJetC100OrQuadJetC60 + hltPreRsqMR300Rsq0p09MR2004jet + HLTAK4CaloJetsSequence + hlt2CaloJet40 + hlt4CaloJet30 + HLTRecoMETSequence + hltRHemisphereCalo + hltRsqMR200Rsq0p01MR100Calo + HLTAK4PFJetsSequence + hlt2PFJet50 + hlt4PFJet40 + hltPFMETProducer + hltRHemisphere + hltRsqMR300Rsq0p09MR200 + HLTEndSequence )
@@ -26462,7 +26465,6 @@ HLTSchedule = cms.Schedule( *(HLTriggerFirstPath,
                               HLT_HT300_PFAlphaT0p5_L1HTT175OrETM70_v1,
                               HLT_HT350_PFAlphaT0p5_L1HTT175OrETM70_v1,
 
-
                               # --------------------------------------------------------------------------------
                               # SUSY triggers
                               # --------------------------------------------------------------------------------
@@ -26488,6 +26490,9 @@ HLTSchedule = cms.Schedule( *(HLTriggerFirstPath,
 
                               # Razor triggers
                               # ----------------------------------------
+                              HLT_RsqMR300_Rsq0p09_MR200_NoL1_v1,
+                              HLT_RsqMR300_Rsq0p09_MR200_4jet_NoL1_v1,
+                              HLT_Rsq0p36_NoL1_v1,
                               HLT_RsqMR300_Rsq0p09_MR200_v1,
                               HLT_RsqMR300_Rsq0p09_MR200_4jet_v1,
                               HLT_Rsq0p36_v1,

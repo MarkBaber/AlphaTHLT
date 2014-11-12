@@ -23,25 +23,25 @@ process.load('AlphaTHLT.ReRunHLT.HLT_AlphaT_cff')
 
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(100)
 #    input = cms.untracked.int32(-1)
 )
 
 
 from AlphaTHLT.ReRunHLT.samples.samples_Signal_MC_cfi import *
-selectedSample = T2tt_300_200 #T2tt_500_250 #T2cc_250_210
+selectedSample = T2tt_500_250 #T2tt_300_200 #T2tt_500_250 #T2cc_250_210
 
 
 # Input source
 process.source = cms.Source("PoolSource",
 
      # Run on private MC samples (Run 'voms-proxy-init -out ~/myproxy -voms cms' first)
-#     fileNames = selectedSample.files,
-
- fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-170to300_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx50_POSTLS162_V2-v1/00000/000CA0BE-4AA6-E311-AA23-00304867918E.root'),
+          fileNames = selectedSample.files,
+                            
+                            # fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-170to300_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx50_POSTLS162_V2-v1/00000/000CA0BE-4AA6-E311-AA23-00304867918E.root'),
 
 
 # fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-30to50_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/002C6EAF-01A7-E311-A921-0030486790A0.root')
@@ -270,33 +270,34 @@ process = customizeHLTforMC(process)
 from SLHCUpgradeSimulations.Configuration.postLS1Customs import customisePostLS1
 process = customisePostLS1(process)
 
+
+# --------------------------------------------------------------------------------
 # override the GlobalTag, connection string and pfnPrefix 
-GT = "25ns"
-print "Using GT for:", GT
+bx = "25ns"
+GT = ""
 
-if GT == "25ns":
-    if 'GlobalTag' in process.__dict__:
-        from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag 
-        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V1A::All') 
-        process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
-        process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-        for pset in process.GlobalTag.toGet.value():
-            pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-        # fix for multi-run processing 
-        process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
-        process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
-elif GT == "50ns":
-    if 'GlobalTag' in process.__dict__:
-        from Configuration.AlCa.GlobalTag import GlobalTag as customiseGlobalTag 
-        process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V2A::All')
-        process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
-        process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-        for pset in process.GlobalTag.toGet.value():
-            pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-        # fix for multi-run processing 
-        process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
-        process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
+if bx   == "25ns":
+    GT = 'MCRUN2_72_V1A::All'
+elif bx == "50ns":
+    GT = 'MCRUN2_72_V2A::All'
+else:
+    print "Error: Bunch spacing '", bx, "' not recognised\n"
+    exit(0)
+
+print "BX = ", bx, ", using GT:", GT
+if 'GlobalTag' in process.__dict__:
+    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
+    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = GT)
+    process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
+    process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+    for pset in process.GlobalTag.toGet.value():
+        pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
+    # fix for multi-run processing
+    process.GlobalTag.RefreshEachRun   = cms.untracked.bool( False )
+    process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+
+# --------------------------------------------------------------------------------   
 
 # FIX incorrect HCAL tower configurations
 process.GlobalTag.toGet.append(
