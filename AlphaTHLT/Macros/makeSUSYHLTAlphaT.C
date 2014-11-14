@@ -1,4 +1,4 @@
-#define TEST
+//#define TEST
 //#define SIGNAL
 #define NEUTRINO
 
@@ -214,7 +214,10 @@ void makeSUSYHLTAlphaT(){
 
 
   // ------------------------------------------------------------------------------------------------------------------------
-  sample selectedSample =  DYJets; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
+  sample selectedSample = QCD80to120; // QCD80to120; // DYJets; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
+
+
+
 
   // Label QCD ptHat bins
   int samplePTHat = 0;
@@ -1316,8 +1319,8 @@ void makeSUSYHLTAlphaT(){
 
     // Dynamic AlphaT
     hltCaloAlphaTDynamic   = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy, 
-						     maxCaloJet, hltCaloJetThreshold, 
-						     caloJetAlphaThreshold );
+						     maxCaloJet, hltCaloJetThreshold);//, 
+						     //caloJetAlphaThreshold );
  
     bool passesOffJet(false);
     bool passesAnaBinOffAT(false), passesAnaBinOffJet(false), passesAnaBinOffAll(false);
