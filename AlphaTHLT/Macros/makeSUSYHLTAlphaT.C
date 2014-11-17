@@ -1,6 +1,6 @@
 //#define TEST
-//#define SIGNAL
-#define NEUTRINO
+#define SIGNAL
+//#define NEUTRINO
 
 //#define HLT_NOFASTJET
 
@@ -136,6 +136,7 @@ void makeSUSYHLTAlphaT(){
   TString branch    = "MakeTrees/Ntuple";
 
   TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/12Nov14/";       // 25ns, HCAL fix
+  //   TString sampleDir = "/vols/ssd00/cms/mbaber/AlphaT/Trigger/12Nov14_50ns/";  // 50ns, HCAL fix
 
   // Automatically determine bunch spacing
   double instLumi(0);
@@ -214,7 +215,7 @@ void makeSUSYHLTAlphaT(){
 
 
   // ------------------------------------------------------------------------------------------------------------------------
-  sample selectedSample = QCD80to120; // QCD80to120; // DYJets; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
+  sample selectedSample = TTBar; //QCD80to120; // QCD80to120; // DYJets; //QCD800to1000; //QCD30to50; //T2tt_2J_mStop_850_mLSP_100; //QCD800to1000; //T2tt_500_250; //QCD30to50;  //test; //QCD30to50; // T2tt_500_250; //T2cc_250_210; //DYJets; //NuGun; //DYJets; //TTBar; //DYJets;
 
 
 
@@ -765,8 +766,17 @@ void makeSUSYHLTAlphaT(){
 	  TString suffix = TString("_") + anaHtStr + TString("_") + anaJetStr;
 	  TString label  = anaHtLab + TString(", ") + anaAlphaTLab + TString(", ") + anaJetStr;
 	  
-	  hist2DOnEff[stdStr  + suffix] = new TEfficiency(stdStr  + suffix,"Calojet #alpha_{T}^{static} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
-	  hist2DOnEff[dynStr  + suffix] = new TEfficiency(dynStr  + suffix,"Calojet #alpha_{T}^{dynamic} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+
+	  // --------------------------------------------------------------------------------
+	  // Efficiency of final HLT decision
+	  // --------------------------------------------------------------------------------
+
+	  hist2DOnEff[stdStr  + "PF" + suffix] = new TEfficiency(stdStr  + "PF" + suffix,"PFJet #alpha_{T}^{static} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+	  //	  hist2DOnEff[dynStr  + "PF" + suffix] = new TEfficiency(dynStr  + "PF" + suffix,"PFJet #alpha_{T}^{dynamic} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+
+
+	  hist2DOnEff[stdStr  + "Calo" + suffix] = new TEfficiency(stdStr + "Calo" + suffix,"Calojet #alpha_{T}^{static} vs H_{T}^{static} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",   HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
+
 	  // hist2DOnEff[dyn2Str + suffix] = new TEfficiency(dyn2Str + suffix,"Calojet #alpha_{T}^{dynamic} vs H_{T}^{dynamic} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}", HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 	  // hist2DOnEff[dyn3Str + suffix] = new TEfficiency(dyn3Str + suffix,"Calojet #alpha_{T}^{static} vs H_{T}^{dynamic} efficiency " + label + " (" + jet2PTCutLab + ");H_{T} (GeV);#alpha_{T}",  HTBins,HTMin,HTMax,  alphaTBins,alphaTMin,alphaTMax);
 	  
@@ -1468,7 +1478,7 @@ void makeSUSYHLTAlphaT(){
 	  if ( genAlphaTStandard > alphaT)                                          { passesAnaBinOffAT  = true; }
 	  if ( (genJetsAboveThresh >= 2 ) && ((*genJetPT)[1] > genJet2PTThreshold) ){ passesAnaBinOffJet = true; }
 	  // Check full offline selection
-	  if ( passesAnaBinOffAT && passesAnaBinOffJet )                            { passesAnaBinOffAll = true; }
+	  if ( passesAnaBinOffAT && passesAnaBinOffJet && passesOffVetoes )         { passesAnaBinOffAll = true; }
 
 	  // Get jet bin
 	  for (uint iJetBin = 0; iJetBin < anaJetBins.size(); ++iJetBin){
@@ -1480,10 +1490,10 @@ void makeSUSYHLTAlphaT(){
 	    
 	    TString suffix = TString("_") + anaHtStr + TString("_") + anaJetStr;
 	    
-	    hist2DOnEff[stdStr  + suffix] ->Fill( passesAnaBinOffAll, hltPFHT,                     hltPFAlphaTStandard );
-	    // hist2DOnEff[dynStr  + suffix] ->Fill( passesAnaBinOffAll, caloHT,                     caloAlphaTDynamic );
-	    // hist2DOnEff[dyn2Str + suffix] ->Fill( passesAnaBinOffAll, caloAlphaTHTDynamic.second, caloAlphaTDynamic );
-	    // hist2DOnEff[dyn3Str + suffix] ->Fill( passesAnaBinOffAll, caloAlphaTHTDynamic.second, caloAlphaTStandard );
+	    if ( passesAnaBinOffAll  ){	    std::cout << hltPFHT << "\t" <<  hltPFAlphaTStandard << "\n"; }
+	    hist2DOnEff[stdStr + "PF"   + suffix] ->Fill( passesAnaBinOffAll, hltPFHT,   hltPFAlphaTStandard );
+
+	    hist2DOnEff[stdStr + "Calo" + suffix] ->Fill( passesAnaBinOffAll, hltCaloHT, hltCaloAlphaTStandard );
 	    
 
 	    // Make candidate L1 trigger plots
