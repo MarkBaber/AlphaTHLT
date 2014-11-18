@@ -23,11 +23,11 @@ process.load('AlphaTHLT.ReRunHLT.HLT_AlphaT_cff')
 
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
-#    input = cms.untracked.int32(-1)
+#    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
 )
 
 
@@ -38,20 +38,12 @@ selectedSample = T2tt_500_250 #T2tt_300_200 #T2tt_500_250 #T2cc_250_210
 # Input source
 process.source = cms.Source("PoolSource",
 
-     # Run on private MC samples (Run 'voms-proxy-init -out ~/myproxy -voms cms' first)
+          # Run on private MC samples (Run 'voms-proxy-init -out ~/myproxy -voms cms' first)
           fileNames = selectedSample.files,
                             
-                            # fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-170to300_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx50_POSTLS162_V2-v1/00000/000CA0BE-4AA6-E311-AA23-00304867918E.root'),
 
-
-# fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-30to50_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/002C6EAF-01A7-E311-A921-0030486790A0.root')
-
-#    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root')
-#    fileNames = cms.untracked.vstring("root://xrootd.unl.edu//store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00005/02B79593-F47F-E311-8FF6-003048FFD796.root")
-
-#    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00001/4AAC6F5B-9979-E311-9DED-0025905A48F0.root')
-
-
+          #    fileNames = cms.untracked.vstring('/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root')
+          #    fileNames = cms.untracked.vstring("root://xrootd.unl.edu//store/mc/Fall13dr/Neutrino_Pt-2to20_gun/GEN-SIM-RAW/tsg_PU40bx25_POSTLS162_V2-v1/00005/02B79593-F47F-E311-8FF6-003048FFD796.root")
 
 )
 
@@ -87,13 +79,11 @@ process.output = cms.OutputModule("PoolOutputModule",
         'keep *_genMetCaloAndNonPrompt_*_*',
         'keep *_genMetTrue_*_*',
 
-        
 
-       #   'keep *_hlt*_*_HLT2',
-       #  'keep *_*_*_HLT2',
+       # 'keep *_hlt*_*_HLT2',
+       # 'keep *_*_*_HLT2',
        # 'drop *_*_*Digi*_',
        # 'drop *_mix_*_*',
-
 
         # UCT
        'keep *BXVector*_*_*_*',
@@ -105,15 +95,12 @@ process.output = cms.OutputModule("PoolOutputModule",
        'keep recoPFJets_*_*_*',
        'keep recoCaloJets_hltAK4CaloJets*_*_*',
 
-
        'keep triggerTriggerFilterObjectWithRefs_*_*_HLT2',
        'keep recoMETs_*_*_HLT2',
        'keep recoCaloMETs_*_*_HLT2',
        
-
        'keep *_ak4PFJets*_*_*',
        'keep *_ak4CaloJets*_*_*',
-       
        
        'keep *_hltL1GtObjectMap_*_HLT2',
        'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
@@ -273,6 +260,7 @@ process = customisePostLS1(process)
 
 # --------------------------------------------------------------------------------
 # override the GlobalTag, connection string and pfnPrefix 
+#bx = "25ns"
 bx = "25ns"
 GT = ""
 
