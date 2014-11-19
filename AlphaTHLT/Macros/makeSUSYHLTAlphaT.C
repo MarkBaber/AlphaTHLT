@@ -1,6 +1,6 @@
 //#define TEST
-//#define SIGNAL
-#define NEUTRINO
+#define SIGNAL
+//#define NEUTRINO
 
 //#define HLT_NOFASTJET
 
@@ -439,7 +439,7 @@ void makeSUSYHLTAlphaT(){
   std::vector<float> jet2PTCuts;
   jet2PTCuts.push_back(0.);
   // jet2PTCuts.push_back(50.);
-  // jet2PTCuts.push_back(60.);
+  jet2PTCuts.push_back(60.);
   jet2PTCuts.push_back(70.);
   jet2PTCuts.push_back(80.);
   jet2PTCuts.push_back(90.);
@@ -1294,7 +1294,7 @@ void makeSUSYHLTAlphaT(){
     }
 
     bool l1Trig1 = ( (uctHT >= 175)  || (uctMET >= 70) ); // DJ100
-    bool l1Trig2 = ( (uctHT >= 110)  && !(uctMHToverHT < 0.6 && deltaPhiSeg <= 2) );
+    bool l1Trig2 = ( (uctHT >= 200)  || ((uctHT >= 110)  && !(uctMHToverHT < 0.6 && deltaPhiSeg <= 2)) );
 
 
     // bool l1Trig2 = ( (uctHT >= 200)  || (uctMET >= 60) ); // DJ120
@@ -1420,7 +1420,6 @@ void makeSUSYHLTAlphaT(){
 	    HLT4 = ( (hltPFHT > 350)  && (hltPFAlphaTStandard > 0.52) );
 	    HLT5 = ( (hltPFHT > 400)  && (hltPFAlphaTStandard > 0.51) );
 	}
-
       
 	// ********************************************************************************
 	// *                                   Prefilter                                  *
@@ -1429,52 +1428,49 @@ void makeSUSYHLTAlphaT(){
 	  TString trigStr  = "";
 	  bool    trigBool = false;
 	  
-	  //if ( passHltPreFilterSecondJet ){
-
-	    // NOTE: Currently there is a labeling problem, the PF secondjet threshold labeled is the same at the prefilter
-	    //       value even though it is currently fixed at hltPFSecondJetThreshold = 90
+	  trigBool = passHltPreFilterSecondJet;
+	  if (HLT1){
 	    trigStr  = "HLT1";
-	    trigBool = HLT1;
 	    hist2DHLTEff[trigStr + stdStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard    );
 	    hist2DHLTEff[trigStr + dynStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic     );
 	    hist2DHLTEff[trigStr + nfjStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloNFJAlphaTStandard );
 	    hist2DHLTEff[trigStr + atpStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTPrime       );
 	    hist2DHLTEff[trigStr + mohStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloMHTOverHT         );
-
+	  }
+	  if (HLT2){
 	    trigStr  = "HLT2";
-	    trigBool = HLT2;
 	    hist2DHLTEff[trigStr + stdStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard    );
 	    hist2DHLTEff[trigStr + dynStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic     );
 	    hist2DHLTEff[trigStr + nfjStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloNFJAlphaTStandard );
 	    hist2DHLTEff[trigStr + atpStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTPrime       );
 	    hist2DHLTEff[trigStr + mohStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloMHTOverHT         );
-
+	  }
+	  if (HLT3){
 	    trigStr  = "HLT3";
-	    trigBool = HLT3;
 	    hist2DHLTEff[trigStr + stdStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard    );
 	    hist2DHLTEff[trigStr + dynStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic     );
 	    hist2DHLTEff[trigStr + nfjStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloNFJAlphaTStandard );
 	    hist2DHLTEff[trigStr + atpStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTPrime       );
 	    hist2DHLTEff[trigStr + mohStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloMHTOverHT         );
-
+	  }
+	  if (HLT4){
 	    trigStr  = "HLT4";
-	    trigBool = HLT4;
 	    hist2DHLTEff[trigStr + stdStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard    );
 	    hist2DHLTEff[trigStr + dynStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic     );
 	    hist2DHLTEff[trigStr + nfjStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloNFJAlphaTStandard );
 	    hist2DHLTEff[trigStr + atpStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTPrime       );
 	    hist2DHLTEff[trigStr + mohStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloMHTOverHT         );
-
+	  }
+	  if (HLT5){
 	    trigStr  = "HLT5";
-	    trigBool = HLT5;
 	    hist2DHLTEff[trigStr + stdStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTStandard    );
 	    hist2DHLTEff[trigStr + dynStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTDynamic     );
 	    hist2DHLTEff[trigStr + nfjStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloNFJAlphaTStandard );
 	    hist2DHLTEff[trigStr + atpStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloAlphaTPrime       );
 	    hist2DHLTEff[trigStr + mohStr  + "_" + genJetBinStr]->Fill( trigBool, hltCaloHT, hltCaloMHTOverHT         );
-  
-	    // } // End prefilter second jet
-	}
+	  }  
+
+	} // End PF second jet threshold
       
 
 	// Get offline analysis bin
@@ -1718,11 +1714,11 @@ void makeSUSYHLTAlphaT(){
     if ( (uctJetPT->size() > 1) && ((*uctJetPT)[1] > 30.) ){
       float deltaPhi = calculateDeltaPhi( (*uctJetPhi)[0], (*uctJetPhi)[1] );
       // Incorrect but is defined for the working point to fix use: deltaPhiSegFix =  int(9 - (fabs(deltaPhi) - 0.3)/0.349);
-      deltaPhiSeg    =  9 - (abs(deltaPhi/0.349)); 
+      deltaPhiSeg    = 9 - (abs(deltaPhi/0.349)); 
     }
 
     bool l1Trig1 = ( (uctHT >= 175)  || (uctMET >= 70) ); // DJ100
-    bool l1Trig2 = ( (uctHT >= 110)  && !(uctMHToverHT < 0.6 && deltaPhiSeg <= 2) );
+    bool l1Trig2 = ( (uctHT >= 200)  || ((uctHT >= 110)  && !(uctMHToverHT < 0.6 && deltaPhiSeg <= 2)) );
 
     // bool l1Trig2 = ( (uctHT >= 200)  || (uctMET >= 60) ); // DJ120
     // bool l1Trig3 = ( (uctHT >= 160)  || (uctMET >= 70) ); // DJ120
@@ -1832,11 +1828,10 @@ void makeSUSYHLTAlphaT(){
     hltCaloNFJAlphaTStandard = calculateAlphaT( hltCaloJetNFJPT, hltCaloJetNFJPx, hltCaloJetNFJPy, hltPFJetThreshold );
     // Dynamic AlphaT 
     hltPFAlphaTDynamic       = calculateDynamicAlphaT( hltPFJetPT, hltPFJetPx, hltPFJetPy,
-						       maxCaloJet, hltPFJetThreshold);//,
-    //						       caloJetAlphaThreshold );
+						       maxCaloJet, hltPFJetThreshold);
     hltCaloAlphaTDynamic     = calculateDynamicAlphaT( hltCaloJetPT, hltCaloJetPx, hltCaloJetPy,
-						       maxCaloJet, hltCaloJetThreshold);//,
-    //caloJetAlphaThreshold );
+						       maxCaloJet, hltCaloJetThreshold);
+
 
 
 
@@ -2517,38 +2512,39 @@ void makeSUSYHLTAlphaT(){
 
     TString histoName = itr->first; //Extract the histogram key 
     fOut->cd("Raw/PrefilterEfficiencyRaw");
-    //itr->second->Write();
+    itr->second->Write();
 
-    TEfficiency *eff      = (TEfficiency*)itr->second      ->Clone();
-    TH2* passed           = (TH2*)eff->GetPassedHistogram()->Clone();
-    TH2* passedCumul      = (TH2*)eff->GetPassedHistogram()->Clone();
-    TH2* passedUni        = (TH2*)eff->GetPassedHistogram()->Clone();
+    TEfficiency *eff   = (TEfficiency*)itr->second      ->Clone();
+    TH2* passed        = (TH2*)eff->GetPassedHistogram()->Clone();
+    TH2* passedCumul   = (TH2*)eff->GetPassedHistogram()->Clone();
+    TH2* total         = (TH2*)eff->GetTotalHistogram()->Clone();
+    TH2* totalUni      = (TH2*)eff->GetTotalHistogram()->Clone();
 
     // Uniform
     TEfficiency *effUniCumul = (TEfficiency*)eff->Clone();
     reverseCumulative2D( passed, passedCumul, 1 );
 
-    // The numerator contains all the information, the denominator means little, we only consider entries in the numerator!!!
-    fillUniform2D( passedUni, passed->GetEntries() );
 
-    effUniCumul->SetTotalHistogram(  *passedUni,   "" );
+    fillUniform2D( totalUni, total->GetEntries() );
+
+    effUniCumul->SetTotalHistogram(  *totalUni,    "" );
     effUniCumul->SetPassedHistogram( *passedCumul, "" );
     effUniCumul->SetName( histoName + "_UniCumul" );
     effUniCumul->Write();
 
-    fOut->cd("Raw/PrefilterEfficiency");
-    TCanvas *c = new TCanvas(histoName);
-    TEfficiency* histogramEff = (TEfficiency*)effUniCumul->Clone();
-    //    histogramEff->Draw("COLZTEXTE");
-    histogramEff->Draw("COLZTEXT");
-    gPad->Update();
-    histogramEff->GetPaintedHistogram()->SetMaximum(1.0);
-    histogramEff->GetPaintedHistogram()->GetXaxis()->SetRangeUser(0,     450);
-    if ( !histoName.Contains("MoH") ){
-      histogramEff->GetPaintedHistogram()->GetYaxis()->SetRangeUser(0.47, 0.6);
-    }
-    histogramEff->GetPaintedHistogram()->Draw("COLZTEXT");
-    c->Write();
+    // fOut->cd("Raw/PrefilterEfficiency");
+    // TCanvas *c = new TCanvas(histoName);
+    // TEfficiency* histogramEff = (TEfficiency*)effUniCumul->Clone();
+    // //    histogramEff->Draw("COLZTEXTE");
+    // histogramEff->Draw("COLZTEXT");
+    // gPad->Update();
+    // histogramEff->GetPaintedHistogram()->SetMaximum(1.0);
+    // histogramEff->GetPaintedHistogram()->GetXaxis()->SetRangeUser(0,     450);
+    // if ( !histoName.Contains("MoH") ){
+    //   histogramEff->GetPaintedHistogram()->GetYaxis()->SetRangeUser(0.47, 0.6);
+    // }
+    // histogramEff->GetPaintedHistogram()->Draw("COLZTEXT");
+    // c->Write();
 
   } 
 
