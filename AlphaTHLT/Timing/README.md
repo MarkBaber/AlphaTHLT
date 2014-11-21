@@ -24,3 +24,6 @@ Further reading:
 
     https://twiki.cern.ch/twiki/bin/viewauth/CMS/TriggerStudiesTiming
     https://twiki.cern.ch/twiki/bin/viewauth/CMS/FastTimerService
+    
+Details on the L1 skim for timing studies:    
+    https://hypernews.cern.ch/HyperNews/CMS/get/hlt/3674.html
