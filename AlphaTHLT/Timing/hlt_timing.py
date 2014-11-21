@@ -2,7 +2,7 @@
 
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process( "HLTTIMING" )
+process = cms.Process( "TEST" )
 
 process.HLTConfigVersion = cms.PSet(
   tableName = cms.string('/dev/CMSSW_7_2_1/GRun/V65')
@@ -39835,7 +39835,7 @@ if 'hltDQML1SeedLogicScalers' in process.__dict__:
 
 # limit the number of events to be processed
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32( 100 )
+    input = cms.untracked.int32( -1 )
 )
 
 # enable the TrigReport and TimeReport
