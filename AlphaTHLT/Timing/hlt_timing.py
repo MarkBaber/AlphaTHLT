@@ -2,7 +2,7 @@
 
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process( "TEST" )
+process = cms.Process( "HLTTIMING" )
 
 process.HLTConfigVersion = cms.PSet(
   tableName = cms.string('/dev/CMSSW_7_2_1/GRun/V65')
@@ -39754,14 +39754,14 @@ process.source = cms.Source( "PoolSource",
 
         # Debugging on lxplus
         # --------------------------------------------------------------------------------
-        '/store/group/comm_trigger/TriggerStudiesGroup/Timing/L1_Emulator_Skims/No_Repacker/Neutrino_Pt-2to20_gun_PU40bx25_withMasks_v2/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part0.root', 
-        '/store/group/comm_trigger/TriggerStudiesGroup/Timing/L1_Emulator_Skims/No_Repacker/Neutrino_Pt-2to20_gun_PU40bx25_withMasks_v2/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part1.root', 
+        # '/store/group/comm_trigger/TriggerStudiesGroup/Timing/L1_Emulator_Skims/No_Repacker/Neutrino_Pt-2to20_gun_PU40bx25_withMasks_v2/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part0.root', 
+        # '/store/group/comm_trigger/TriggerStudiesGroup/Timing/L1_Emulator_Skims/No_Repacker/Neutrino_Pt-2to20_gun_PU40bx25_withMasks_v2/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part1.root', 
 
         # Running locally on vocms0<3,4> (Required for timing studies)
         # --------------------------------------------------------------------------------
 
-        # 'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part0.root',
-        # 'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part1.root',
+        'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part0.root',
+        'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part1.root',
         # # 'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part2.root',
         # # 'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part3.root',
         # # 'file:/data/samples/NeutrinoGun_PU40bx25_L1Skim/Neutrino_Pt-2to20_gun_PU40bx25_NewL1Skim_withMasks_v2_part4.root',
