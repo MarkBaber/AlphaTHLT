@@ -1,7 +1,7 @@
 HLT timing studies
 ==================
 
-Use the TSG machines vocms003 or vocms004 for timing, to source CMS-SW:
+Use the TSG machines vocms003 or vocms004 for timing, to source CMS-SW:<br>
 <code>
 source /data/release/cmssw/cmsset_default.sh
 </code>
@@ -11,12 +11,14 @@ Make a release locally for studies:
 /data/user/$USER
 </code>
 
-Check no other jobs are running prior to studies and restrict running to a single core:
+Check no other jobs are running prior to studies and restrict running to a single core:<br>
 <code>
-taskset -c 7 cmsRun configuration.py
+taskset -c 7 cmsRun hlt_timing.py
 </code>
 
-The timing per event at 100 kHz is equivalent to a single process on a single core on the vocms003 Ivybridge at 162 ms/ev.
+At least 30k events should be processed to give a representative estimate of timing.
+
+The timing per event at 100 kHz is equivalent to a single process on a single core on vocms003 at 162 ms/ev.
 
 Further reading: 
 
