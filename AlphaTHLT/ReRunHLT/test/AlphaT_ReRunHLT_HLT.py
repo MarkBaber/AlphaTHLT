@@ -26,7 +26,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-#    input = cms.untracked.int32(100)
+#    input = cms.untracked.int32(30)
     input = cms.untracked.int32(-1)
 )
 
