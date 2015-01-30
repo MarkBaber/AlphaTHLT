@@ -6,9 +6,11 @@
 struct sample{
   TChain *chain;
   TString name;
-  sample(TString aName, TString aFiles){
+  bool    process;
+  sample(TString aName, TString aFiles, bool aProcess){
     chain = new TChain("MakeTrees/Ntuple"); chain->Add( aFiles );
     name = aName;
+    process = aProcess;
   }
 };
 

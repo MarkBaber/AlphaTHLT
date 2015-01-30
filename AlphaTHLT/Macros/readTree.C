@@ -22,9 +22,7 @@
 #include "ttreeDraw.C"
 
 
-
-
-
+#define MHT_VS_MoM
 
 int readTree(){
 
@@ -34,17 +32,23 @@ int readTree(){
   TString filename = "RECOSelectedDistsSignalMETTest.root";
   TFile *f = new TFile(outDir + filename,"RECREATE");
 
+  // Switches
+  // -------------------------------------------------- 
+  bool runRate       = true;
+  bool runBackground = false;
+  bool runSignal     = false;
+
   // Define samples
   // -------------------------------------------------- 
-  sample QCD          = sample("QCD", dir + "12Nov14QCDReweighted_New/*.root");
-  sample ttBar        = sample("ttBar", dir + "/12Nov14_New/TT_Tune4C_13TeV-pythia8-tauola/*.root" );
-  sample DY           = sample("DY",    dir + "/12Nov14_New/DYJetsToLL_M-50_13TeV-madgraph-pythia8/*.root" );
-  sample t2tt_425_325 = sample("t2tt_425_325", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-425_mLSP-325/*.root" );
-  sample t2tt_500_325 = sample("t2tt_500_325", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-500_mLSP-325/*.root" );
-  sample t2tt_650_325 = sample("t2tt_650_325", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-650_mLSP-325/*.root" );
-  sample t2tt_850_100 = sample("t2tt_850_100", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-850_mLSP-100/*.root" );
-  sample t2qq_600_550 = sample("t2qq_600_550", dir + "/16Jan15_20PU25ns_New/T2qq_2J_mStop-600_mLSP-550/*.root" );
-  sample t2bb_600_580 = sample("t2bb_600_580", dir + "/16Jan15_20PU25ns_New/T2bb_2J_mStop-600_mLSP-580/*.root" );
+  sample QCD          = sample("QCD", dir + "12Nov14QCDReweighted_New/*.root",                                  runRate);
+  sample ttBar        = sample("ttBar", dir + "/12Nov14_New/TT_Tune4C_13TeV-pythia8-tauola/*.root",             runBackground );
+  sample DY           = sample("DY",    dir + "/12Nov14_New/DYJetsToLL_M-50_13TeV-madgraph-pythia8/*.root",     runBackground );
+  sample t2tt_425_325 = sample("t2tt_425_325", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-425_mLSP-325/*.root", runSignal );
+  sample t2tt_500_325 = sample("t2tt_500_325", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-500_mLSP-325/*.root", runSignal );
+  sample t2tt_650_325 = sample("t2tt_650_325", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-650_mLSP-325/*.root", runSignal );
+  sample t2tt_850_100 = sample("t2tt_850_100", dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-850_mLSP-100/*.root", runSignal );
+  sample t2qq_600_550 = sample("t2qq_600_550", dir + "/16Jan15_20PU25ns_New/T2qq_2J_mStop-600_mLSP-550/*.root", runSignal );
+  sample t2bb_600_580 = sample("t2bb_600_580", dir + "/16Jan15_20PU25ns_New/T2bb_2J_mStop-600_mLSP-580/*.root", runSignal );
 
   sampleCollection rate; 
   rate.push_back( QCD );
@@ -58,25 +62,6 @@ int readTree(){
   signal.push_back( t2tt_850_100 );
   signal.push_back( t2qq_600_550 );
   signal.push_back( t2bb_600_580 );
-  
-  // TChain* rate  = new TChain("MakeTrees/Ntuple");  rate   ->Add( dir + "12Nov14QCDReweighted_New/*.root" );
-  // TChain* ttBar = new TChain("MakeTrees/Ntuple"); ttBar   ->Add( dir + "/12Nov14_New/TT_Tune4C_13TeV-pythia8-tauola/*.root" );
-  // TChain* DY    = new TChain("MakeTrees/Ntuple");    DY   ->Add( dir + "/12Nov14_New/DYJetsToLL_M-50_13TeV-madgraph-pythia8/*.root" );
-  // // Signal samples
-  // TChain* t2tt_425_325 = new TChain("MakeTrees/Ntuple");
-  // t2tt_425_325->Add( dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-425_mLSP-325/*.root" );
-  // TChain* t2tt_500_325 = new TChain("MakeTrees/Ntuple");
-  // t2tt_500_325->Add( dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-500_mLSP-325/*.root" );
-  // TChain* t2tt_650_325 = new TChain("MakeTrees/Ntuple");
-  // t2tt_650_325->Add( dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-650_mLSP-325/*.root" );
-  // TChain* t2tt_850_100 = new TChain("MakeTrees/Ntuple");
-  // t2tt_850_100->Add( dir + "/16Jan15_20PU25ns_New/T2tt_2J_mStop-850_mLSP-100/*.root" );
-  // TChain* t2qq_600_550 = new TChain("MakeTrees/Ntuple");
-  // t2qq_600_550->Add( dir + "/16Jan15_20PU25ns_New/T2qq_2J_mStop-600_mLSP-550/*.root" );
-  // TChain* t2bb_600_580 = new TChain("MakeTrees/Ntuple");
-  // t2bb_600_580->Add( dir + "/16Jan15_20PU25ns_New/T2bb_2J_mStop-600_mLSP-580/*.root" );
-
-
 
   // Binning
   // -------------------------------------------------- 
@@ -105,6 +90,9 @@ int readTree(){
 				   DPhiBins,DPhiMin,DPhiMax, DPhiBins,DPhiMin,DPhiMax);
  TH2D* mht_vs_met       = new TH2D("mht_vs_met",";HLT #slash{E}_{T};HLT #slash{H}_{T}",
 				   MHTBins,MHTMin,MHTMax, MHTBins,MHTMin,MHTMax);
+ TH2D* mht_vs_mom       = new TH2D("mht_vs_mom",";HLT #slash{H}_{T}/#slash{E}_{T};HLT #slash{H}_{T}",
+				   momBins,momMin,momMax, MHTBins,MHTMin,MHTMax);
+
 
  // Selections
  // --------------------------------------------------
@@ -197,50 +185,30 @@ int readTree(){
 #ifdef FOR_VS_MOM
  // For vs MoM
  // --------------------
- make2DDistributions( rate,  for_vs_mom, "Rate_For_vs_MoM",  "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", rateCuts, true); 
- make2DDistributions( ttBar, for_vs_mom, "TTBar_For_vs_MoM", "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true);
- make2DDistributions( DY,    for_vs_mom, "DY_For_vs_MoM",    "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true);
- make2DDistributions( t2tt_425_325,   for_vs_mom, "t2tt_425_325_For_vs_MoM",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true); 
- make2DDistributions( t2tt_500_325,   for_vs_mom, "t2tt_500_325_For_vs_MoM",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true); 
- make2DDistributions( t2tt_650_325,   for_vs_mom, "t2tt_650_325_For_vs_MoM",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true); 
- make2DDistributions( t2tt_850_100,   for_vs_mom, "t2tt_850_100_For_vs_MoM",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true); 
- make2DDistributions( t2qq_600_550,   for_vs_mom, "t2qq_600_550_For_vs_MoM",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true); 
- make2DDistributions( t2bb_600_580,   for_vs_mom, "t2bb_600_580_For_vs_MoM",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,  true); 
- // RECO selection
- make2DDistributions( t2tt_425_325,   for_vs_mom, "t2tt_425_325_For_vs_MoM_RECO",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts,  true); 
- make2DDistributions( t2tt_500_325,   for_vs_mom, "t2tt_500_325_For_vs_MoM_RECO",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts,  true); 
- make2DDistributions( t2tt_650_325,   for_vs_mom, "t2tt_650_325_For_vs_MoM_RECO",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts,  true); 
- make2DDistributions( t2tt_850_100,   for_vs_mom, "t2tt_850_100_For_vs_MoM_RECO",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts,  true); 
- make2DDistributions( t2qq_600_550,   for_vs_mom, "t2qq_600_550_For_vs_MoM_RECO",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts,  true); 
- make2DDistributions( t2bb_600_580,   for_vs_mom, "t2bb_600_580_For_vs_MoM_RECO",   "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts,  true); 
+ make2DDistributions( rate,       for_vs_mom, "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", rateCuts,    true);
+ make2DDistributions( background, for_vs_mom, "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,     true);
+ make2DDistributions( signal,     for_vs_mom, "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts,     true);
+ make2DDistributions( signal,     for_vs_mom, "hltAk4PFFor_Pt[0]:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts, true, "RECO");
 #endif
-
-
- // MHT vs MET
- // --------------------
- make2DDistributions( rate, mht_vs_met, "hltAk4PF_MhtPT40:hltMetCalo_MetPT", rateCuts);
-
 
 #ifdef MHT_VS_MET
  // MHT vs MET
  // --------------------
- make2DDistributions( rate,  mht_vs_met, "Rate_mht_vs_met",  "hltAk4PF_MhtPT40:hltMetCalo_MetPT", rateCuts); 
- make2DDistributions( ttBar, mht_vs_met, "TTBar_mht_vs_met", "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts);
- make2DDistributions( DY,    mht_vs_met, "DY_mht_vs_met",    "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts);
- make2DDistributions( t2tt_425_325,   mht_vs_met, "t2tt_425_325_mht_vs_met",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts); 
- make2DDistributions( t2tt_500_325,   mht_vs_met, "t2tt_500_325_mht_vs_met",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts); 
- make2DDistributions( t2tt_650_325,   mht_vs_met, "t2tt_650_325_mht_vs_met",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts); 
- make2DDistributions( t2tt_850_100,   mht_vs_met, "t2tt_850_100_mht_vs_met",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts); 
- make2DDistributions( t2qq_600_550,   mht_vs_met, "t2qq_600_550_mht_vs_met",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts); 
- make2DDistributions( t2bb_600_580,   mht_vs_met, "t2bb_600_580_mht_vs_met",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts); 
- // RECO selection
- make2DDistributions( t2tt_425_325,   mht_vs_met, "t2tt_425_325_mht_vs_met_RECO",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts); 
- make2DDistributions( t2tt_500_325,   mht_vs_met, "t2tt_500_325_mht_vs_met_RECO",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts); 
- make2DDistributions( t2tt_650_325,   mht_vs_met, "t2tt_650_325_mht_vs_met_RECO",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts); 
- make2DDistributions( t2tt_850_100,   mht_vs_met, "t2tt_850_100_mht_vs_met_RECO",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts); 
- make2DDistributions( t2qq_600_550,   mht_vs_met, "t2qq_600_550_mht_vs_met_RECO",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts); 
- make2DDistributions( t2bb_600_580,   mht_vs_met, "t2bb_600_580_mht_vs_met_RECO",   "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts); 
+ make2DDistributions( rate,       mht_vs_met, "hltAk4PF_MhtPT40:hltMetCalo_MetPT", rateCuts);
+ make2DDistributions( background, mht_vs_met, "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts);
+ make2DDistributions( signal,     mht_vs_met, "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effCuts);
+ make2DDistributions( signal,     mht_vs_met, "hltAk4PF_MhtPT40:hltMetCalo_MetPT", effRECOCuts, false, "RECO");
 #endif
+
+#ifdef MHT_VS_MoM
+ // MHT vs MoM
+ // --------------------
+ make2DDistributions( rate,       mht_vs_mom, "hltAk4PF_MhtPT40:hltAk4PF_MhtPT40/hltMetCalo_MetPT", rateCuts);
+ make2DDistributions( background, mht_vs_mom, "hltAk4PF_MhtPT40:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts);
+ make2DDistributions( signal,     mht_vs_mom, "hltAk4PF_MhtPT40:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effCuts);
+ make2DDistributions( signal,     mht_vs_mom, "hltAk4PF_MhtPT40:hltAk4PF_MhtPT40/hltMetCalo_MetPT", effRECOCuts, false, "RECO");
+#endif
+
 
  // // Jet2 PT vs HT
  // // -------------------- 
@@ -255,9 +223,6 @@ int readTree(){
  // make2DDistributions( eff,   for_vs_eta, "Eff_For_vs_Eta",   "hltAk4PFFor_Pt[0]:abs(hltAk4PF_Eta[0])", effCuts,  true); 
  // make2DDistributions( ttBar, for_vs_eta, "TTBar_For_vs_Eta", "hltAk4PFFor_Pt[0]:abs(hltAk4PF_Eta[0])", effCuts,  true);
  // make2DDistributions( DY,    for_vs_eta, "DY_For_vs_Eta",    "hltAk4PFFor_Pt[0]:abs(hltAk4PF_Eta[0])", effCuts,  true);
-
-
-
 
  // // Jet2 PT
  // make2D( rate, jet2_vs_ht, "Rate_Jet2_vs_HT_L1WP1",        "hltAk4PF_Pt[1]:hltAk4PF_HT40", L1+"&&(hltAk4PF_AlphaT40>0.60)");
