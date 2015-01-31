@@ -111,7 +111,7 @@ void make2D(TChain *t, TH2D* hist, TString title, TString plot, TString cut, boo
   TH2D* hCumul = (TH2D*)h->Clone();
   hCumul->Clear();
   hCumul->SetName( title + "_Cumul");
-  if (!(title.Contains("Rate_"))){
+  if (!(title.Contains("QCD"))){
     if (veto){ cumulative2D( h, hCumul, 1/h->GetEntries());        } // Veto selected region
     else     { reverseCumulative2D( h, hCumul, 1/h->GetEntries()); }
     hCumul->SetMinimum( 0. );
@@ -151,6 +151,8 @@ void make2DDistributions(sampleCollection samples, TH2D* hist, TString plot, cut
   for (uint iSample = 0; iSample < samples.size(); ++iSample){
 
     sample currentSample = samples[ iSample ];
+    if (!currentSample.process){continue;}
+
     TString title  = currentSample.name + "_" + hist->GetName();
     if (suffix != ""){ title += "_" + suffix; }
 
