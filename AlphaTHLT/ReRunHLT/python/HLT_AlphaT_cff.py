@@ -26104,38 +26104,53 @@ hltHT400PFAlphaT0p51 = cms.EDFilter( "HLTAlphaTPFJetFilter",
     minHt = cms.double( 400.0 )
 )
 
+hltPreHT150PFAlphaT0p51 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    offset = cms.uint32( 0 )
+)
+
+hltPreHT250PFAlphaT0p51 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    offset = cms.uint32( 0 )
+)
+
+hltPreHT350PFAlphaT0p50 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    offset = cms.uint32( 0 )
+)
+
 
 
 HLT_PFDijet90HT200AlphaT0p57_Dijet70HT150AlphaT0p51_L1HTT175OrETM70_v1 = cms.Path( HLTBeginSequence 
-                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT200PFAlphaT0p5
+                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT150PFAlphaT0p51
                                                                                    + HLTAK4CaloJetsSequence 
                                                                                    + hlt2CaloJet70 + hltHT150AlphaT0p51
                                                                                    + HLTAK4PFJetsSequence + hltAK4PFJetsCorrected 
                                                                                    + hlt2PFJet90 + hltHT200PFAlphaT0p57
                                                                                    + HLTEndSequence )
 HLT_PFDijet90HT250AlphaT0p55_Dijet70HT150AlphaT0p51_L1HTT175OrETM70_v1 = cms.Path( HLTBeginSequence 
-                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT200PFAlphaT0p5
+                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT150PFAlphaT0p51
                                                                                    + HLTAK4CaloJetsSequence 
                                                                                    + hlt2CaloJet70 + hltHT150AlphaT0p51
                                                                                    + HLTAK4PFJetsSequence + hltAK4PFJetsCorrected 
                                                                                    + hlt2PFJet90 + hltHT250PFAlphaT0p55
                                                                                    + HLTEndSequence )
 HLT_PFDijet90HT300AlphaT0p53_Dijet70HT150AlphaT0p51_L1HTT175OrETM70_v1 = cms.Path( HLTBeginSequence 
-                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT200PFAlphaT0p5
+                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT150PFAlphaT0p51
                                                                                    + HLTAK4CaloJetsSequence 
                                                                                    + hlt2CaloJet70 + hltHT150AlphaT0p51
                                                                                    + HLTAK4PFJetsSequence + hltAK4PFJetsCorrected 
                                                                                    + hlt2PFJet90 + hltHT300PFAlphaT0p53
                                                                                    + HLTEndSequence )
 HLT_PFDijet90HT350AlphaT0p52_Dijet70HT250AlphaT0p51_L1HTT175OrETM70_v1 = cms.Path( HLTBeginSequence 
-                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT200PFAlphaT0p5
+                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT250PFAlphaT0p51
                                                                                    + HLTAK4CaloJetsSequence 
                                                                                    + hlt2CaloJet70 + hltHT250AlphaT0p51
                                                                                    + HLTAK4PFJetsSequence + hltAK4PFJetsCorrected 
                                                                                    + hlt2PFJet90 + hltHT350PFAlphaT0p52
                                                                                    + HLTEndSequence )
 HLT_PFDijet90HT400AlphaT0p51_Dijet70HT350AlphaT0p50_L1HTT175OrETM70_v1 = cms.Path( HLTBeginSequence 
-                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT200PFAlphaT0p5
+                                                                                   + hltL1sL1HTT175OrETM70 + hltPreHT350PFAlphaT0p50
                                                                                    + HLTAK4CaloJetsSequence 
                                                                                    + hlt2CaloJet70 + hltHT350AlphaT0p50
                                                                                    + HLTAK4PFJetsSequence + hltAK4PFJetsCorrected 
