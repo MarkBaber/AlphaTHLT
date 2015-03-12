@@ -26,6 +26,7 @@ def main():
     # Information to extract
     cfgFile = ""
     jobs    = 0
+    suffix  = ""
 
     argCount = 0
 
@@ -39,8 +40,10 @@ def main():
             cfgFile = str(os.getcwd()) + "/" + arg
         elif (argCount == 3):
             jobs = int(arg)
+        elif (argCount == 4):
+            suffix = str(arg)
         else:
-            print "Error: More than 2 arguments specified, expected only two: cfgFilename, numberOfJobs"
+            print "Error: More than 3 arguments specified, expected only three: cfgFilename, numberOfJobs, (suffix)"
             return
         pass
     
@@ -86,7 +89,7 @@ def main():
     # ----------------------------------------
 
     # Directory to return the jobs to
-    outputDir = baseDir + "/" + theDate + "_" + crabJob
+    outputDir = baseDir + "/" + theDate + "_" + crabJob + "_" + suffix
 
     # Make sure directory does not exist
     if ( os.path.exists( outputDir ) ):
@@ -167,7 +170,7 @@ def main():
         tempShText +=     "export FILENAME=\""  + outputROOTName + "\"\n\n"
 
         tempShText +=     "# IC Batch Job Script\n"
-        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_2_1_patch2/src\"\n"
+        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_3_0/src\"\n"
         tempShText +=     "cd /home/hep/mb1512/$CMSSW_PROJECT_SRC\n\n"
 
         tempShText +=     "# source cms stuff\n"

@@ -39,16 +39,17 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
     #Gen inputs
     srcGen4Jet = cms.VInputTag(cms.InputTag("ak4NoMuNoNuGenJets","","")),
-    srcGen5Jet = cms.VInputTag(cms.InputTag("ak5NoMuNoNuGenJets","","")),
+#    srcGen5Jet = cms.VInputTag(cms.InputTag("ak5NoMuNoNuGenJets","","")),
 
     srcGenMetCalo             = cms.InputTag( "genMetCalo" ),
     srcGenMetCaloAndNonPrompt = cms.InputTag( "genMetCaloAndNonPrompt" ),
     srcGenMetTrue             = cms.InputTag( "genMetTrue" ),
 
                            
-    srcHLTMetCalo             = cms.InputTag( "hltMet" ), 
-    srcHLTMetCleanCalo        = cms.InputTag( "hltMetCleanUsingJetID" ), 
-    srcHLTMetPF               = cms.InputTag( "hltPFMETProducer" ),
+    srcHLTMetCalo                = cms.InputTag( "hltMet" ), 
+    srcHLTMetCleanCalo           = cms.InputTag( "hltMetClean" ), 
+    srcHLTMetCleanUsingJetIDCalo = cms.InputTag( "hltMetCleanUsingJetID" ), 
+    srcHLTMetPF                  = cms.InputTag( "hltPFMETProducer" ),
 
     srcHLTMhtCalo             = cms.InputTag( "hltHtMht" ), 
     srcHLTMhtPF               = cms.InputTag( "hltPFHT" ), 
@@ -57,7 +58,7 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     # Gen particles                           
     MakeGenParticles          = cms.bool( True ),
     srcGenParticles           = cms.InputTag( "prunedGenParticles"),
-    genElectronMinPt          = cms.double( 10. ),                           
+    genElectronMinPt          = cms.double( 20. ),                           
     genElectronMaxEta         = cms.double( 2.5 ),                           
     genMuonMinPt              = cms.double( 10. ),                           
     genMuonMaxEta             = cms.double( 2.5 ),                           
@@ -78,11 +79,12 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 #     srcPfJet = cms.VInputTag(cms.InputTag("ak5PFJets")),
 #     srcCaloJet = cms.VInputTag(cms.InputTag("PUsubAK5CaloJetProducer")),
 #     srcPfJet   = cms.VInputTag(cms.InputTag("PUsubAK5PFJetProducer")),
+                           
 
-    #srcCaloJet = cms.VInputTag(cms.InputTag("ak5CaloJetsL1FastL2L3")),
-    #srcPfJet   = cms.VInputTag(cms.InputTag("ak5PFJetsL1FastL2L3")),
-    srcCaloJet = cms.VInputTag(),
-    srcPfJet   = cms.VInputTag(),
+    # srcAk4Calo = cms.VInputTag(cms.InputTag("ak4CaloJetsL1FastL2L3")),
+    # srcAk4PF   = cms.VInputTag(cms.InputTag("ak4PFJetsCHSL1FastL2L3")),
+    srcAk4Calo = cms.VInputTag(),
+    srcAk4PF   = cms.VInputTag(),
     
 
     #Parameters for HT
@@ -92,7 +94,6 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
     # Cuts for jet skims
     jetMinPt    = cms.double(20.0),
-#    jetMaxEta   = cms.double(3.0),
 
     cenJetMinEta = cms.double(0.0),
     cenJetMaxEta = cms.double(3.0),
@@ -100,8 +101,9 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     forJetMaxEta = cms.double(5.0),
 
 
-    srcRegionEt = cms.InputTag("UCT2015Producer","regionEt"),
-    srcRegionEta = cms.InputTag("UCT2015Producer","regionEta"),
-    srcRegionPhi = cms.InputTag("UCT2015Producer","regionPhi"),
+    # Dynamic HT, AlphaT low-jet pt threshold
+    dynamicJetThreshold = cms.double(20.0),
+
+
     )
 
