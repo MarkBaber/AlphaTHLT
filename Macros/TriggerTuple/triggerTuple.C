@@ -200,7 +200,6 @@ std::vector<TString> selSampleStrs;
 
 
 
-std::map< TString, triggerPath > HLTTriggerBits;
 
 
 std::map< TString, triggerMenu > TriggerMenu;
@@ -302,64 +301,40 @@ void triggerTuple(){
     TriggerMenu["PFBrokenHLTTrigger"].addTrigger( WP,        AlphaTTrigger( WP ) );
     TriggerMenu["PFBrokenHLTTrigger"].setSignal(  WP, passOffHT[i] );    
 
+    TriggerMenu["PFHLTTriggers"].addPath(    WP, HLTBaseSelection);
+    TriggerMenu["PFHLTTriggers"].addTrigger( WP,  CaloHLTTriggers[ WP ] );
+    TriggerMenu["PFHLTTriggers"].addTrigger( WP,        HTTrigger( WP ) );
+    TriggerMenu["PFHLTTriggers"].addTrigger( WP,    AlphaTTrigger( WP ) );
+    TriggerMenu["PFHLTTriggers"].setSignal(  WP, passOffHT[i] );
 
-    PFBrokenHLTTriggers.addPath(    WP, HLTBaseSelection);
-    PFBrokenHLTTriggers.addTrigger( WP, CaloBrokenHLTTriggers[ WP ] );
-    PFBrokenHLTTriggers.addTrigger( WP,            HTTrigger( WP ) );
-    PFBrokenHLTTriggers.addTrigger( WP,        AlphaTTrigger( WP ) );
-    PFBrokenHLTTriggers.setSignal( WP, passOffHT[i] );    
+    TriggerMenu["PFDynHLTTriggers"].addPath(    WP, HLTBaseSelection);
+    TriggerMenu["PFDynHLTTriggers"].addTrigger( WP,     CaloHLTTriggers[ WP ] );
+    TriggerMenu["PFDynHLTTriggers"].addTrigger( WP,  DynHTAlphaTTrigger( WP ) );
+    TriggerMenu["PFDynHLTTriggers"].setSignal(  WP, passOffHT[i] );
 
+    TriggerMenu["PFHLTMin25Triggers"].addPath(    WP, HLTBaseSelection);
+    TriggerMenu["PFHLTMin25Triggers"].addTrigger( WP,  CaloHLTTriggers[ WP ] );
+    TriggerMenu["PFHLTMin25Triggers"].addTrigger( WP,        HTTrigger( WP, "Min25" ) );
+    TriggerMenu["PFHLTMin25Triggers"].addTrigger( WP,    AlphaTTrigger( WP ) );
+    TriggerMenu["PFHLTMin25Triggers"].setSignal(  WP, passOffHT[i] );
 
-    // PFBrokenHLTTriggers[ WP ] = HLTBaseSelection;
-    // PFBrokenHLTTriggers[ WP ].addTrigger( CaloBrokenHLTTriggers[ WP ] );
-    // PFBrokenHLTTriggers[ WP ].addTrigger(             HTTrigger( WP ) );
-    // PFBrokenHLTTriggers[ WP ].addTrigger(         AlphaTTrigger( WP ) );
-    // PFBrokenHLTTriggers[ WP ].setSignal( passOffHT[i] );    
+    TriggerMenu["PFDynHLTMin25Triggers"].addPath(    WP, HLTBaseSelection);
+    TriggerMenu["PFDynHLTMin25Triggers"].addTrigger( WP,     CaloHLTTriggers[ WP ] );
+    TriggerMenu["PFDynHLTMin25Triggers"].addTrigger( WP,  DynHTAlphaTTrigger( WP, "Min25") );
+    TriggerMenu["PFDynHLTMin25Triggers"].setSignal(  WP, passOffHT[i] );
 
-    PFHLTTriggers[ WP ] = HLTBaseSelection;
-    PFHLTTriggers[ WP ].addTrigger( CaloHLTTriggers[ WP ] );
-    PFHLTTriggers[ WP ].addTrigger(       HTTrigger( WP ) );
-    PFHLTTriggers[ WP ].addTrigger(   AlphaTTrigger( WP ) );
-    PFHLTTriggers[ WP ].setSignal( passOffHT[i] );
+    TriggerMenu["PFDijetAvgHLTTriggers"].addPath(    WP, HLTBaseDijetAvgSelection);
+    TriggerMenu["PFDijetAvgHLTTriggers"].addTrigger( WP,  CaloHLTTriggers[ WP ] );
+    TriggerMenu["PFDijetAvgHLTTriggers"].addTrigger( WP,        HTTrigger( WP, "Min25" ) );
+    TriggerMenu["PFDijetAvgHLTTriggers"].addTrigger( WP,    AlphaTTrigger( WP ) );
+    TriggerMenu["PFDijetAvgHLTTriggers"].setSignal(  WP, passOffHT[i] );
 
-    PFDynHLTTriggers[ WP ] = HLTBaseSelection;
-    PFDynHLTTriggers[ WP ].addTrigger(    CaloHLTTriggers[ WP ] );
-    PFDynHLTTriggers[ WP ].addTrigger( DynHTAlphaTTrigger( WP ) );
-    PFDynHLTTriggers[ WP ].setSignal( passOffHT[i] );
-
-    PFHLTMin25Triggers[ WP ] = HLTBaseSelection;
-    PFHLTMin25Triggers[ WP ].addTrigger( CaloHLTTriggers[ WP ] );
-    PFHLTMin25Triggers[ WP ].addTrigger(       HTTrigger( WP, "Min25" ) );
-    PFHLTMin25Triggers[ WP ].addTrigger(   AlphaTTrigger( WP ) );
-    PFHLTMin25Triggers[ WP ].setSignal( passOffHT[i] );
-
-    PFDynHLTMin25Triggers[ WP ] = HLTBaseSelection;
-    PFDynHLTMin25Triggers[ WP ].addTrigger(    CaloHLTTriggers[ WP ] );
-    PFDynHLTMin25Triggers[ WP ].addTrigger( DynHTAlphaTTrigger( WP, "Min25") );
-    PFDynHLTMin25Triggers[ WP ].setSignal( passOffHT[i] );
-
-    PFDijetAvgHLTTriggers[ WP ] = HLTBaseDijetAvgSelection;
-    PFDijetAvgHLTTriggers[ WP ].addTrigger( CaloHLTTriggers[ WP ] );
-    PFDijetAvgHLTTriggers[ WP ].addTrigger(       HTTrigger( WP, "Min25" ) );
-    PFDijetAvgHLTTriggers[ WP ].addTrigger(   AlphaTTrigger( WP ) );
-    PFDijetAvgHLTTriggers[ WP ].setSignal( passOffHT[i] );
-
-    PFDijetAvgDynHLTMin25Triggers[ WP ] = HLTBaseDijetAvgSelection;
-    PFDijetAvgDynHLTMin25Triggers[ WP ].addTrigger(    CaloHLTTriggers[ WP ] );
-    PFDijetAvgDynHLTMin25Triggers[ WP ].addTrigger( DynHTAlphaTTrigger( WP, "Min25") );
-    PFDijetAvgDynHLTMin25Triggers[ WP ].setSignal( passOffHT[i] );
+    TriggerMenu["PFDijetAvgDynHLTMin25Triggers"].addPath(    WP, HLTBaseDijetAvgSelection);
+    TriggerMenu["PFDijetAvgDynHLTMin25Triggers"].addTrigger( WP,     CaloHLTTriggers[ WP ] );
+    TriggerMenu["PFDijetAvgDynHLTMin25Triggers"].addTrigger( WP,  DynHTAlphaTTrigger( WP, "Min25") );
+    TriggerMenu["PFDijetAvgDynHLTMin25Triggers"].setSignal(  WP, passOffHT[i] );
 
   }
-
-  // //PFHLTTriggers[ "PF0" ].setSignal( passOffHT0 );
-  // PFHLTTriggers[ "PF1" ].setSignal( passOffHT1 );
-  // PFHLTTriggers[ "PF2" ].setSignal( passOffHT2 );
-  // PFHLTTriggers[ "PF3" ].setSignal( passOffHT3 );
-  // PFHLTTriggers[ "PF4" ].setSignal( passOffHT4 );
-  // PFHLTTriggers[ "PF5" ].setSignal( passOffHT5 );
-
-
-
 
   // HLT trigger bits
   hltPathNames.push_back("HLT_PFHT200_DiPFJet90_PFAlphaT0p57_v1");
@@ -391,8 +366,12 @@ void triggerTuple(){
   hltPathNames.push_back("HLT_RsqMR300_Rsq0p09_MR200_v1");
   hltPathNames.push_back("HLT_RsqMR300_Rsq0p09_MR200_4jet_v1");
 
-  for (auto itr : hltPathNames){ HLTTriggerBits[itr].addTrigger( trigger( itr,    &passHLTPath[ itr ])  ); };
 
+
+  for (auto itr : hltPathNames){ 
+    TriggerMenu["HLTTriggerBits"].newPath(itr); 
+    TriggerMenu["HLTTriggerBits"].addTrigger( itr, trigger( itr, &passHLTPath[itr]) );
+  };
 
 
   // ****************************************************************************************************
@@ -413,32 +392,16 @@ void triggerTuple(){
   }
 
   // ****************************************************************************************************
+  // *                                        Print menu results                                        *
   // ****************************************************************************************************
 
+  for( auto itr : TriggerMenu ){
+    std::cout << "\n\n" << itr.first << "\n";
+    itr.second.printPaths();
+  }
 
 
-  // CONVERT TO A TRIGGER MENU
 
-  std::cout << "\n\nPFBrokenHLTTriggers\n";
-  //  for( auto itr : PFBrokenHLTTriggers ) { itr.second.print(); }
-  TriggerMenu["PFBrokenHLTTrigger"].printPaths();
-
-  PFBrokenHLTTriggers.printPaths();
-  // std::cout << "\n\nPFHLTTriggers\n";
-  // for( auto itr : PFHLTTriggers)        { itr.second.print(); }
-  // std::cout << "\n\nPFDynHLTTriggers\n";
-  // for( auto itr : PFDynHLTTriggers)     { itr.second.print(); }
-  // std::cout << "\n\nPFHLTMin25Triggers\n";
-  // for( auto itr : PFHLTMin25Triggers)   { itr.second.print(); }
-  // std::cout << "\n\nPFDynHLTTriggers\n";
-  // for( auto itr : PFDynHLTMin25Triggers){ itr.second.print(); }
-  // std::cout << "\n\nPFDijetAvgHLTTriggers\n";
-  // for( auto itr : PFDijetAvgHLTTriggers){ itr.second.print(); }
-  // std::cout << "\n\nPFDijetAvgDynHLTTriggers\n";
-  // for( auto itr : PFDijetAvgDynHLTMin25Triggers){ itr.second.print(); }
-
-  // std::cout << "\nTriggerBits\n";
-  // for( auto itr : HLTTriggerBits){ itr.second.print(false); }
 
 
 
@@ -928,17 +891,8 @@ void analyse( TString sampleStr ){
     // Set QCD rate weights
     // ------------------------------------------------------------
     for ( auto &itr : TriggerMenu ){ itr.second.setWeight( weight ); }
-    PFBrokenHLTTriggers.setWeight( weight );
 
-    //    for ( auto &itr : PFBrokenHLTTriggers ) { itr.second.setWeight( weight ); }
-    for ( auto &itr : PFHLTTriggers )       { itr.second.setWeight( weight ); }
-    for ( auto &itr : PFDynHLTTriggers)     { itr.second.setWeight( weight ); }
-    for ( auto &itr : PFHLTMin25Triggers)   { itr.second.setWeight( weight ); }
-    for ( auto &itr : PFDynHLTMin25Triggers){ itr.second.setWeight( weight ); }
-    for ( auto &itr : PFDijetAvgHLTTriggers){ itr.second.setWeight( weight ); }
-    for ( auto &itr : PFDijetAvgDynHLTMin25Triggers){ itr.second.setWeight( weight ); }
 
-    for ( auto &itr : HLTTriggerBits)        { itr.second.setWeight( weight ); }
     for ( auto &itr : dynHistRate )          { itr.second.setWeight( weight ); }
 
 
@@ -1150,7 +1104,7 @@ void analyse( TString sampleStr ){
 
     // Trigger bits
     for (auto itr : hltPathNames){ passHLTPath[itr] = uBranch[itr]; }
-    //HLTTriggerBits[itr].addTrigger( trigger( itr,    &passHLTPath[ itr ])  ); };
+
 
 
 
@@ -1159,18 +1113,10 @@ void analyse( TString sampleStr ){
     // ----------------------------------------
 
     offSelection.checkEvent();
-    // PF trigger menu
-    //for (auto &itr : PFBrokenHLTTriggers)  { itr.second.checkEvent(); }
+    // Check menues
     for ( auto &itr : TriggerMenu ){ itr.second.checkEvent(); }
 
-    PFBrokenHLTTriggers.checkEvent();
-    for (auto &itr : PFHLTTriggers)        { itr.second.checkEvent(); }
-    for (auto &itr : PFDynHLTTriggers)     { itr.second.checkEvent(); }
-    for (auto &itr : PFHLTMin25Triggers)   { itr.second.checkEvent(); }
-    for (auto &itr : PFDynHLTMin25Triggers){ itr.second.checkEvent(); }
-    for (auto &itr : PFDijetAvgHLTTriggers){ itr.second.checkEvent(); }
-    for (auto &itr : PFDijetAvgDynHLTMin25Triggers){ itr.second.checkEvent(); }
-    for (auto &itr : HLTTriggerBits)       { itr.second.checkEvent(); }
+
     // ================================================================================
 
   } // End loop

@@ -163,6 +163,10 @@ struct triggerMenu{
     };
   }
 
+  void newPath(TString aPathname){
+    path[aPathname] = triggerPath();
+  }
+
   void addPath(TString aPathname, triggerPath aPath){
     path[aPathname] = aPath;
   }
