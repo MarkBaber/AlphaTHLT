@@ -14,4 +14,8 @@ Installation instructions:
   git cms-addpkg HLTrigger/Configuration
   scram b -j8
 
+  mkdir AlphaTHLT
+  cd AlphaTHLT
+  git remote add origin git@github.com:MarkBaber/AlphaTHLT.git
+
 </code></pre>
