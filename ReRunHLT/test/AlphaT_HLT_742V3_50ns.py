@@ -53337,11 +53337,11 @@ import HLTrigger.Configuration.customizeHLTforL1Emulator
 process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToL1Emulator( process )
 process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimStage1Digis( process )
 
-if 'MessageLogger' in process.__dict__:
-    process.MessageLogger.categories.append('TriggerSummaryProducerAOD')
-    process.MessageLogger.categories.append('L1GtTrigReport')
-    process.MessageLogger.categories.append('HLTrigReport')
-    process.MessageLogger.categories.append('FastReport')
+# if 'MessageLogger' in process.__dict__:
+#     process.MessageLogger.categories.append('TriggerSummaryProducerAOD')
+#     process.MessageLogger.categories.append('L1GtTrigReport')
+#     process.MessageLogger.categories.append('HLTrigReport')
+#     process.MessageLogger.categories.append('FastReport')
 
 # add specific customizations
 _customInfo = {}
@@ -53575,8 +53575,6 @@ process.HLT_PFMET_NoiseCleaned_v1 = cms.Path( process.HLTBeginSequence + process
 
 
 
-# METHOD3
-process.hltHbhereco.puCorrMethod = cms.int32(3) # HCAL Method 2 Fast/HLT (aka "method3" for now)
 
 # ================================================================================
 # Additional reconstruction
