@@ -53351,10 +53351,13 @@ _customInfo['globalTags'][True ] = "auto:run2_hlt_50nsGRun"
 _customInfo['globalTags'][False] = "auto:run2_mc_50nsGRun"
 _customInfo['inputFiles']={}
 _customInfo['inputFiles'][True]  = "file:RelVal_Raw_50nsGRun_DATA.root"
-_customInfo['inputFiles'][False] = "/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root"
+_customInfo['inputFiles'][False] = "/store/mc/Spring14dr/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/PU20bx25_POSTLS170_V5-v1/00000/04F95C95-C442-E411-8FDD-002590200844.root"
+#"/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root"
 _customInfo['maxEvents' ]=  100
 _customInfo['globalTag' ]= "FALL1374_50V0"
-_customInfo['inputFile' ]=  ['/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root']
+_customInfo['inputFile' ]=  ['/store/mc/Spring14dr/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/PU20bx25_POSTLS170_V5-v1/00000/04F95C95-C442-E411-8FDD-002590200844.root'
+#'/store/mc/Fall13dr/QCD_Pt-800to1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/castor_tsg_PU40bx25_POSTLS162_V2-v1/00000/0002521B-7C9D-E311-874A-003048FFCB8C.root'
+]
 _customInfo['realData'  ]=  False
 from HLTrigger.Configuration.customizeHLTforALL import customizeHLTforAll
 process = customizeHLTforAll(process,_customInfo)
@@ -53803,6 +53806,9 @@ process.HLTSchedule = cms.Schedule( process.HLTriggerFirstPath,
                                     process.HLT_PFHT350_v2,
                                     process.HLT_PFHT400_v1,
                                     process.HLT_PFHT475_v1, 
+                                    process.HLT_PFHT600_v2,
+                                    process.HLT_PFHT650_v2,
+
                                     
                                     process.HLT_PFHT800_v1,
                                     process.HLT_PFHT350_PFMET100_NoiseCleaned_v1,
@@ -53826,8 +53832,6 @@ process.HLTSchedule = cms.Schedule( process.HLTriggerFirstPath,
                                     process.HLT_RsqMR270_Rsq0p09_MR200_4jet_v1,
                                  
 
-                                 process.HLT_PFHT600_v2,
-                                 process.HLT_PFHT650_v2,
 
                                  process.HLTriggerFinalPath,
 

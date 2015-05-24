@@ -715,35 +715,48 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // ------------------------------------------------------------
 
 
-     hltPathNames.push_back("HLT_PFHT200_DiPFJet90_PFAlphaT0p57_v1");
-     hltPathNames.push_back("HLT_PFHT250_DiPFJet90_PFAlphaT0p55_v1");
-     hltPathNames.push_back("HLT_PFHT300_DiPFJet90_PFAlphaT0p53_v1");
-     hltPathNames.push_back("HLT_PFHT350_DiPFJet90_PFAlphaT0p52_v1");
-     hltPathNames.push_back("HLT_PFHT400_DiPFJet90_PFAlphaT0p51_v1");
+     hltPathNames.push_back("HLT_PFHT200_DiPFJetAve90_PFAlphaT0p57_v1"); 
+     hltPathNames.push_back("HLT_PFHT250_DiPFJetAve90_PFAlphaT0p55_v1"); 
+     hltPathNames.push_back("HLT_PFHT300_DiPFJetAve90_PFAlphaT0p53_v1"); 
+     hltPathNames.push_back("HLT_PFHT350_DiPFJetAve90_PFAlphaT0p52_v1"); 
+     hltPathNames.push_back("HLT_PFHT400_DiPFJetAve90_PFAlphaT0p51_v1"); 
 
-     hltPathNames.push_back("HLT_PFHT900_v1");
-     hltPathNames.push_back("HLT_PFHT350_PFMET120_NoiseCleaned_v1");
-     hltPathNames.push_back("HLT_PFMET170_NoiseCleaned_v1");
-     hltPathNames.push_back("HLT_PFMET120_NoiseCleaned_BTagCSV07_v1");
-    
-     hltPathNames.push_back("HLT_HT100_v1");
-     hltPathNames.push_back("HLT_HT200_v1");
-     hltPathNames.push_back("HLT_HT250_v1");
-     hltPathNames.push_back("HLT_HT300_v1");
-     hltPathNames.push_back("HLT_HT350_v1");
-     hltPathNames.push_back("HLT_HT400_v1");
+     hltPathNames.push_back("HLT_PFHT200_DiPFJetAve90_PFAlphaT0p63_v1"); 
+     hltPathNames.push_back("HLT_PFHT250_DiPFJetAve90_PFAlphaT0p58_v1");
+     hltPathNames.push_back("HLT_PFHT300_DiPFJetAve90_PFAlphaT0p54_v1"); 
+     hltPathNames.push_back("HLT_PFHT350_DiPFJetAve90_PFAlphaT0p53_v1"); 
+     hltPathNames.push_back("HLT_PFHT400_DiPFJetAve90_PFAlphaT0p52_v1");
 
-     hltPathNames.push_back("HLT_PFHT100_v1");     
-     hltPathNames.push_back("HLT_PFHT350_v1");
-     hltPathNames.push_back("HLT_PFHT600_v1");
-     hltPathNames.push_back("HLT_PFHT650_v1");
-         
-    
-     hltPathNames.push_back("HLT_Rsq0p36_v1");
-     hltPathNames.push_back("HLT_RsqMR260_Rsq0p09_MR200_v1");
-     hltPathNames.push_back("HLT_RsqMR260_Rsq0p09_MR200_4jet_v1");
-     hltPathNames.push_back("HLT_RsqMR300_Rsq0p09_MR200_v1");
-     hltPathNames.push_back("HLT_RsqMR300_Rsq0p09_MR200_4jet_v1");
+                                    
+     hltPathNames.push_back("HLT_PFHT200_v1");
+     hltPathNames.push_back("HLT_PFHT250_v1");
+     hltPathNames.push_back("HLT_PFHT300_v1");
+     hltPathNames.push_back("HLT_PFHT350_v2");
+     hltPathNames.push_back("HLT_PFHT400_v1");
+     hltPathNames.push_back("HLT_PFHT475_v1"); 
+                                    
+     hltPathNames.push_back("HLT_PFHT800_v1");
+     hltPathNames.push_back("HLT_PFHT350_PFMET100_NoiseCleaned_v1");
+     hltPathNames.push_back("HLT_PFMET170_NoiseCleaned_v2");
+     hltPathNames.push_back("HLT_PFMET120_NoiseCleaned_BTagCSV07_v2");
+                                  
+
+
+     hltPathNames.push_back("HLT_Rsq0p25_v1"); 
+     hltPathNames.push_back("HLT_Rsq0p30_v1"); 
+     hltPathNames.push_back("HLT_RsqMR240_Rsq0p09_MR200_v1");
+     hltPathNames.push_back("HLT_RsqMR240_Rsq0p09_MR200_4jet_v1");
+     hltPathNames.push_back("HLT_RsqMR270_Rsq0p09_MR200_v1");
+     hltPathNames.push_back("HLT_RsqMR270_Rsq0p09_MR200_4jet_v1");
+                                 
+
+     hltPathNames.push_back("HLT_PFHT600_v2");
+     hltPathNames.push_back("HLT_PFHT650_v2");
+
+
+
+
+
 
 
 
