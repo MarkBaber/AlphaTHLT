@@ -43,8 +43,8 @@ config.JobType.psetName = '../test/AlphaT_HLT_742V2_25ns.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.outputFiles = ['hltReRunResults.root']
 config.section_('Data')
-config.Data.outLFN   = '/store/user/mbaber/' + jobName + '_' + prodTag
-config.Data.inputDBS = 'global'
+config.Data.outLFNDirBase   = '/store/user/mbaber/' + jobName + '_' + prodTag
+config.Data.inputDBS        = 'global'
 config.Data.inputDataset = dataset
 config.Data.publication  = False
 config.Data.splitting = 'FileBased'
