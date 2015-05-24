@@ -50055,11 +50055,10 @@ _customInfo['globalTags'][True ] = "auto:run2_hlt_GRun"
 _customInfo['globalTags'][False] = "auto:run2_mc_GRun"
 _customInfo['inputFiles']={}
 _customInfo['inputFiles'][True]  = "file:RelVal_Raw_GRun_DATA.root"
-_customInfo['inputFiles'][False] = "/store/mc/Spring14dr/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/PU20bx25_POSTLS170_V
-5-v1/00000/04F95C95-C442-E411-8FDD-002590200844.root"
+_customInfo['inputFiles'][False] = "/store/mc/Spring14dr/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/PU20bx25_POSTLS170_V5-v1/00000/04F95C95-C442-E411-8FDD-002590200844.root"
 _customInfo['maxEvents' ]=  100
 _customInfo['globalTag' ]= "FALL1374_25V4"
-_customInfo['inputFile' ]=  ['/store/mc/Spring14dr/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/PU20bx25_POSTLS170_V']
+_customInfo['inputFile' ]=  ['/store/mc/Spring14dr/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/PU20bx25_POSTLS170_V5-v1/00000/04F95C95-C442-E411-8FDD-002590200844.root']
 _customInfo['realData'  ]=  False
 from HLTrigger.Configuration.customizeHLTforALL import customizeHLTforAll
 process = customizeHLTforAll(process,_customInfo)
