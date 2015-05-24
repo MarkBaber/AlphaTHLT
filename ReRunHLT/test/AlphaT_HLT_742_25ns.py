@@ -50072,3 +50072,20 @@ if hasattr(process, 'cscReEmulTriggerPrimitiveDigis'):
     process.cscReEmulTriggerPrimitiveDigis.CSCWireDigiProducer = cms.InputTag("simMuonCSCDigis","MuonCSCWireDigi")
 
 
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+      cms.PSet(
+            record = cms.string('JetCorrectionsRecord'),
+            tag    = cms.string('JetCorrectorParametersCollection_EcalMultifit_AK4PFHLT'),
+            label  = cms.untracked.string('AK4PFHLT')
+            )
+      ), 
+      connect = cms.string('sqlite_file:EcalMultifit3.db')
+
+)
+## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
