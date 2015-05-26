@@ -92,7 +92,7 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
     #Parameters for HT
     #htThreshold = cms.double(30.0),
-    maxjet      = cms.uint32(10),
+    maxjet      = cms.uint32(20),
     usePU       = cms.bool(True),
 
     # Cuts for jet skims

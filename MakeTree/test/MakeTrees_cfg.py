@@ -5,50 +5,34 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 process = cms.Process("TreeMaker")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-   input = cms.untracked.int32(-1)
-#   input = cms.untracked.int32(1000)
+#   input = cms.untracked.int32(-1)
+   input = cms.untracked.int32(1000)
 )
 
 # --------------------------------------------------------------------------------
 # Select bx to process
-bx = "25ns"
+#bx = "25ns"
 #bx = "50nsPU1"
-#bx = "50ns"
+bx = "50ns"
 #bx = "20PU25ns"
-
 #bx = "AVE30BX50"
 
-#HCAL3 = False 
-HCAL3 = True
+
+#from AlphaTHLT.MakeTree.samples.MCRUN2_72_V4A_74X_PU40bx50_HCAL3_26Mar15 import *
 
 if (bx == "25ns"):
-    if HCAL3 == False:
-        from AlphaTHLT.MakeTree.samples.MCRUN2_72_V3A_74X_PU40bx25_22Mar15_cfi import * # 25ns 7_4_0_pre9
-    else:
-        from AlphaTHLT.MakeTree.samples.MCRUN2_72_V3A_74X_PU40bx25_HCAL3_26Mar15_cfi import *
+    from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15 import * 
 elif (bx == "50ns"):
-    if HCAL3 == False:
-        from AlphaTHLT.MakeTree.samples.MCRUN2_72_V4A_74X_PU40bx50_25Mar15_cfi import *
-    else:
-        from AlphaTHLT.MakeTree.samples.MCRUN2_72_V4A_74X_PU40bx50_HCAL3_26Mar15_cfi import *
-    pass
+    from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15 import * 
 elif (bx == "AVE30BX50"):
-    if HCAL3 == False:
-        from AlphaTHLT.MakeTree.samples.PHYS14_50_V1_74X_AVE30BX50_Signal_25Mar15_cfi import * 
-    else:
-        from AlphaTHLT.MakeTree.samples.PHYS14_50_V1_74X_AVE30BX50_HCAL3_Signal_26Mar15_cfi import * 
-
+    pass
 elif (bx == "50nsPU1"):
     pass
 elif (bx == "20PU25ns"):
-    if HCAL3 == False:
-        from AlphaTHLT.MakeTree.samples.PHYS14_25_V1_74X_PU20BX25_29Mar15_v2_cfi import * 
-    else:
-        from AlphaTHLT.MakeTree.samples.PHYS14_25_V1_74X_PU20BX25_HCAL3_29Mar15_v2_cfi import * 
-
+    from AlphaTHLT.MakeTree.samples.PHY1474_25V4_742_PU20BX25_HCAL3_24May15 import * 
     pass
 else:
     print "Error: Bunch spacing '", bx, "' not recognised\n"
@@ -117,15 +101,15 @@ elif (bx == "50nsPU1"):
                # QCD600to800,  # 7
                #QCD800to1000] # 8
                ]
-selectedSample = samples[9]
+selectedSample = samples[0]
 
 
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
 
-                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ), 
-#                             fileNames = selectedSample.files,
+#                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ), 
+                             fileNames = selectedSample.files,
 
 #                             fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MCRUN2_72_V3A_74X_PU40bx25/TT_Tune4C_13TeV-pythia8-tauola/crab_TT/150322_224937/0000/hltReRunResults_1.root')
 
@@ -148,11 +132,11 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 GT = ""
 
 if (bx == "25ns" or bx == "20PU25ns"):
-    GT = 'MCRUN2_72_V3A::All'
+    GT = 'PHY1474_25V4'
 elif (bx == "50ns" or bx == "50nsPU1"):
-    GT = 'MCRUN2_72_V4A::All'
+    GT = 'FALL1374_50V0'
 elif (bx == "AVE30BX50"):
-    GT = 'PHYS14_50_V1'
+    GT = 'PHY1474_STV4'
 
 print "\nProcessing sample :\t", selectedSample.name, "\nBeam BX scenario  :\t", bx, "\nGlobaltag         :\t", GT, "\n\n"
 if 'GlobalTag' in process.__dict__:
@@ -174,7 +158,7 @@ process.load("AlphaTHLT.MakeTree.MakeTrees_cfi")
 
 process.HLTJetProducer = cms.EDProducer('HLTJetProducer',
                                         HLTResults = cms.untracked.InputTag("TriggerResults::HLT2"),
-                                        JetMinPT   = cms.double( 20. ),
+                                        JetMinPT   = cms.double( 30. ),
                                         HLTAk4Calojets = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
 )
 
