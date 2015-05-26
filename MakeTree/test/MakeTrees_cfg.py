@@ -5,11 +5,11 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 process = cms.Process("TreeMaker")
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-#   input = cms.untracked.int32(-1)
-   input = cms.untracked.int32(1000)
+   input = cms.untracked.int32(-1)
+#   input = cms.untracked.int32(1000)
 )
 
 # --------------------------------------------------------------------------------
@@ -21,18 +21,16 @@ bx = "50ns"
 #bx = "AVE30BX50"
 
 
-#from AlphaTHLT.MakeTree.samples.MCRUN2_72_V4A_74X_PU40bx50_HCAL3_26Mar15 import *
-
 if (bx == "25ns"):
-    from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15 import * 
+    from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15_cfi import * 
 elif (bx == "50ns"):
-    from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15 import * 
+    from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15_cfi import * 
 elif (bx == "AVE30BX50"):
     pass
 elif (bx == "50nsPU1"):
     pass
 elif (bx == "20PU25ns"):
-    from AlphaTHLT.MakeTree.samples.PHY1474_25V4_742_PU20BX25_HCAL3_24May15 import * 
+    from AlphaTHLT.MakeTree.samples.PHY1474_25V4_742_PU20BX25_HCAL3_24May15_cfi import * 
     pass
 else:
     print "Error: Bunch spacing '", bx, "' not recognised\n"
@@ -52,7 +50,7 @@ elif (bx == "20PU25ns"):
     samples = [
     T2tt_2J_mStop_425_mLSP_325 , # 1M events - 0
     T1bbbb_2J_mGl_1000_mLSP_900,
-    T1tttt_2J_mGl_1200_mLSP_800,
+    #T1tttt_2J_mGl_1200_mLSP_800,
     T2qq_2J_mStop_1200_mLSP_100,
     T2tt_2J_mStop_650_mLSP_325 ,
     T2qq_2J_mStop_600_mLSP_550 ,
@@ -101,20 +99,18 @@ elif (bx == "50nsPU1"):
                # QCD600to800,  # 7
                #QCD800to1000] # 8
                ]
-selectedSample = samples[0]
+selectedSample = samples[9]
 
 
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
 
+
 #                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ), 
                              fileNames = selectedSample.files,
 
 #                             fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MCRUN2_72_V3A_74X_PU40bx25/TT_Tune4C_13TeV-pythia8-tauola/crab_TT/150322_224937/0000/hltReRunResults_1.root')
-
-#                             fileNames = cms.untracked.vstring( 'file:/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_0_pre9/src/AlphaTHLT/ReRunHLT/test/hltReRunResults.root' ), 
-                             #fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/AlphaTHLT_PRE_LS172_V16_PU40bx25_10Oct14/QCD_Pt-30to50_Tune4C_13TeV_pythia8/hltReRunResults_302_1_UtZ.root' )
 
 )
 process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
@@ -132,11 +128,11 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 GT = ""
 
 if (bx == "25ns" or bx == "20PU25ns"):
-    GT = 'PHY1474_25V4'
+    GT = 'MCRUN2_72_V3A::All' #GT = 'PHY1474_25V4'
 elif (bx == "50ns" or bx == "50nsPU1"):
-    GT = 'FALL1374_50V0'
+    GT = 'MCRUN2_72_V4A::All' #GT = 'FALL1374_50V0'
 elif (bx == "AVE30BX50"):
-    GT = 'PHY1474_STV4'
+    GT = 'PHYS14_50_V1' #GT = 'PHY1474_STV4'
 
 print "\nProcessing sample :\t", selectedSample.name, "\nBeam BX scenario  :\t", bx, "\nGlobaltag         :\t", GT, "\n\n"
 if 'GlobalTag' in process.__dict__:
