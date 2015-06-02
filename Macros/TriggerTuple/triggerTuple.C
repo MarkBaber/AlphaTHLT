@@ -26,7 +26,8 @@
 #include "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_2/src/AlphaTHLT/Macros/TriggerTuple/branches.cpp"
 #include "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_2/src/AlphaTHLT/Macros/TriggerTuple/integration.cpp"
 #include "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_2/src/AlphaTHLT/Macros/TriggerTuple/trigger.cpp"
-#include "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_2/src/AlphaTHLT/Macros/TriggerTuple/samples/samples_v2.cpp"
+//#include "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_2/src/AlphaTHLT/Macros/TriggerTuple/samples/samples_v2.cpp"
+#include "/home/hep/mb1512/SUSY/UCTHLT/CMSSW_7_4_2/src/AlphaTHLT/Macros/TriggerTuple/samples/samples_v3.cpp"
 
 //const int MAX_EVENTS = 10000;
 const int MAX_EVENTS = -1;
@@ -40,8 +41,8 @@ TString PF2Jet =  "dijetAvggt90";
 //#define NOVETO
 #define NOLEPTONVETO
 
-#define ROOTFILE // Required for ntuple production
-#define TURNON
+//#define ROOTFILE // Required for ntuple production
+//#define TURNON
 // // #define PREFILTER
 // #define HIST2DTURN
 // //#define HIST1DTURN
@@ -49,18 +50,18 @@ TString PF2Jet =  "dijetAvggt90";
 // FOR RATE
 //#define MAKE_TRIGGER_TUPLE
 //#define HIST2DTURNSAVE
-#define HIST1DTURNSAVE
+//#define HIST1DTURNSAVE
 
-#define HTTRIGGERS
+//#define HTTRIGGERS
 
 
 
-//#define MAKE_TRIGGER_LOG
+#define MAKE_TRIGGER_LOG
 
 //#define DYNALPHAT
 //#define DYNALPHAT_NEW
 
-//#define TRIGGERBITS
+#define TRIGGERBITS
 
 // ****************************************
 // output
@@ -71,7 +72,7 @@ TString PF2Jet =  "dijetAvggt90";
 //TString outdir = "output/23_04_15_Job1/";
 //TString outdir = "output/23_04_15_Job2/";
 //TString outdir = "output/23_04_15_50nsWPEff/";
-TString outdir = "output/30_04_15_HTTrigger/";
+TString outdir = "output/02_06_15_Test/";
 
 TString fileSuffix;
 
@@ -92,7 +93,6 @@ std::map< TString, TEfficiency*> hist2DPrefTurn;
 // Dynamic triggers 
 //std::map< TString, dynamicRate > dynHistRate;
 //std::map< TString, dynamicRate > dynHistEff;
-
 
 
 TString offRecoType ;
@@ -342,6 +342,8 @@ void triggerTuple(){
   selSampleStr = "PU40bx25_HCAL3_HPUV_QCD";
   //selSampleStr = "PU40bx50_HCAL3_HPUV_QCD";
 
+  //selSampleStr = "PU20bx25_HPUV_QCD";
+
   // --------------------------------------------------------------------------------
 
 
@@ -486,14 +488,14 @@ void triggerTuple(){
  // SelectedTriggerMenues.push_back("PFNewTrigger");
  // SelectedTriggerMenues.push_back("PFNewTriggerNJet");
 
-  SelectedTriggerMenues.push_back( "PFJ2StdTrigger");
-  SelectedTriggerMenues.push_back( "PFJ2DynTrigger");
-  SelectedTriggerMenues.push_back( "PFAveStdTrigger");
-  SelectedTriggerMenues.push_back( "PFAveDynTrigger");
-  SelectedTriggerMenues.push_back( "PF2012J2StdTrigger");
-  SelectedTriggerMenues.push_back( "PF2012J2DynTrigger");
-  SelectedTriggerMenues.push_back( "PF2012AveStdTrigger");
-  SelectedTriggerMenues.push_back( "PF2012AveDynTrigger");
+  // SelectedTriggerMenues.push_back( "PFJ2StdTrigger");
+  // SelectedTriggerMenues.push_back( "PFJ2DynTrigger");
+  // SelectedTriggerMenues.push_back( "PFAveStdTrigger");
+  // SelectedTriggerMenues.push_back( "PFAveDynTrigger");
+  // SelectedTriggerMenues.push_back( "PF2012J2StdTrigger");
+  // SelectedTriggerMenues.push_back( "PF2012J2DynTrigger");
+  // SelectedTriggerMenues.push_back( "PF2012AveStdTrigger");
+  // SelectedTriggerMenues.push_back( "PF2012AveDynTrigger");
 
   // SelectedTriggerMenues.push_back( "PFJ2StdTriggerNJet");
   // SelectedTriggerMenues.push_back( "PFJ2DynTriggerNJet");
@@ -508,7 +510,7 @@ void triggerTuple(){
 
  // SelectedTriggerMenues.push_back("PFBrokenHLTTrigger");
  // SelectedTriggerMenues.push_back("PFHLTTriggers");
-  // SelectedTriggerMenues.push_back("HLTTriggerBits");
+  SelectedTriggerMenues.push_back("HLTTriggerBits");
 
   //  SelectedTriggerMenues.push_back("CumulPFNewTriggerNJet");
 
