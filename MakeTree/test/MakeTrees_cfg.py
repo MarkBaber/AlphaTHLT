@@ -16,8 +16,8 @@ process.maxEvents = cms.untracked.PSet(
 # Select bx to process
 #bx = "25ns"
 #bx = "50nsPU1"
-bx = "50ns"
-#bx = "20PU25ns"
+#bx = "50ns"
+bx = "20PU25ns"
 #bx = "AVE30BX50"
 
 
@@ -26,11 +26,12 @@ if (bx == "25ns"):
 elif (bx == "50ns"):
     from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15_cfi import * 
 elif (bx == "AVE30BX50"):
+    from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU30bx50_26May15v2_cfi import *
     pass
 elif (bx == "50nsPU1"):
     pass
 elif (bx == "20PU25ns"):
-    from AlphaTHLT.MakeTree.samples.PHY1474_25V4_742_PU20BX25_HCAL3_24May15_cfi import * 
+    from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
     pass
 else:
     print "Error: Bunch spacing '", bx, "' not recognised\n"
@@ -41,28 +42,52 @@ else:
 samples = []
 
 if (bx == "AVE30BX50"):
-    samples = [T2tt_2J_mStop_425_mLSP_325, # 1M events
-               T1tttt_2J_mGl_1500_mLSP_100,
-               T2tt_2J_mStop_650_mLSP_325,
-               T1tttt_2J_mGl_1200_mLSP_800,
+    samples = [QCD30to50,    # 0
+               QCD50to80,    # 1
+               QCD80to120,   # 2
+               QCD120to170,  # 3
+               QCD170to300,  # 4
+               QCD300to470,  # 5 
+               QCD470to600,  # 6
+               QCD600to800,  # 7
+               QCD800to1000, # 8
+               # T2tt_2J_mStop_425_mLSP_325, # 1M events
+               # T1tttt_2J_mGl_1500_mLSP_100,
+               # T2tt_2J_mStop_650_mLSP_325,
+               # T1tttt_2J_mGl_1200_mLSP_800,
                ]
 elif (bx == "20PU25ns"):
-    samples = [
-    T2tt_2J_mStop_425_mLSP_325 , # 1M events - 0
-    T1bbbb_2J_mGl_1000_mLSP_900,
-    #T1tttt_2J_mGl_1200_mLSP_800,
-    T2qq_2J_mStop_1200_mLSP_100,
-    T2tt_2J_mStop_650_mLSP_325 ,
-    T2qq_2J_mStop_600_mLSP_550 ,
-    T1qqqq_2J_mGl_1400_mLSP_100,
-    T2bb_2J_mStop_900_mLSP_100 ,
-    T2bb_2J_mStop_600_mLSP_580 ,
-    T2tt_2J_mStop_500_mLSP_325 ,
-    T1tttt_2J_mGl_1500_mLSP_100,
-    T2tt_2J_mStop_850_mLSP_100 ,
-    T1bbbb_2J_mGl_1500_mLSP_100,
-    T1qqqq_2J_mGl_1000_mLSP_800, # 13
-    ]
+    samples = [QCD30to50,    # 0
+               QCD50to80,    # 1
+               QCD80to120,   # 2
+               QCD120to170,  # 3
+               QCD170to300,  # 4
+               QCD300to470,  # 5 
+               QCD470to600,  # 6
+               QCD600to800,  # 7
+               QCD800to1000, # 8
+               # T2tt_2J_mStop_425_mLSP_325, # 1M events
+               # T1tttt_2J_mGl_1500_mLSP_100,
+               # T2tt_2J_mStop_650_mLSP_325,
+               # T1tttt_2J_mGl_1200_mLSP_800,
+               ]
+
+    # samples = [
+    # T2tt_2J_mStop_425_mLSP_325 , # 1M events - 0
+    # T1bbbb_2J_mGl_1000_mLSP_900,
+    # #T1tttt_2J_mGl_1200_mLSP_800,
+    # T2qq_2J_mStop_1200_mLSP_100,
+    # T2tt_2J_mStop_650_mLSP_325 ,
+    # T2qq_2J_mStop_600_mLSP_550 ,
+    # T1qqqq_2J_mGl_1400_mLSP_100,
+    # T2bb_2J_mStop_900_mLSP_100 ,
+    # T2bb_2J_mStop_600_mLSP_580 ,
+    # T2tt_2J_mStop_500_mLSP_325 ,
+    # T1tttt_2J_mGl_1500_mLSP_100,
+    # T2tt_2J_mStop_850_mLSP_100 ,
+    # T1bbbb_2J_mGl_1500_mLSP_100,
+    # T1qqqq_2J_mGl_1000_mLSP_800, # 13
+    # ]
 
 elif (bx == "25ns"):
     samples = [ QCD30to50,    # 0
@@ -99,7 +124,7 @@ elif (bx == "50nsPU1"):
                # QCD600to800,  # 7
                #QCD800to1000] # 8
                ]
-selectedSample = samples[9]
+selectedSample = samples[8]
 
 
 # --------------------------------------------------------------------------------
@@ -132,7 +157,7 @@ if (bx == "25ns" or bx == "20PU25ns"):
 elif (bx == "50ns" or bx == "50nsPU1"):
     GT = 'MCRUN2_72_V4A::All' #GT = 'FALL1374_50V0'
 elif (bx == "AVE30BX50"):
-    GT = 'PHYS14_50_V1' #GT = 'PHY1474_STV4'
+    GT = 'MCRUN2_72_V4A::All' #GT = 'PHYS14_50_V1' #GT = 'PHY1474_STV4'
 
 print "\nProcessing sample :\t", selectedSample.name, "\nBeam BX scenario  :\t", bx, "\nGlobaltag         :\t", GT, "\n\n"
 if 'GlobalTag' in process.__dict__:
