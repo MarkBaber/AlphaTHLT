@@ -67,12 +67,7 @@ TString PF2Jet =  "dijetAvggt90";
 // output
 // ****************************************
 //TString outdir = "output/test/";
-//TString outdir = "output/23_04_15/";
-//TString outdir = "output/23_04_15_Ntuples_Bosh/";
-//TString outdir = "output/23_04_15_Job1/";
-//TString outdir = "output/23_04_15_Job2/";
-//TString outdir = "output/23_04_15_50nsWPEff/";
-TString outdir = "output/02_06_15_Test/";
+TString outdir = "output/03_06_15_TriggerRates/";
 
 TString fileSuffix;
 
@@ -339,10 +334,10 @@ void triggerTuple(){
   //selSampleStr = "test";
   
   //selSampleStr = "PU40bx25_HPUV_QCD";
-  selSampleStr = "PU40bx25_HCAL3_HPUV_QCD";
+  //selSampleStr = "PU40bx25_HCAL3_HPUV_QCD";
   //selSampleStr = "PU40bx50_HCAL3_HPUV_QCD";
 
-  //selSampleStr = "PU20bx25_HPUV_QCD";
+  selSampleStr = "PU20bx25_HPUV_QCD";
 
   // --------------------------------------------------------------------------------
 
@@ -387,7 +382,7 @@ void triggerTuple(){
   HLTHTAlphaTTrigger["PF5"] = std::make_pair( 400., 0.51 );
 
   // 2012 threshold
-  HLTHTAlphaTTrigger["2012PF1"] = std::make_pair( 200., 0.63 ); 
+  HLTHTAlphaTTrigger["2012PF1"] = std::make_pair( 200., 0.57 ); 
   //  HLTHTAlphaTTrigger["2012PF1"] = std::make_pair( 200., 0.60 );
   HLTHTAlphaTTrigger["2012PF2"] = std::make_pair( 250., 0.55 );
   HLTHTAlphaTTrigger["2012PF3"] = std::make_pair( 300., 0.53 );
@@ -491,20 +486,20 @@ void triggerTuple(){
   // SelectedTriggerMenues.push_back( "PFJ2StdTrigger");
   // SelectedTriggerMenues.push_back( "PFJ2DynTrigger");
   // SelectedTriggerMenues.push_back( "PFAveStdTrigger");
-  // SelectedTriggerMenues.push_back( "PFAveDynTrigger");
+  SelectedTriggerMenues.push_back( "PFAveDynTrigger");
   // SelectedTriggerMenues.push_back( "PF2012J2StdTrigger");
   // SelectedTriggerMenues.push_back( "PF2012J2DynTrigger");
   // SelectedTriggerMenues.push_back( "PF2012AveStdTrigger");
-  // SelectedTriggerMenues.push_back( "PF2012AveDynTrigger");
+  SelectedTriggerMenues.push_back( "PF2012AveDynTrigger");
 
   // SelectedTriggerMenues.push_back( "PFJ2StdTriggerNJet");
   // SelectedTriggerMenues.push_back( "PFJ2DynTriggerNJet");
   // SelectedTriggerMenues.push_back( "PFAveStdTriggerNJet");
-  // SelectedTriggerMenues.push_back( "PFAveDynTriggerNJet");
+  //SelectedTriggerMenues.push_back( "PFAveDynTriggerNJet");
   // SelectedTriggerMenues.push_back( "PF2012J2StdTriggerNJet");
   // SelectedTriggerMenues.push_back( "PF2012J2DynTriggerNJet");
   // SelectedTriggerMenues.push_back( "PF2012AveStdTriggerNJet");
-  // SelectedTriggerMenues.push_back( "PF2012AveDynTriggerNJet");
+  //SelectedTriggerMenues.push_back( "PF2012AveDynTriggerNJet");
 
 
 
@@ -1195,7 +1190,7 @@ void triggerTuple(){
 
   for (uint i = 0; i < selSampleStrs.size(); ++i){
       TString sample   = selSampleStrs[i];
-      if ( sample.Contains( "PU40bx50" ) ){ bx50 = true; std::cout << "Using low-lumi L1 thresholds\n"; }
+      if ( sample.Contains( "PU40bx50" ) || sample.Contains( "PU20bx25" ) ){ bx50 = true; std::cout << "Using low-lumi L1 thresholds\n"; }
 
 #ifdef ROOTFILE
       // Output files 
@@ -1955,7 +1950,7 @@ void endJob(){
     TH2* total         = (TH2*)cumulHist->GetTotalHistogram() ->Clone();
     TH2* totalCumul    = (TH2*)cumulHist->GetTotalHistogram() ->Clone();
 
-    // Uniform                                                                                                                              
+    // Uniform 
     reverseCumulative2D( passed, passedCumul, 1 );
     fillUniform2D( totalCumul, total->GetEntries() );
  
