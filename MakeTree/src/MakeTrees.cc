@@ -6,7 +6,7 @@
 // UNCOMMENT TO RUN ON RECO
 #define RECO
 // Remove isolated leptons from gen and HLT jets
-#define LEPTON_XCLEANING
+//#define LEPTON_XCLEANING
 // **************************************************
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
