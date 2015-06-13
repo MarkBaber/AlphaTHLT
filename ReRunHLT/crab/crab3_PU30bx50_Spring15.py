@@ -1,8 +1,8 @@
 from WMCore.Configuration import Configuration
 
-prodTag = "24May15"
-sampleN = 10   # 0 - 10
-jobName = "FALL1374_25V4_742_PU40bx25_HCAL3"
+prodTag = "13Jun15"
+sampleN = 0   # 0 - 10
+jobName = "SPR1574_STV1_752_PU30bx50"
 
 
 datasets = ['/QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8/RunIISpring15Digi74-AVE_30_BX_50ns_tsg_MCRUN2_74_V6-v1/GEN-SIM-RAW',
@@ -35,7 +35,7 @@ config.General.workArea = jobName + '_' + prodTag
 config.General.transferOutputs = True
 config.General.requestName = label
 config.section_('JobType')
-config.JobType.psetName = '../test/AlphaT_HLT_742V2_25ns.py'
+config.JobType.psetName = '../test/AlphaT_HLT_745_50ns_SPRING15.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.outputFiles = ['hltReRunResults.root']
 config.section_('Data')

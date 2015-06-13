@@ -2,7 +2,7 @@ from WMCore.Configuration import Configuration
 
 prodTag = "26May15v2"
 sampleN =  6  # 0 - 8
-jobName = "PHY1474_STV4_742_PU30bx50"
+jobName = "PHY1474_STV4_745_PU30bx50"
 signal = True
 
 datasets = {}
@@ -38,7 +38,7 @@ config.General.workArea = jobName + '_' + prodTag
 config.General.transferOutputs = True
 config.General.requestName = label
 config.section_('JobType')
-config.JobType.psetName = '../test/AlphaT_HLT_742V3_PHYS14_50ns.py'
+config.JobType.psetName = '../test/AlphaT_HLT_745_PHYS14_50ns.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.outputFiles = ['hltReRunResults.root']
 config.section_('Data')

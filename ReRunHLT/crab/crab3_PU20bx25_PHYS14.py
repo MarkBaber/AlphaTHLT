@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 prodTag = "07Jun15"
 sampleN =  0  # 0 - 8
-jobName = "PHY1474_STV4_742_PU20bx25"
+jobName = "PHY1474_STV4_745_PU20bx25"
 signal  = True
 datasets= {}
 
@@ -39,7 +39,7 @@ config.General.workArea = jobName + '_' + prodTag
 config.General.transferOutputs = True
 config.General.requestName = label
 config.section_('JobType')
-config.JobType.psetName = '../test/AlphaT_HLT_742V2_25ns_PHYS14.py'
+config.JobType.psetName = '../test/AlphaT_HLT_745_25ns_PHYS14.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.outputFiles = ['hltReRunResults.root']
 config.section_('Data')
