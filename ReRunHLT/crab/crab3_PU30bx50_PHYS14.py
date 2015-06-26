@@ -1,20 +1,25 @@
 from WMCore.Configuration import Configuration
 
-prodTag = "26May15v2"
-sampleN =  6  # 0 - 8
+prodTag = "26Jun15"
+sampleN =  0  # 0 - 8
 jobName = "PHY1474_STV4_745_PU30bx50"
 signal = True
 
 datasets = {}
 if signal:
-    datasets = {'T1bbbb_2J_mGl_1000_mLSP_900':'/SMS-T1bbbb_2J_mGl-1000_mLSP-900_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
-                'T1qqqq_2J_mGl_1000_mLSP_800':'/SMS-T1qqqq_2J_mGl-1000_mLSP-800_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v3/GEN-SIM-RAW',
-                'T1tttt_2J_mGl_1200_mLSP_800':'/SMS-T1tttt_2J_mGl-1200_mLSP-800_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v2/GEN-SIM-RAW',
-                'T1tttt_2J_mGl_1500_mLSP_100':'/SMS-T1tttt_2J_mGl-1500_mLSP-100_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
-                'T2tt_2J_mStop_650_mLSP_325' :'/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v2/GEN-SIM-RAW',
-                'T2tt_2J_mStop_500_mLSP_325' :'/SMS-T2tt_2J_mStop-500_mLSP-325_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v2/GEN-SIM-RAW',
-                'T2tt_2J_mStop_425_mLSP_325' :'/SMS-T2tt_2J_mStop-425_mLSP-325_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
+    datasets = {'DYJetsToMuMu':'/DYJetsToMuMu_PtZ-180_M-50_13TeV-madgraph/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
+                'TTbar':'/TT_Tune4C_13TeV-pythia8-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
                 }
+
+
+    # datasets = {'T1bbbb_2J_mGl_1000_mLSP_900':'/SMS-T1bbbb_2J_mGl-1000_mLSP-900_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
+    #             'T1qqqq_2J_mGl_1000_mLSP_800':'/SMS-T1qqqq_2J_mGl-1000_mLSP-800_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v3/GEN-SIM-RAW',
+    #             'T1tttt_2J_mGl_1200_mLSP_800':'/SMS-T1tttt_2J_mGl-1200_mLSP-800_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v2/GEN-SIM-RAW',
+    #             'T1tttt_2J_mGl_1500_mLSP_100':'/SMS-T1tttt_2J_mGl-1500_mLSP-100_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
+    #             'T2tt_2J_mStop_650_mLSP_325' :'/SMS-T2tt_2J_mStop-650_mLSP-325_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v2/GEN-SIM-RAW',
+    #             'T2tt_2J_mStop_500_mLSP_325' :'/SMS-T2tt_2J_mStop-500_mLSP-325_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v2/GEN-SIM-RAW',
+    #             'T2tt_2J_mStop_425_mLSP_325' :'/SMS-T2tt_2J_mStop-425_mLSP-325_Tune4C_13TeV-madgraph-tauola/Phys14DR-AVE30BX50_tsg_PHYS14_ST_V1-v1/GEN-SIM-RAW',
+    #             }
 else:
     datasets = {'QCD30to50'   :'/QCD_Pt-30to50_Tune4C_13TeV_pythia8/Phys14DR-AVE30BX50_tsg_castor_PHYS14_ST_V1-v2/GEN-SIM-RAW',
                 'QCD50to80'   :'/QCD_Pt-50to80_Tune4C_13TeV_pythia8/Phys14DR-AVE30BX50_tsg_castor_PHYS14_ST_V1-v1/GEN-SIM-RAW',
@@ -38,7 +43,7 @@ config.General.workArea = jobName + '_' + prodTag
 config.General.transferOutputs = True
 config.General.requestName = label
 config.section_('JobType')
-config.JobType.psetName = '../test/AlphaT_HLT_745_PHYS14_50ns.py'
+config.JobType.psetName = '../test/AlphaT_HLT_745_50ns_PHYS14.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.outputFiles = ['hltReRunResults.root']
 config.section_('Data')
