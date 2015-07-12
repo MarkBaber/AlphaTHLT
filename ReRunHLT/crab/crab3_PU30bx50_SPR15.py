@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 
-prodTag = "13Jun15"
-sampleN = 5   # 0 - 8
+prodTag = "12Jul15"
+sampleN = 0   # 0 - 8
 jobName = "SPR1574_STV1_752_PU30bx50"
 
 
