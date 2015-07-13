@@ -1,22 +1,16 @@
 AlphaTHLT
 =========
 
-Working with CMSSW_7_4_2
-
 Installation instructions:
 
 
 ```bash
-  cmsrel CMSSW_7_4_5
-  cd CMSSW_7_4_5/src
+  cmsrel CMSSW_7_4_6_patch2
+  cd CMSSW_7_4_6_patch2/src
   cmsenv
-  git cms-addpkg HLTrigger/Configuration
-  git cms-merge-topic cms-tsg-storm:hltUpdatesOnTopOf744_74X
-  git cms-checkdeps -A -a
-  scram b -j8
 
   git init
-  git clone git@github.com:MarkBaber/AlphaTHLT.git
+  git clone -b Run2_CMSSW_7_4_6_patch2 --single-branch git@github.com:MarkBaber/AlphaTHLT.git
 ```
 
 Latest frozen menues:
