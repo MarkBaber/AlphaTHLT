@@ -358,13 +358,18 @@ float calculateAlphaT( std::vector<float> *jetPT, std::vector<float> *jetPx, std
 
 
 // Returns all HT alphaT pairs
-std::vector<std::pair<float,float> > calculateDynamicAlphaTPairs( const std::vector<const reco::Candidate*>& jetColl, float dynamicJetThreshold){
+//std::vector<std::pair<float,float> > 
+void calculateDynamicAlphaTPairs( const std::vector<const reco::Candidate*>& jetColl, float dynamicJetThreshold,
+				  std::vector<float>& alphaTVec, std::vector<float>& HTVec){
 
   float currentHT(0);
   std::vector<float> jetPTNew;
   std::vector<float> jetPxNew;
   std::vector<float> jetPyNew;
-  std::vector<std::pair<float,float> > alphaTHTPairs;
+  //std::vector<std::pair<float,float> > alphaTHTPairs;
+
+  alphaTVec.clear();
+  HTVec.clear();
 
   bool firstJet(true);
   for ( std::vector<const reco::Candidate*>::const_iterator itr = jetColl.begin(); itr != jetColl.end(); ++itr ){
@@ -382,11 +387,14 @@ std::vector<std::pair<float,float> > calculateDynamicAlphaTPairs( const std::vec
     
     if (firstJet){firstJet = false; continue;} // Require two jets
     float aT = calculateAlphaT( &jetPTNew, &jetPxNew, &jetPyNew, 0 );
-    alphaTHTPairs.push_back( std::make_pair( aT, currentHT ) );
+  
+    alphaTVec.push_back( aT );
+    HTVec.push_back( currentHT );
+    //alphaTHTPairs.push_back( std::make_pair( aT, currentHT ) );
 
   }
 
-  return alphaTHTPairs;
+  //return alphaTHTPairs;
 }
 
 

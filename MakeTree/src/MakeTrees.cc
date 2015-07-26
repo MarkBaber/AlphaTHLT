@@ -255,6 +255,11 @@ class MakeTrees : public edm::EDAnalyzer {
     float dynamicJetThreshold;
     std::vector<std::pair<float,float> > genAk4DynamicAlphaTHT40;
     std::vector<std::pair<float,float> > hltAk4PFDynamicAlphaTHT40;
+    std::vector<float> genAk4DynamicAlphaT40;
+    std::vector<float> genAk4DynamicHT40;
+    std::vector<float> hltAk4PFDynamicAlphaT40;
+    std::vector<float> hltAk4PFDynamicHT40;
+
   //    std::vector<std::pair<float,float> > recoAk4PFDynamicAlphaTHT40;
 
 
@@ -585,6 +590,12 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // Dynamic AlphaT, HT
     tree->Branch("genAk4_DynamicAlphaTHT40",    "std::vector<std::pair<float,float>>", &genAk4DynamicAlphaTHT40);
     tree->Branch("hltAk4PF_DynamicAlphaTHT40",  "std::vector<std::pair<float,float>>", &hltAk4PFDynamicAlphaTHT40);
+
+    tree->Branch("genAk4_DynamicAlphaT40",   "std::vector<float>", &genAk4DynamicAlphaT40);
+    tree->Branch("genAk4_DynamicHT40",       "std::vector<float>", &genAk4DynamicHT40);
+    tree->Branch("hltAk4PF_DynamicAlphaT40", "std::vector<float>", &hltAk4PFDynamicAlphaT40);
+    tree->Branch("hltAk4PF_DynamicHT40",     "std::vector<float>", &hltAk4PFDynamicHT40);
+
     //tree->Branch("recoAk4PF_DynamicAlphaTHT40", "std::vector<std::pair<float,float>>", &recoAk4PFDynamicAlphaTHT40);
 
 
@@ -1521,8 +1532,13 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // recoAk4PFAlphaTHT40           = calculateAlphaTHT( recoAk4PF,   40.);
 
     // Dynamic HT and AlphaT 
-    genAk4DynamicAlphaTHT40    = calculateDynamicAlphaTPairs( genAk4,    dynamicJetThreshold );
-    hltAk4PFDynamicAlphaTHT40  = calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold );
+    // genAk4DynamicAlphaTHT40    = calculateDynamicAlphaTPairs( genAk4,    dynamicJetThreshold );
+    // hltAk4PFDynamicAlphaTHT40  = calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold );
+
+    calculateDynamicAlphaTPairs( genAk4, dynamicJetThreshold, genAk4DynamicAlphaT40, genAk4DynamicHT40 );
+    calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold, hltAk4PFDynamicAlphaT40, hltAk4PFDynamicHT40 );
+
+
     //    recoAk4PFDynamicAlphaTHT40 = calculateDynamicAlphaTPairs( recoAk4PF, dynamicJetThreshold );
 
 
