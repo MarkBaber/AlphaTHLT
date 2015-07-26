@@ -59,7 +59,7 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     # Gen particles                           
     MakeGenParticles          = cms.bool( True ),
     srcGenParticles           = cms.InputTag( "prunedGenParticles"),
-    genElectronMinPt          = cms.double( 20. ),                           
+    genElectronMinPt          = cms.double( 20. ), 
     genElectronMaxEta         = cms.double( 2.5 ),                           
     genMuonMinPt              = cms.double( 10. ),                           
     genMuonMaxEta             = cms.double( 2.5 ),                           
@@ -70,7 +70,8 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
     # HLT jets
     srcHLTAk4PF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
-    srcHLTAk4Calo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")),                           
+    srcHLTAk4Calo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrected","","")), 
+    srcHLTAk4CaloID        = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")), 
     srcHLTAk4CaloNoFastJet = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassedNoFastJet","","")),                           
 #    srcHLTAk4PF     = cms.VInputTag(cms.InputTag("hltAntiKT4PFJets","","")),                           
 #    srcHLTAk4PFNoPU = cms.VInputTag(cms.InputTag("hltAntiKT4PFJetsNoPU","","")),                           

@@ -8,8 +8,8 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.maxEvents = cms.untracked.PSet(
-   input = cms.untracked.int32(-1)
-#   input = cms.untracked.int32(1000)
+#   input = cms.untracked.int32(-1)
+   input = cms.untracked.int32(1000)
 )
 
 # --------------------------------------------------------------------------------
@@ -17,7 +17,8 @@ process.maxEvents = cms.untracked.PSet(
 #bx = "25ns"
 #bx = "50nsPU1"
 #bx = "50ns"
-bx = "20PU25ns"
+#bx = "20PU25ns"
+bx = "40PU25ns"
 #bx = "AVE30BX50"
 
 
@@ -32,6 +33,9 @@ elif (bx == "50nsPU1"):
     pass
 elif (bx == "20PU25ns"):
     from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
+    pass
+elif (bx == "40PU25ns"):
+    from AlphaTHLT.MakeTree.samples._74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3_25Jul15_cfi import *
     pass
 else:
     print "Error: Bunch spacing '", bx, "' not recognised\n"
@@ -56,7 +60,7 @@ if (bx == "AVE30BX50"):
                # T2tt_2J_mStop_650_mLSP_325,
                # T1tttt_2J_mGl_1200_mLSP_800,
                ]
-elif (bx == "20PU25ns"):
+elif (bx == "20PU25ns" or bx == "40PU25ns"):
     samples = [QCD30to50,    # 0
                QCD50to80,    # 1
                QCD80to120,   # 2
@@ -152,7 +156,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 # override the GlobalTag, connection string and pfnPrefix                                                                                  
 GT = ""
 
-if (bx == "25ns" or bx == "20PU25ns"):
+if (bx == "25ns" or bx == "20PU25ns" or bx == "40PU25ns"):
     GT = 'MCRUN2_72_V3A::All' #GT = 'PHY1474_25V4'
 elif (bx == "50ns" or bx == "50nsPU1"):
     GT = 'MCRUN2_72_V4A::All' #GT = 'FALL1374_50V0'
@@ -197,7 +201,9 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process, path = 'p', hltProcess = 'HLT2') #,outputModule = 'out')
 
 
+process.RemovePileUpDominatedEvents = cms.EDFilter("RemovePileUpDominatedEvents")
 
 process.p1 = cms.Path(
+      process.RemovePileUpDominatedEvents*
       process.MakeTrees
       )
