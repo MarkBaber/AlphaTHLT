@@ -6,7 +6,7 @@ Installation instructions:
 
 ```bash
   cmsrel CMSSW_7_4_7
-  cd CMSSW_7_4_7_patch2/src
+  cd CMSSW_7_4_7/src
   cmsenv
   git cms-addpkg HLTrigger/Configuration
   git cms-merge-topic cms-tsg-storm:hltUpdatesOnTopOf745plusEpsilon_74X
