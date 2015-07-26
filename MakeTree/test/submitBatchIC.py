@@ -170,7 +170,7 @@ def main():
         tempShText +=     "export FILENAME=\""  + outputROOTName + "\"\n\n"
 
         tempShText +=     "# IC Batch Job Script\n"
-        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_4_5/src\"\n"
+        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_4_7/src\"\n"
         tempShText +=     "cd /home/hep/mb1512/$CMSSW_PROJECT_SRC\n\n"
 
         tempShText +=     "# source cms stuff\n"
