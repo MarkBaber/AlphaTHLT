@@ -1,8 +1,8 @@
 from WMCore.Configuration import Configuration
 
-prodTag = "25Jul15"
-sampleN = 0   # 0 - 8
-jobName = "74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3"
+prodTag = "27Jul15"
+sampleN = 8   # 0 - 8
+jobName = "HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3"
 
 
 datasets = ['/QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8/RunIISpring15Digi74-AVE_40_BX_25ns_tsg_MCRUN2_74_V7-v1/GEN-SIM-RAW',    #4,970,341

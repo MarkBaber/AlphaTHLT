@@ -53205,7 +53205,9 @@ _customInfo['inputFiles'][False] = "file:RelVal_Raw_GRun_MC.root"
 _customInfo['maxEvents' ]=  100
 _customInfo['globalTag' ]= "74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0"
 #_customInfo['inputFile' ]=  ['/store/mc/RunIISpring15Digi74/QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8/GEN-SIM-RAW/AVE_40_BX_25ns_tsg_MCRUN2_74_V7-v1/00000/18003061-15F1-E411-8C78-0025905C3D96.root']
-_customInfo['inputFile' ]=  ['file:/afs/cern.ch/user/m/mbaber/AlphaTHLT/CMSSW_7_4_7/src/AlphaTHLT/ReRunHLT/test/MyOutputFile.root']
+#_customInfo['inputFile' ]=  ['file:/afs/cern.ch/user/m/mbaber/AlphaTHLT/CMSSW_7_4_7/src/AlphaTHLT/ReRunHLT/test/MyOutputFile.root']
+_customInfo['inputFile' ]=  ['/store/mc/Phys14DR/SMS-T1tttt_2J_mGl-1200_mLSP-800_Tune4C_13TeV-madgraph-tauola/GEN-SIM-RAW/AVE30BX50_tsg_PHYS14_ST_V1-v2/00000/16584FB9-6F97-E411-A9B1-00266CFAEA48.root']
+
 _customInfo['realData'  ]=  False
 from HLTrigger.Configuration.customizeHLTforALL import customizeHLTforAll
 process = customizeHLTforAll(process,_customInfo)
