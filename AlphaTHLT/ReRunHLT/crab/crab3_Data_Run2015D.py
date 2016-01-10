@@ -38,6 +38,7 @@ config.Data.inputDataset = dataset
 config.Data.publication  = False
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5
+config.Data.lumiMask    = 'Selected_Trigger_Runs.JSON'
 #config.Data.totalUnits = 1
 config.section_('User')
 config.section_('Site')
