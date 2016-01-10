@@ -59454,10 +59454,14 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
        # HLT 
        'keep recoMuons_hltMuons_*_*',
 
-       'keep recoPFJets_hltAK4PFJets*_*_*',
+       'keep recoPFJets_hltAK4PFJets_*_*',
+       'keep recoPFJets_hltAK4PFJetsCorrected_*_*',
        'drop recoPFJets_hltAK4PFJetsReg_*_*',
        'drop recoPFJets_hltAK4PFJetsForTaus_*_*',
-       'keep recoCaloJets_hltAK4CaloJets*_*_*',
+       'drop recoPFJets_hltAK4PFJetsForTaus_*_*',
+       'keep recoCaloJets_hltAK4CaloJetsCorrectedIDPassed*_*_*',
+
+
        # RECO 
        'keep *_ak4PFJets*_*_*',
        'keep *_ak4CaloJets*_*_*',
