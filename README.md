@@ -5,21 +5,25 @@ Installation instructions:
 
 
 ```bash
-  cmsrel CMSSW_7_4_8_patch1
-  cd CMSSW_7_4_8_patch1/src
-  cmsenv
-  git cms-addpkg HLTrigger/Configuration
-  scram build
-  cd HLTrigger/Configuration/test
-  ./cmsDriver.csh   
+cmsrel CMSSW_8_0_3_patch1
+cd CMSSW_8_0_3_patch1/src
+cmsenv
+rehash
+
+git cms-init
+git cms-addpkg HLTrigger/Configuration
+git cms-addpkg L1Trigger/L1TCalorimeter L1Trigger/L1TMuon L1Trigger/L1TGlobal
+git cms-merge-topic -u 13704
+git cms-merge-topic -u 13767
+git cms-merge-topic -u cms-tsg-storm:HLTinApril80X
+git cms-merge-topic -u 13809
+git cms-merge-topic -u cms-tsg-storm:L1T_externals_for_803
+
+git cms-checkdeps -A -a
+scram b -j 4
+cmsenv
+rehash
 
   git init
-  git clone -b Run2_CMSSW_7_4_8_patch1 --single-branch git@github.com:MarkBaber/AlphaTHLT.git
+  git clone -b Run2_CMSSW_8_0_3_patch1 --single-branch git@github.com:MarkBaber/AlphaTHLT.git
 ```
-
-Data: Taken from HLT_50ns_5e33_v3_cff.py
-
-
-Latest frozen menues:
-https://twiki.cern.ch/twiki/bin/viewauth/CMS/ConfDB740#Frozen_menus
-
