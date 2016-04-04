@@ -134,11 +134,8 @@ selectedSample = samples[8]
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
-
-
-#                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ), 
-                             fileNames = selectedSample.files,
-
+                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ), 
+#                              fileNames = selectedSample.files,
 #                             fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MCRUN2_72_V3A_74X_PU40bx25/TT_Tune4C_13TeV-pythia8-tauola/crab_TT/150322_224937/0000/hltReRunResults_1.root')
 
 )
@@ -153,27 +150,27 @@ process.TFileService = cms.Service("TFileService",
 # --------------------------------------------------------------------------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
-# override the GlobalTag, connection string and pfnPrefix                                                                                  
-GT = ""
+# # override the GlobalTag, connection string and pfnPrefix                                                                                  
+# GT = ""
 
-if (bx == "25ns" or bx == "20PU25ns" or bx == "40PU25ns"):
-    GT = 'MCRUN2_72_V3A::All' #GT = 'PHY1474_25V4'
-elif (bx == "50ns" or bx == "50nsPU1"):
-    GT = 'MCRUN2_72_V4A::All' #GT = 'FALL1374_50V0'
-elif (bx == "AVE30BX50"):
-    GT = 'MCRUN2_72_V4A::All' #GT = 'PHYS14_50_V1' #GT = 'PHY1474_STV4'
+# if (bx == "25ns" or bx == "20PU25ns" or bx == "40PU25ns"):
+#     GT = 'MCRUN2_72_V3A::All' #GT = 'PHY1474_25V4'
+# elif (bx == "50ns" or bx == "50nsPU1"):
+#     GT = 'MCRUN2_72_V4A::All' #GT = 'FALL1374_50V0'
+# elif (bx == "AVE30BX50"):
+#     GT = 'MCRUN2_72_V4A::All' #GT = 'PHYS14_50_V1' #GT = 'PHY1474_STV4'
 
-print "\nProcessing sample :\t", selectedSample.name, "\nBeam BX scenario  :\t", bx, "\nGlobaltag         :\t", GT, "\n\n"
-if 'GlobalTag' in process.__dict__:
-    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = GT)
-    process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
-    process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-    for pset in process.GlobalTag.toGet.value():
-        pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-    # fix for multi-run processing                                 
-    process.GlobalTag.RefreshEachRun   = cms.untracked.bool( False )
-    process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+# print "\nProcessing sample :\t", selectedSample.name, "\nBeam BX scenario  :\t", bx, "\nGlobaltag         :\t", GT, "\n\n"
+# if 'GlobalTag' in process.__dict__:
+#     from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
+#     process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = GT)
+#     process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
+#     process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+#     for pset in process.GlobalTag.toGet.value():
+#         pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
+#     # fix for multi-run processing                                 
+#     process.GlobalTag.RefreshEachRun   = cms.untracked.bool( False )
+#     process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
 # --------------------------------------------------------------------------------
 
@@ -201,9 +198,9 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process, path = 'p', hltProcess = 'HLT2') #,outputModule = 'out')
 
 
-process.RemovePileUpDominatedEvents = cms.EDFilter("RemovePileUpDominatedEvents")
+#process.RemovePileUpDominatedEvents = cms.EDFilter("RemovePileUpDominatedEvents")
 
 process.p1 = cms.Path(
-      process.RemovePileUpDominatedEvents*
+      #process.RemovePileUpDominatedEvents*
       process.MakeTrees
       )

@@ -2,7 +2,7 @@
 
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process( "TEST" )
+process = cms.Process( "HLT2" )
 
 process.HLTConfigVersion = cms.PSet(
   tableName = cms.string('/dev/CMSSW_8_0_0/GRun/V43')
@@ -59691,3 +59691,103 @@ process = customizeHLTforAll(process,"GRun",_customInfo)
 from HLTrigger.Configuration.customizeHLTforCMSSW import customizeHLTforCMSSW
 process = customizeHLTforCMSSW(process,"GRun")
 
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------------------------
+
+
+
+process.hltOutput = cms.OutputModule( "PoolOutputModule",
+    fileName = cms.untracked.string( "hltReRunResults.root" ),
+    fastCloning = cms.untracked.bool( False ),
+    outputCommands = cms.untracked.vstring( 'drop *',
+
+        # NVTX 
+        'keep PileupSummaryInfos_*_*_*',
+
+        # GEN 
+        'keep GenEventInfoProduct_*_*_*',
+        'keep *_prunedGenParticles_*_*',
+        #        'keep *_*_GenParticleFilter_*', 
+        'keep recoGenJets_*GenJets_*_HLT2',
+
+        'keep *_genMetCalo_*_*',
+        'keep *_genMetCaloAndNonPrompt_*_*',
+        'keep *_genMetTrue_*_*',
+
+       #'keep *_hlt*_*_HLT2', 
+       #'keep *_*_*_HLT2', 
+       'drop *_*Digi*_*_',
+       'drop *_mix_*_*',
+
+        # UCT 
+       #'keep l1extra*_*_*_*',
+
+
+       # HLT 
+       'keep recoPFJets_hltAK4PFJetsCorrected*_*_*',
+       'drop recoPFJets_hltAK4PFJetsReg_*_*',
+       'drop recoPFJets_hltAK4PFJetsForTaus_*_*',
+       'keep recoCaloJets_hltAK4CaloJetsCorrected*_*_*',
+
+       # # RECO 
+       # 'keep *_ak4PFJets*_*_*',
+       # 'keep *_ak4CaloJets*_*_*',
+       # 'keep *_fixedGridRho*_*_*',
+
+#       'keep triggerTriggerFilterObjectWithRefs_*_*_HLT2',
+#       'keep triggerTriggerFilterObjectWithRefs_*AlphaT*_*_HLT2',
+       'keep recoMETs_*_*_HLT2',
+       'drop recoMETs_*Rsq*_*_HLT2',                                            
+       'keep recoCaloMETs_*_*_HLT2',
+
+       'keep *_hltL1GtObjectMap_*_HLT2',
+       'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
+       'keep FEDRawDataCollection_source_*_HLT2',
+       'keep edmTriggerResults_*_*_HLT2',
+       'keep triggerTriggerEvent_*_*_HLT2',
+
+       'drop *_*_*_reHLT',
+    )
+)
+
+process.Output = cms.EndPath( process.hltOutput )
+
+process.HLTSchedule = cms.Schedule( process.HLTriggerFirstPath, 
+
+                                    process.HLT_PFHT200_v2, process.HLT_PFHT250_v2, 
+                                    process.HLT_PFHT300_v2, process.HLT_PFHT350_v3, 
+                                    process.HLT_PFHT400_v2, process.HLT_PFHT475_v2, 
+                                    process.HLT_PFHT600_v3, process.HLT_PFHT650_v3, 
+                                    process.HLT_PFHT800_v2, 
+
+                                    process.HLT_PFMET90_PFMHT90_IDTight_v2, 
+                                    process.HLT_PFMET100_PFMHT100_IDTight_v2, 
+                                    process.HLT_PFMET110_PFMHT110_IDTight_v2, 
+                                    process.HLT_PFMET120_PFMHT120_IDTight_v2, 
+                                    
+                                    process.HLT_PFHT200_PFAlphaT0p51_v2, 
+                                    process.HLT_PFHT200_DiPFJetAve90_PFAlphaT0p57_v2, process.HLT_PFHT200_DiPFJetAve90_PFAlphaT0p63_v2,
+                                    process.HLT_PFHT250_DiPFJetAve90_PFAlphaT0p55_v2, process.HLT_PFHT250_DiPFJetAve90_PFAlphaT0p58_v2,
+                                    process.HLT_PFHT300_DiPFJetAve90_PFAlphaT0p53_v2, process.HLT_PFHT300_DiPFJetAve90_PFAlphaT0p54_v2,
+                                    process.HLT_PFHT350_DiPFJetAve90_PFAlphaT0p52_v2, process.HLT_PFHT350_DiPFJetAve90_PFAlphaT0p53_v2,
+                                    process.HLT_PFHT400_DiPFJetAve90_PFAlphaT0p51_v2, process.HLT_PFHT400_DiPFJetAve90_PFAlphaT0p52_v2, 
+                                 
+
+                                 process.HLTriggerFinalPath,
+
+                                 process.Output )
+
+
+
+# Schedule definition                                                           
+process.schedule = cms.Schedule()
+process.schedule.extend(process.HLTSchedule)
