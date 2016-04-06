@@ -7,7 +7,7 @@
 // Remove isolated leptons from gen and HLT jets
 //#define LEPTON_XCLEANING
 // **************************************************
-
+#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -53,7 +53,6 @@
 
 #include "DataFormats/METReco/interface/GenMET.h" 
 
-
 // Custom modules
 #include "AlphaTHLT/Core/interface/AlphaT.h"
 #include "AlphaTHLT/Core/interface/JetMatch.h"
@@ -78,15 +77,11 @@ class MakeTrees : public edm::EDAnalyzer {
 		   std::map<TString,std::vector<Float_t>* >& eta,
 		   std::map<TString,std::vector<Float_t>* >& phi);
 
-    std::vector< const reco::Candidate*> skimJets(const std::vector<const reco::Candidate*>& inJets, 
-						  double minPt, double minEta, double maxEta);
-
-
+    std::vector< const reco::Candidate*> skimJets(const std::vector<const reco::Candidate*>& inJets, double minPt, double minEta, double maxEta);
 
     float leadL1GenDeltaR( const std::vector<const reco::Candidate*>& gctCen, const std::vector<const reco::Candidate*>& gctFor, 
 			   const std::vector<const reco::Candidate*>& genAk4);
     float leadHLTGenDeltaR( const std::vector<const reco::Candidate*>& hltAk4, const std::vector<const reco::Candidate*>& genAk4);
-
 
     void   lepJetDeltaR( std::vector<Float_t>* leptonEta, std::vector<Float_t>* leptonPhi, const std::vector<const reco::Candidate*>& jet,
                          std::vector<int>   &matchedJetIndexDeltaR, std::vector<float> &lepJetMinDeltaR );
@@ -382,9 +377,16 @@ class MakeTrees : public edm::EDAnalyzer {
   int nIsoElectrons;
   int nIsoMuons;
 
+  edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+
 };
 
 MakeTrees::MakeTrees(const edm::ParameterSet& pset){
+
+
+  triggerBits_ = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
+
+  //triggerBits_(consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("HLTResults")));
 
     // Initialize the ntuple builder
     edm::Service<TFileService> fs;
@@ -764,12 +766,10 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
       tree->Branch( path, &hltPathFired[ path ], path + "/b" );
     }
 
+    //HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT2"));
 
+    
 
-
-
-
-    HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT2"));
 
     srcUctMET_ = pset.getParameter<edm::InputTag>("srcUctMet");
     srcUctMht_ = pset.getParameter<edm::InputTag>("srcUctMht");
@@ -865,21 +865,21 @@ namespace {
     return output;
   }
 
-  // Turn a set of InputTags into a collection of candidate pointers.
-  std::vector<const reco::PFJet*> getPFCollections(const edm::Event& evt, const VInputTag& collections) {
-    std::vector<const reco::PFJet*> output;
-    // Loop over collections
-    for (size_t i = 0; i < collections.size(); ++i) {
-      edm::Handle<edm::View<reco::PFJet> > handle;
-      evt.getByLabel(collections[i], handle);
-      // Loop over objects in current collection
-      for (size_t j = 0; j < handle->size(); ++j) {
-	const reco::PFJet& object = handle->at(j);
-	output.push_back(&object);
-      }
-    }
-    return output;
-  }
+  // // Turn a set of InputTags into a collection of candidate pointers.
+  // std::vector<const reco::PFJet*> getPFCollections(const edm::Event& evt, const VInputTag& collections) {
+  //   std::vector<const reco::PFJet*> output;
+  //   // Loop over collections
+  //   for (size_t i = 0; i < collections.size(); ++i) {
+  //     edm::Handle<edm::View<reco::PFJet> > handle;
+  //     evt.getByLabel(collections[i], handle);
+  //     // Loop over objects in current collection
+  //     for (size_t j = 0; j < handle->size(); ++j) {
+  // 	const reco::PFJet& object = handle->at(j);
+  // 	output.push_back(&object);
+  //     }
+  //   }
+  //   return output;
+  // }
 
   void getValue(const edm::Event& evt, const edm::InputTag& tag, Float_t& pt, Float_t& phi) {
 	edm::Handle<edm::View<reco::Candidate> > handle;
@@ -1095,41 +1095,52 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 
 
-
-
-  // ------------------------------------------------------------------------------------------------------------------------
-  // ------------------------------------------------------------------------------------------------------------------------
-
-  edm::Handle<edm::TriggerResults> hltresults;
-  iEvent.getByLabel(HLTResultsTag, hltresults);
-  
-  // Get the PAT TriggerEvent
-  edm::Handle< pat::TriggerEvent > triggerEvent;
-  iEvent.getByLabel( "patTriggerEvent", triggerEvent );
-
-  
-
-
-  // Get a vector of all HLT paths
-  std::vector<pat::TriggerPath> const* paths = triggerEvent->paths();
-  
-  // Find the full label of the chosen HLT path (i.e. with the version number)
-  std::string full_name;
-
-
-  // Iterate through paths run
-  // ------------------------------------------------------------
-  for (unsigned i = 0; i < paths->size(); ++i) {
-    std::string name = paths->at(i).name();
-    //std::cout << name << "\n";
-
-
-    if ( hltPathFired.find( name ) != hltPathFired.end() ){
-      //      std::cout << name << " found. Fired = " << paths->at(i).wasAccept() << "\n";
-      hltPathFired[ name ] = paths->at(i).wasAccept();
+    edm::Handle<edm::TriggerResults> triggerBits;
+    iEvent.getByToken(triggerBits_, triggerBits);
+    
+    const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+    std::cout << "\n === TRIGGER PATHS === " << std::endl;
+    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
+      std::cout << "Trigger " << names.triggerName(i) << ", prescale " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
     }
 
-  }
+
+
+
+
+  // ------------------------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------------------------
+
+  // edm::Handle<edm::TriggerResults> hltresults;
+  // iEvent.getByLabel(HLTResultsTag, hltresults);
+  
+  // // Get the PAT TriggerEvent
+  // edm::Handle< pat::TriggerEvent > triggerEvent;
+  // iEvent.getByLabel( "patTriggerEvent", triggerEvent );
+
+  
+
+
+  // // Get a vector of all HLT paths
+  // std::vector<pat::TriggerPath> const* paths = triggerEvent->paths();
+  
+  // // Find the full label of the chosen HLT path (i.e. with the version number)
+  // std::string full_name;
+
+
+  // // Iterate through paths run
+  // // ------------------------------------------------------------
+  // for (unsigned i = 0; i < paths->size(); ++i) {
+  //   std::string name = paths->at(i).name();
+  //   //std::cout << name << "\n";
+
+
+  //   if ( hltPathFired.find( name ) != hltPathFired.end() ){
+  //     //      std::cout << name << " found. Fired = " << paths->at(i).wasAccept() << "\n";
+  //     hltPathFired[ name ] = paths->at(i).wasAccept();
+  //   }
+
+  // }
 
 
   // ------------------------------------------------------------------------------------------------------------------------
@@ -1153,7 +1164,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     std::vector<const reco::Candidate*> hltAk4PFForUnskimmed            = getCollections( iEvent, srcHLTAk4PF );
     // std::vector<const reco::Candidate*> recoAk4CaloForUnskimmed         = getCollections( iEvent, srcAk4Calo );
     // std::vector<const reco::Candidate*> recoAk4PFForUnskimmed           = getCollections( iEvent, srcAk4PF   );
-
 
  
     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
@@ -1219,8 +1229,8 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     	double genParticleEta = genParticle.p4().eta();
     	double genParticlePhi = genParticle.p4().phi();
 
-    	// Electron
-    	if(TMath::Abs(genParticle.pdgId()) == 11){
+
+    	if(TMath::Abs(genParticle.pdgId()) == 11){    	// Electron
     	  if ( (genParticlePt >= genElectronMinPt) && (TMath::Abs(genParticleEta) <= genElectronMaxEta) ){
     	    genElectronPt ->push_back( genParticlePt  );
     	    genElectronEta->push_back( genParticleEta );
@@ -1230,8 +1240,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 	    selLeptonIndices.push_back( particleIndex );
     	  }
     	} // End lepton requirement
-    	// Muon
-    	if(TMath::Abs(genParticle.pdgId()) == 13){
+    	else if(TMath::Abs(genParticle.pdgId()) == 13){ // Muon
     	  if ( (genParticlePt >= genMuonMinPt) && (TMath::Abs(genParticleEta) <= genMuonMaxEta) ){
     	    genMuonPt ->push_back( genParticlePt  );
    	    genMuonEta->push_back( genParticleEta );
@@ -1241,9 +1250,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 	    selLeptonIndices.push_back( particleIndex );
     	  }
     	} // End Muon requirement
-
-    	// Photon
-    	if(TMath::Abs(genParticle.pdgId()) == 22){
+    	else if(TMath::Abs(genParticle.pdgId()) == 22){ // Photon
     	  if ( (genParticlePt >= genPhotonMinPt) && (TMath::Abs(genParticleEta) <= genPhotonMaxEta) ){
     	    genPhotonPt ->push_back( genParticlePt  );
    	    genPhotonEta->push_back( genParticleEta );
@@ -1293,115 +1300,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // std::cout << "\nAfter cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
     // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
 #endif
-
-
-    // std::vector<int>   matchedGenJetIndexDeltaR, matchedHLTJetIndexDeltaR;
-    // std::vector<float> lepGenJetMinDeltaR,    lepHLTJetMinDeltaR;
-
-    // if (genMuonVeto){
-
-    //   lepJetDeltaR( genMuonEta, genMuonPhi, genJet4Unskimmed,   matchedGenJetIndexDeltaR, lepGenJetMinDeltaR );
-    //   lepJetDeltaR( genMuonEta, genMuonPhi, hltAk4PFUnskimmed, matchedHLTJetIndexDeltaR, lepHLTJetMinDeltaR );
-
-    //   for (uint i = 0; i < matchedGenJetIndexDeltaR.size(); ++i){
-
-    // 	int genIndex = matchedGenJetIndexDeltaR[i];
-    // 	if (genIndex == -1){ continue; }
-
-    // 	// std::cout << "( " << genAk4.at(index)->eta() << ", " << genAk4.at(index)->phi() << " )\t" 
-    // 	// 	  << "( " << (*genMuonEta)[i]        << ", " << (*genMuonPhi)[i]        << " )\t"
-    // 	// 	  << lepJetMinDeltaR[i] << "\n";
-	
-    // 	float deltaR = lepGenJetMinDeltaR[i];
-    // 	if ( deltaR < 0.3 ){ // Lepton matched to genJet
-
-    // 	  float deltaPtGen = genJet4Unskimmed.at(genIndex)->pt() - (*genMuonPt)[i]; 
-
-    // 	  // reco::Candidate*               jet;
-    // 	  // reco::Candidate::LorentzVector totalP4 = jet->p4();
-  
-    // 	  // // Get muon from genParticles with index in vector
-    // 	  // jetP4 -= (*muon)->p4();
-    // 	  // jet->setP4(totalP4);
-
-    //       if (deltaPtGen < 40.){ 
-    //         // Remove genjet 
-    // 	    //
-    // 	    //	    
-  
-    // 	    if (i < matchedHLTJetIndexDeltaR.size() ){ // Check whether HLT reconstructed lepton as jet
-    // 	      int hltIndex = matchedHLTJetIndexDeltaR[i];
-    // 	      if (hltIndex == -1){ continue; }	    
-
-    // 	      //genMuonMatchedGenMuonIndex.push_back( i );
-    // 	      genMuonMatchedGenMuonPt.push_back(  (*genMuonPt)[i] );
-    // 	      genMuonMatchedGenJetPt.push_back( genJet4Unskimmed.at(genIndex)->pt() );
-    // 	      genMuonMatchedHLTPFJetPt.push_back( hltAk4PFJetUnskimmed.at(hltIndex)->pt() );
-    // 	      genMuonMatchedHLTPFJetMuonEF.push_back( hltAk4PFJetUnskimmed.at(hltIndex)->muonEnergyFraction() );
-    // 	      genMuonMatchedHLTPFJetElectronEF.push_back(hltAk4PFJetUnskimmed.at(hltIndex)->electronEnergyFraction() );
-	      
-    // 	      // //	      float deltaPtHLT = hltAk4PFUnskimmed.at(hltIndex)->pt() - (*genMuonPt)[i];
-    // 	      // float deltaPtHLT = hltAk4PFJetUnskimmed.at(hltIndex)->pt() - (*genMuonPt)[i];
-	      
-    // 	      // 	std::cout << "GEN:\n \tgenJetPt = " << genJet4Unskimmed.at(genIndex)->pt() 
-    // 	      // 		  << "\tGenMuonPt = " << (*genMuonPt)[i] 
-    // 	      // 		  << "\tdeltaPt = " << deltaPtGen 
-    // 	      // 		  << "\n";
-		
-    // 	      // 	std::cout << "\tGenJet( " << genJet4Unskimmed.at(genIndex)->eta() << ", " << genJet4Unskimmed.at(genIndex)->phi() << " )\t" 
-    // 	      // 		  << "GenMuon( " << (*genMuonEta)[i]                     << ", " << (*genMuonPhi)[i]        << " )\tdeltaR = "
-    // 	      // 		  << lepGenJetMinDeltaR[i] << "\n";
-		
-    // 	      // 	std::cout << "HLT:\n \thltJetPt = " << hltAk4PFJetUnskimmed.at(hltIndex)->pt() 
-    // 	      // 		  << "\tGenMuonPt = " << (*genMuonPt)[i] 
-    // 	      // 		  << "\tdeltaPt = " << deltaPtHLT << "\n"
-    // 	      // 		  << "\thltJet( " << hltAk4PFJetUnskimmed.at(hltIndex)->eta() 
-    // 	      // 		  << ", " << hltAk4PFJetUnskimmed.at(hltIndex)->phi() << " )\t" 
-    // 	      // 		  << "GenMuon( " << (*genMuonEta)[i]        << ", " << (*genMuonPhi)[i]        << " )\tdeltaR = "
-    // 	      // 		  << lepHLTJetMinDeltaR[i] << "\n"
-    // 	      // 		  << "\thltMuonPt = "   << hltAk4PFJetUnskimmed.at(hltIndex)->muonEnergy()*TMath::Sin(hltAk4PFJetUnskimmed.at(hltIndex)->theta())
-    // 	      // 		  << "\n\n"
-
-		
-    // 	      // 		  << "\thltJetEn  = "   << hltAk4PFJetUnskimmed.at(hltIndex)->energy() << "\n"
-    // 	      // 	          << "\thltMuonEn = "   << hltAk4PFJetUnskimmed.at(hltIndex)->muonEnergy()
-    // 	      // 		  << "\thltMuonEF = "   << hltAk4PFJetUnskimmed.at(hltIndex)->muonEnergyFraction() 
-    // 	      // 		  << "\thltMuonMult = " << hltAk4PFJetUnskimmed.at(hltIndex)->muonMultiplicity() << "\n"
-    // 	      // 	          << "\thltEleEn  = "   << hltAk4PFJetUnskimmed.at(hltIndex)->electronEnergy()
-    // 	      // 		  << "\thltEleEF  = "   << hltAk4PFJetUnskimmed.at(hltIndex)->electronEnergyFraction() 
-    // 	      // 		  << "\thltEleMult  = " << hltAk4PFJetUnskimmed.at(hltIndex)->electronMultiplicity() 
-    // 	      // 	          << "\n\thltCHEn   = "   << hltAk4PFJetUnskimmed.at(hltIndex)->chargedHadronEnergy()
-    // 	      // 		  << "\thltCHEF   = "     << hltAk4PFJetUnskimmed.at(hltIndex)->chargedHadronEnergyFraction() 
-    // 	      // 		  << "\thltCHMult   = "   << hltAk4PFJetUnskimmed.at(hltIndex)->chargedHadronMultiplicity() 
-    // 	      // 	          // << "\n\thltCEMEn  = "   << hltAk4PFJetUnskimmed.at(hltIndex)->chargedEmEnergy()
-    // 	      // 		  // << "\thltCEMEF  = "     << hltAk4PFJetUnskimmed.at(hltIndex)->chargedEmEnergyFraction() 
-    // 	      // 	          << "\n\thltNHEn   = "   << hltAk4PFJetUnskimmed.at(hltIndex)->neutralHadronEnergy()
-    // 	      // 		  << "\thltNHEF   = "     << hltAk4PFJetUnskimmed.at(hltIndex)->neutralHadronEnergyFraction() 
-    // 	      // 		  << "\thltNHMult   = "   << hltAk4PFJetUnskimmed.at(hltIndex)->neutralHadronMultiplicity() 
-    // 	      // 	          << "\n\thltNEMEn  = "   << hltAk4PFJetUnskimmed.at(hltIndex)->neutralEmEnergy()
-    // 	      // 		  << "\thltNEMEF  = "     << hltAk4PFJetUnskimmed.at(hltIndex)->neutralEmEnergyFraction() 
-    // 	      // 		  << "\n";
-		
-    // 	      // 	std::cout << "\n\n";
-
-    // 	      // if (deltaPtHLT > 40.){
-    // 	      // 	// REMOVE ENERGY
-		
-    
-    // 	      // }
-    // 	      // else{
-    // 	      // 	// REMOVE JET
-    // 	      // }
-
-    // 	    }
-	    
-    // 	  }
-
-    // 	} // Matched lepton to jet
-
-    //   } // DeltaR loop
-
-    // }
 
 
 
@@ -1684,54 +1582,6 @@ MakeTrees::skimJets(const std::vector<const reco::Candidate*>& inputJets, double
 
 
 
-// std::vector <int>
-// MakeTrees::correctLeptonHLTJets(const std::vector<const reco::Candidate*>& inputJets,
-// 				std::vector <int> skimmedJetIndices,
-// 				std::vector<int> matchedGenJetIndexDeltaR, std::vector<float> lepGenJetMinDeltaR,
-// 				double maxDeltaR, double minPt, int& isoLepCount ){
-
-	  
-// 	    if (i < matchedHLTJetIndexDeltaR.size() ){ // Check whether HLT reconstructed lepton as jet
-// 	      int hltIndex = matchedHLTJetIndexDeltaR[i];
-// 	      if (hltIndex == -1){ continue; }	    
-	      
-// 	      float deltaPtHLT = hltAk4PFUnskimmed.at(hltIndex)->pt() - (*genMuonPt)[i];
-
-// 	      if (deltaPtHLT > minPt){
-// 		// REMOVE ENERGY
-		
-// 		std::cout << "GEN: " << genJet4Unskimmed.at(genIndex)->pt() << "\t" << (*genMuonPt)[i] << "\t" << deltaPtGen << "\n";
-		
-// 		std::cout << "( " << genJet4Unskimmed.at(genIndex)->eta() << ", " << genJet4Unskimmed.at(genIndex)->phi() << " )\t" 
-// 			  << "( " << (*genMuonEta)[i]                     << ", " << (*genMuonPhi)[i]        << " )\t"
-// 			  << lepGenJetMinDeltaR[i] << "\n";
-		
-// 		std::cout << "HLT: " << hltAk4PFUnskimmed.at(hltIndex)->pt() << "\t" 
-// 			  << (*genMuonPt)[i] << "\t" << deltaPtHLT << "\n";
-		
-// 		std::cout << "( " << hltAk4PFUnskimmed.at(hltIndex)->eta() << ", " << hltAk4PFUnskimmed.at(hltIndex)->phi() << " )\t" 
-// 			  << "( " << (*genMuonEta)[i]        << ", " << (*genMuonPhi)[i]        << " )\t"
-// 			  << lepHLTJetMinDeltaR[i] << "\n";
-// 		std::cout << "\n\n";
-    
-// 	      }
-// 	      else{
-// 		// REMOVE JET
-// 	      }
-// 	    }
-// 	  }
-//       }
-//     }
-
-
-
- 
-
-
-
-
-// }
-
 
 
 
@@ -1972,5 +1822,5 @@ MakeTrees::removeLeptonsFromJets( std::vector <const reco::Candidate*>& inputJet
 
 
  
-#include "FWCore/Framework/interface/MakerMacros.h"
+
 DEFINE_FWK_MODULE(MakeTrees);

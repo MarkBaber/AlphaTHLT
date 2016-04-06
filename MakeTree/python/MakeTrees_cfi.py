@@ -3,8 +3,11 @@ import FWCore.ParameterSet.Config as cms
 # General purpose tree maker
 MakeTrees = cms.EDAnalyzer("MakeTrees",
 
-    HLTResults = cms.untracked.InputTag("TriggerResults::HLT2"),
 
+    
+    HLTResults = cms.InputTag("TriggerResults","","HLT2"),
+
+                           
 
     #UCT inputs  
     #srcUctMht = cms.InputTag("caloStage1FinalDigis","", "L1TEMULATION"),
