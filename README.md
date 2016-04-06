@@ -27,3 +27,15 @@ rehash
   git init
   git clone -b Run2_CMSSW_8_0_3_patch1 --single-branch git@github.com:MarkBaber/AlphaTHLT.git
 ```
+
+-- Running jobs
+Submit grid jobs using the CRAB configuration files in: `AlphaTHLT/ReRunHLT/crab/`
+This will return the processed files to Imperial, edit as required to return to your area on the IC T2. The name of the basedirectory of the CRAB jobs is used as the key for the next step of processing.
+
+-- Creating sample files for processed files
+At Imperial exectute the command:
+```
+/home/hep/mb1512/.scripts/Jobs/getCRAB3Jobs.py <NAME_OF_CRABDIR>
+```
+
+-- Making trigger Ntuples
