@@ -59,3 +59,11 @@ You can browse files on the Tier-2 with the command:
   ```
   lcg-ls $DCACHE_SRM_ROOT/store/user/
   ```
+  Remove files with the command:
+  ```
+  lcg-del -l FILEPATH
+   ```
+   And remove empty directories with:
+    ```
+  lcg-del -a FILEPATH
+   ```
