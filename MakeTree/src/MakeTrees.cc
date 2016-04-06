@@ -1,8 +1,7 @@
-
 // **************************************************
 // Switches
 // **************************************************
-
+//#define SIMULATION
 // UNCOMMENT TO RUN ON RECO
 //#define RECO
 // Remove isolated leptons from gen and HLT jets
@@ -59,11 +58,7 @@
 #include "AlphaTHLT/Core/interface/AlphaT.h"
 #include "AlphaTHLT/Core/interface/JetMatch.h"
 
-TLorentzVector P4toTLV (reco::Particle::LorentzVector a){
-  return TLorentzVector( a.px(), a.py(), a.pz(), a.energy() );
-}
-
-
+TLorentzVector P4toTLV (reco::Particle::LorentzVector a){ return TLorentzVector( a.px(), a.py(), a.pz(), a.energy() ); }
 
 
 typedef std::vector<edm::InputTag> VInputTag;
@@ -111,9 +106,7 @@ class MakeTrees : public edm::EDAnalyzer {
 				  std::vector<float>& genLeptonMatchedHLTPFJetMuonEF ,
 				  std::vector<float>& genLeptonMatchedHLTPFJetElectronEF );
 
-
   void removeLeptonsFromJets( std::vector <const reco::Candidate*>& inputJets, std::vector<int> cleaningIndex );
-  
   
 
 
@@ -155,7 +148,6 @@ class MakeTrees : public edm::EDAnalyzer {
     edm::InputTag srcHLTMetPF_;
     edm::InputTag srcHLTMhtCalo_;
     edm::InputTag srcHLTMhtPF_;
-
 
 
     edm::InputTag srcGenParticles_;
@@ -390,7 +382,6 @@ class MakeTrees : public edm::EDAnalyzer {
   int nIsoElectrons;
   int nIsoMuons;
 
-
 };
 
 MakeTrees::MakeTrees(const edm::ParameterSet& pset){
@@ -398,8 +389,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // Initialize the ntuple builder
     edm::Service<TFileService> fs;
     tree = fs->make<TTree>("tree", "tree");
-
-
 
     lvl_.push_back("genAk4");
     lvl_.push_back("genAk4For");
@@ -419,7 +408,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     lvl_.push_back("gctCen");
     lvl_.push_back("gctFor");
     // lvl_.push_back("hltAk4PFNoPU");
-
 
 
     // ********************************************************************************
@@ -781,7 +769,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
 
-    HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT"));
+    HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT2"));
 
     srcUctMET_ = pset.getParameter<edm::InputTag>("srcUctMet");
     srcUctMht_ = pset.getParameter<edm::InputTag>("srcUctMht");
@@ -1081,12 +1069,14 @@ namespace {
 
 void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
+  NVTX = 0;
   
+#ifdef SIMULATION
   // Get NVTX from simulation
   edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
   iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
 
-  NVTX = 0;
+
   std::vector<PileupSummaryInfo>::const_iterator PVI;
   for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
     int BX = PVI->getBunchCrossing();
@@ -1101,7 +1091,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   std::auto_ptr<bool>   genInfoValid ( new bool( geninfo.isValid() && !geninfo->binningValues().empty()));
   std::auto_ptr<double> pthat (new double(*genInfoValid ? geninfo->binningValues()[0] : -1.));
   PThat = *pthat;
-
+#endif
 
 
 

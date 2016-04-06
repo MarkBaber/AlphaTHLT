@@ -161,7 +161,6 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 #     # fix for multi-run processing                                 
 #     process.GlobalTag.RefreshEachRun   = cms.untracked.bool( False )
 #     process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
-
 # --------------------------------------------------------------------------------
 
 
@@ -174,8 +173,6 @@ process.HLTJetProducer = cms.EDProducer('HLTJetProducer',
                                         HLTAk4Calojets = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
 )
 
-
-
 # Output module
 process.out = cms.OutputModule("PoolOutputModule",
                                fileName        = cms.untracked.string('file:patReRunResults.root'),
@@ -185,8 +182,7 @@ process.out = cms.OutputModule("PoolOutputModule",
 
 process.p = cms.Path()
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger( process, path = 'p', hltProcess = 'HLT2') #,outputModule = 'out')
-
+# switchOnTrigger( process, path = 'p', hltProcess = 'HLT2') #,outputModule = 'out')
 
 #process.RemovePileUpDominatedEvents = cms.EDFilter("RemovePileUpDominatedEvents")
 
