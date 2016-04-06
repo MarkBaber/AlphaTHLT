@@ -28,14 +28,24 @@ rehash
   git clone -b Run2_CMSSW_8_0_3_patch1 --single-branch git@github.com:MarkBaber/AlphaTHLT.git
 ```
 
--- Running jobs
+1. HLT emulation
+=========
+The first stage for trigger measurements is the remulation of the HLT using from CMSSW RAW datasets. This utilises configurations in `AlphaTHLT/ReRunHLT/test/` which are generated using the `hltGetConfiguration` command described in https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGlobalHLT.
+
+Running jobs
+------------
 Submit grid jobs using the CRAB configuration files in: `AlphaTHLT/ReRunHLT/crab/`
 This will return the processed files to Imperial, edit as required to return to your area on the IC T2. The name of the basedirectory of the CRAB jobs is used as the key for the next step of processing.
 
--- Creating sample files for processed files
+
+
+2. Making trigger Ntuples
+=========
+Trigger flat trees are made from processing of CMSSW Ntuples produced in the previous step.
+
+Creating sample files for processed files
+--
 At Imperial exectute the command:
 ```
 /home/hep/mb1512/.scripts/Jobs/getCRAB3Jobs.py <NAME_OF_CRABDIR>
 ```
-
--- Making trigger Ntuples
