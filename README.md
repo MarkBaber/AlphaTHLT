@@ -34,9 +34,10 @@ The first stage for trigger measurements is the remulation of the HLT using from
 
 Running jobs
 ------------
-Submit grid jobs using the CRAB configuration files in: `AlphaTHLT/ReRunHLT/crab/`
-This will return the processed files to Imperial, edit as required to return to your area on the IC T2. The name of the basedirectory of the CRAB jobs is used as the key for the next step of processing. You can submit your chosen configuration uisng the following example command:
-```crab submit crab3_Data_Run2015D.py```
+You can submit grid jobs using the CRAB configuration files in: `AlphaTHLT/ReRunHLT/crab/`. This will submit GRID jobs to process the trigger emulation, returning the processed files to Imperial, edit as required to return to your area on the Imperial Tier-2. The name of the basedirectory of the CRAB jobs is used as the key for the next step of processing. You can submit your chosen configuration uisng the following example command:
+  ```
+  crab submit crab3_Data_Run2015D.py
+  ```
 
 2. Making trigger Ntuples
 =========
@@ -45,11 +46,16 @@ Trigger flat trees are made from processing of CMSSW Ntuples produced in the pre
 Creating sample files for processed files
 --------------------
 At Imperial setup the grid environment and generate a GRID proxy in order to access the Tier-2:
-```
-source /vols/cms/grid/setup.sh
-voms-proxy-init --voms cms --valid 168:00
-```
+  ```
+  source /vols/cms/grid/setup.sh
+  voms-proxy-init --voms cms --valid 168:00
+  ```
 Then execute `getCRAB3Jobs.py` using the name of the CRAB basedirectory:
-```
-/home/hep/mb1512/.scripts/Jobs/getCRAB3Jobs.py <NAME_OF_CRABDIR>
-```
+  ```
+  /home/hep/mb1512/.scripts/Jobs/getCRAB3Jobs.py <NAME_OF_CRABDIR>
+  ```
+
+You can browse files on the Tier-2 with the command:
+  ```
+  lcg-ls $DCACHE_SRM_ROOT/store/user/
+  ```
