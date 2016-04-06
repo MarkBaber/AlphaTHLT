@@ -54,6 +54,9 @@ Then execute `getCRAB3Jobs.py` using the name of the CRAB basedirectory:
   ```
   /home/hep/mb1512/.scripts/Jobs/getCRAB3Jobs.py <NAME_OF_CRABDIR>
   ```
+This will automatically search through directories on the Tier-2 for all files associated with the CRAB job, producing CMSSW `cfi` files with links to all the processed files.
+
+
 
 You can browse files on the Tier-2 with the command:
   ```
