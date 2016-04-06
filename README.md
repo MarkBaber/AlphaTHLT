@@ -59,8 +59,12 @@ This will automatically search through directories on the Tier-2 for all files a
   cd ../../..
   scram b -j8
 ```
-
-
+Creating trigger Ntuples
+--------------------
+Trigger ntuples are produced by the configuration file `MakeTrees_cfg.py` in the directory `AlphaTHLT/MakeTree/test`. To run interactively use the command:
+```
+cmsRun MakeTrees_cfg.py
+```
 
 You can browse files on the Tier-2 with the command:
   ```
