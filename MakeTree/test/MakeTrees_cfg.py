@@ -15,35 +15,25 @@ process.maxEvents = cms.untracked.PSet(
 # --------------------------------------------------------------------------------
 # Select bx to process
 #bx = "25ns"
-#bx = "50nsPU1"
 #bx = "50ns"
 #bx = "20PU25ns"
-bx = "40PU25ns"
+#bx = "40PU25ns"
 #bx = "AVE30BX50"
+bx = "Data"
 
-
-if (bx == "25ns"):
-    from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15_cfi import * 
-elif (bx == "50ns"):
-    from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15_cfi import * 
-elif (bx == "AVE30BX50"):
-    from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU30bx50_26May15v2_cfi import *
-    pass
-elif (bx == "50nsPU1"):
-    pass
-elif (bx == "20PU25ns"):
-    from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
-    pass
-elif (bx == "40PU25ns"):
-    from AlphaTHLT.MakeTree.samples._74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3_25Jul15_cfi import *
-    pass
-else:
+if   (bx == "25ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15_cfi import * 
+elif (bx == "50ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15_cfi import * 
+elif (bx == "AVE30BX50"): from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU30bx50_26May15v2_cfi import *
+elif (bx == "20PU25ns"):  from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
+elif (bx == "40PU25ns"):  from AlphaTHLT.MakeTree.samples._74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3_25Jul15_cfi import *
+elif (bx =="Data"):       from AlphaTHLT.MakeTree.samples.Run2015D_03Apr16_cfi import *
+else:  
     print "Error: Bunch spacing '", bx, "' not recognised\n"
     exit(0)
 
-# Samples:
+# Samples: Specify which samples to ntuplise as defined in: AlphaT/MakeTree/python/samples
 # ----------------------------------------
-samples = []
+samples = [] # Container for sample PSets
 
 if (bx == "AVE30BX50"):
     samples = [QCD30to50,    # 0
@@ -128,14 +118,16 @@ elif (bx == "50nsPU1"):
                # QCD600to800,  # 7
                #QCD800to1000] # 8
                ]
-selectedSample = samples[8]
+elif (bx == "Data"):
+    samples = [HLTPhysics3]
+selectedSample = samples[0]
 
 
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ), 
-#                              fileNames = selectedSample.files,
+#                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ),  # Test on local file
+                             fileNames = selectedSample.files,                                  # Execute file from imported PSet
 #                             fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MCRUN2_72_V3A_74X_PU40bx25/TT_Tune4C_13TeV-pythia8-tauola/crab_TT/150322_224937/0000/hltReRunResults_1.root')
 
 )
@@ -144,8 +136,6 @@ process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 process.TFileService = cms.Service("TFileService",
                                    fileName = selectedSample.name 
 ) 
-
-
 
 # --------------------------------------------------------------------------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
@@ -188,7 +178,7 @@ process.HLTJetProducer = cms.EDProducer('HLTJetProducer',
 
 # Output module
 process.out = cms.OutputModule("PoolOutputModule",
-                               fileName = cms.untracked.string('file:patReRunResults.root'),
+                               fileName        = cms.untracked.string('file:patReRunResults.root'),
                                SelectEvents    = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
                                outputCommands  = cms.untracked.vstring('drop *')
                               )
