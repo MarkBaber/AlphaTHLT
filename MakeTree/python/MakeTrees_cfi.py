@@ -4,8 +4,6 @@ import FWCore.ParameterSet.Config as cms
 MakeTrees = cms.EDAnalyzer("MakeTrees",
 
 
-    
-    HLTResults = cms.InputTag("TriggerResults","","HLT2"),
 
                            
 
@@ -29,15 +27,13 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     srcS2GlobalMht = cms.InputTag("Stage2JetProducer","l1Stage2GlobalPUSMht"),
     srcS2GlobalJetCentral = cms.VInputTag(cms.InputTag("Stage2JetProducer","l1Stage2JetsGlobalPUS")),
 
-    #GCT inputs
-    # srcGctMht = cms.InputTag("l1extraParticles", "MHT"),
-    # srcGctMet = cms.InputTag("l1extraParticles", "MET"),
+    # ----------------------------------------
+    # Level -1
+    # ----------------------------------------
     srcGctMht = cms.InputTag("hltL1extraParticles", "MHT"),
     srcGctMet = cms.InputTag("hltL1extraParticles", "MET"),
-
     srcGctJetCentral = cms.VInputTag(cms.InputTag("hltL1extraParticles", "Central")),
     srcGctJetForward = cms.VInputTag(cms.InputTag("hltL1extraParticles", "Forward")),
-
     srcGctJetAll = cms.VInputTag(cms.InputTag("hltL1extraParticles", "Central"),cms.InputTag("hltL1extraParticles", "Forward")),
 
     #Gen inputs
@@ -69,17 +65,22 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     genPhotonMinPt            = cms.double( 25. ),                           
     genPhotonMaxEta           = cms.double( 2.5 ),                           
 
-
-
     # HLT jets
+    hltAk4CaloSrc          = cms.InputTag("hltAK4CaloJetsCorrected"),
+
+    
+    HLTResults = cms.InputTag("TriggerResults"),
+
+    #hltCaloMetSrc = cms.InputTag( "hltMet","","HLT2"),
+    hltCaloMetSrc = cms.InputTag( "hltMetClean"),  #","","HLT2"),
+
+    inputJetTag = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
+
+
     srcHLTAk4PF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
     srcHLTAk4Calo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrected","","")), 
     srcHLTAk4CaloID        = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")), 
     srcHLTAk4CaloNoFastJet = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassedNoFastJet","","")),                           
-#    srcHLTAk4PF     = cms.VInputTag(cms.InputTag("hltAntiKT4PFJets","","")),                           
-#    srcHLTAk4PFNoPU = cms.VInputTag(cms.InputTag("hltAntiKT4PFJetsNoPU","","")),                           
-#    srcHLTAk4Calo   = cms.VInputTag(cms.InputTag("hltCaloJetL1FastJetCorrected","","")),                           
-
 
     #Reco inputs
 #     srcCaloJet = cms.VInputTag(cms.InputTag("ak5CaloJets")),
@@ -107,10 +108,8 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     forJetMinEta = cms.double(3.0),
     forJetMaxEta = cms.double(5.0),
 
-
     # Dynamic HT, AlphaT low-jet pt threshold
     dynamicJetThreshold = cms.double(30.0),
-
 
     )
 

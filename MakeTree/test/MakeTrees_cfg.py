@@ -186,7 +186,11 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 
 #process.RemovePileUpDominatedEvents = cms.EDFilter("RemovePileUpDominatedEvents")
 
+
+process.content = cms.EDAnalyzer("EventContentAnalyzer")
+
 process.p1 = cms.Path(
       #process.RemovePileUpDominatedEvents*
+      #process.content *
       process.MakeTrees
       )

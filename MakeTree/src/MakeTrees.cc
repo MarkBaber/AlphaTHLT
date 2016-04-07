@@ -2,11 +2,13 @@
 // Switches
 // **************************************************
 //#define SIMULATION
-// UNCOMMENT TO RUN ON RECO
+//#define L1
 //#define RECO
 // Remove isolated leptons from gen and HLT jets
 //#define LEPTON_XCLEANING
 // **************************************************
+#include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -29,6 +31,11 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
+#include "DataFormats/METReco/interface/CaloMETCollection.h"
+
 // NVTX
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 // PAT trigger
@@ -161,7 +168,15 @@ class MakeTrees : public edm::EDAnalyzer {
     float L1Jet_DPhi;
 
 
-    VInputTag srcHLTAk4Calo;
+    //VInputTag srcHLTAk4Calo;
+    edm::EDGetTokenT<VInputTag> srcHLTAk4Calo;
+
+    edm::EDGetTokenT<edm::View<reco::CaloJetCollection> > hltAk4CaloCollection_;
+
+    edm::EDGetTokenT<edm::View< reco::MET> > hltCaloMetCollection_;
+  edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
+
+
     VInputTag srcHLTAk4CaloID;
     //VInputTag srcHLTAk4CaloNoFastJet;
     VInputTag srcHLTAk4PF;
@@ -377,7 +392,14 @@ class MakeTrees : public edm::EDAnalyzer {
   int nIsoElectrons;
   int nIsoMuons;
 
+  edm::InputTag hltCaloMetTag_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+
+
+
+  edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetToken_;
+
+
 
 };
 
@@ -748,16 +770,13 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
      hltPathNames.push_back("HLT_PFMET170_NoiseCleaned_v2");
      hltPathNames.push_back("HLT_PFMET120_NoiseCleaned_BTagCSV07_v2");
                                   
-
      hltPathNames.push_back("HLT_Rsq0p25_v1"); 
      hltPathNames.push_back("HLT_Rsq0p30_v1"); 
      hltPathNames.push_back("HLT_RsqMR240_Rsq0p09_MR200_v1");
      hltPathNames.push_back("HLT_RsqMR240_Rsq0p09_MR200_4jet_v1");
      hltPathNames.push_back("HLT_RsqMR270_Rsq0p09_MR200_v1");
      hltPathNames.push_back("HLT_RsqMR270_Rsq0p09_MR200_4jet_v1");
-                                 
-
-
+                                
     
     // Trigger bits
     for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
@@ -768,16 +787,10 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
     //HLTResultsTag = pset.getUntrackedParameter("HLTResults", edm::InputTag("TriggerResults","HLT2"));
 
-    
-
 
     srcUctMET_ = pset.getParameter<edm::InputTag>("srcUctMet");
     srcUctMht_ = pset.getParameter<edm::InputTag>("srcUctMht");
     srcUctJet_ = pset.getParameter<edm::InputTag>("srcUctJet");
-
-    srcGenMetCalo_                = pset.getParameter<edm::InputTag>("srcGenMetCalo");
-    srcGenMetCaloAndNonPrompt_    = pset.getParameter<edm::InputTag>("srcGenMetCaloAndNonPrompt");
-    srcGenMetTrue_                = pset.getParameter<edm::InputTag>("srcGenMetTrue");
 
     srcHLTMetCalo_                = pset.getParameter<edm::InputTag>("srcHLTMetCalo");
     srcHLTMetCleanCalo_           = pset.getParameter<edm::InputTag>("srcHLTMetCleanCalo");   
@@ -786,8 +799,11 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcHLTMhtCalo_                = pset.getParameter<edm::InputTag>("srcHLTMhtCalo");
     srcHLTMhtPF_                  = pset.getParameter<edm::InputTag>("srcHLTMhtPF");
 
-
-    // Gen particles
+    // Gen 
+    srcGenMetCalo_                = pset.getParameter<edm::InputTag>("srcGenMetCalo");
+    srcGenMetCaloAndNonPrompt_    = pset.getParameter<edm::InputTag>("srcGenMetCaloAndNonPrompt");
+    srcGenMetTrue_                = pset.getParameter<edm::InputTag>("srcGenMetTrue");
+    srcGen4Jet_                   = pset.getParameter<VInputTag>("srcGen4Jet");
     makeGenParticles           = pset.getParameter<bool>("MakeGenParticles");
     srcGenParticles_           = pset.getParameter<edm::InputTag>("srcGenParticles");
     genElectronMinPt           = pset.getParameter<double>("genElectronMinPt");
@@ -797,21 +813,34 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     genPhotonMinPt             = pset.getParameter<double>("genPhotonMinPt");
     genPhotonMaxEta            = pset.getParameter<double>("genPhotonMaxEta");
 
-
+#ifdef L1
     srcGctMht_        = pset.getParameter<edm::InputTag>("srcGctMht");
     srcGctMet_        = pset.getParameter<edm::InputTag>("srcGctMet");
     srcGctJetCentral_ = pset.getParameter<VInputTag>("srcGctJetCentral");
     srcGctJetForward_ = pset.getParameter<VInputTag>("srcGctJetForward");
-    // srcGctJetAll_     = pset.getParameter<VInputTag>("srcGctJetAll");
+#endif
 
-    srcGen4Jet_        = pset.getParameter<VInputTag>("srcGen4Jet");
-    //srcGen5Jet_        = pset.getParameter<VInputTag>("srcGen5Jet");
 
-    srcHLTAk4Calo         = pset.getParameter<VInputTag>("srcHLTAk4Calo");
+    //srcHLTAk4Calo         = pset.getParameter<VInputTag>("srcHLTAk4Calo");
+    //srcHLTAk4Calo         = consumes<VInputTag> ( pset.getParameter<VInputTag>("srcHLTAk4Calo"));
+
+    //hltAk4CaloCollection_ = consumes<edm::View<reco::CaloJetCollection> > ( pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
+
+    hltCaloMetCollection_  = consumes<edm::View< reco::MET> > ( pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
+
+
+    hltCaloMetTag_    = pset.getParameter<edm::InputTag>("hltCaloMetSrc");
+    hltCaloMetToken_  = consumes<reco::CaloMETCollection>( hltCaloMetTag_ );
+
+    hltAk4CaloJetToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
+
+
+//hltCaloMetToken_  = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
+
+
+
     srcHLTAk4CaloID       = pset.getParameter<VInputTag>("srcHLTAk4CaloID");
-    //srcHLTAk4CaloNoFastJet = pset.getParameter<VInputTag>("srcHLTAk4CaloNoFastJet");
     srcHLTAk4PF            = pset.getParameter<VInputTag>("srcHLTAk4PF");
-    // srcHLTAk4PFNoPU    = pset.getParameter<VInputTag>("srcHLTAk4PFNoPU");
 
 #ifdef RECO    
     srcAk4Calo       = pset.getParameter<VInputTag>("srcAk4Calo");
@@ -864,6 +893,7 @@ namespace {
     }
     return output;
   }
+
 
   // // Turn a set of InputTags into a collection of candidate pointers.
   // std::vector<const reco::PFJet*> getPFCollections(const edm::Event& evt, const VInputTag& collections) {
@@ -999,83 +1029,32 @@ namespace {
     return std::make_pair( mhtVec.Pt(), mhtVec.Phi() );
   }
 
-
-//   std::pair<float, float> calculateAlphaTHT(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
-     
-//       // Momentum sums in transverse plane
-//       float sum_et(0), sum_px(0), sum_py(0);
-
-//       // check the size of the input collection
-//       if (jets.size() <= 1){
-// 	return std::make_pair(0., sum_et);
-//       }
-
-
-//       // Jet collection restricted to jet threshold
-//       std::vector<float> jetPTNew;
-
-//       for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
-
-// 	if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
-// 	jetPTNew.push_back( jets.at(iJet)->pt() );
-
-// 	sum_et += jets.at(iJet)->pt();
-// 	sum_px += jets.at(iJet)->px();
-// 	sum_py += jets.at(iJet)->py();
-
-//       }
-//       // check the size of the new input collection 
-//       if (jetPTNew.size() <= 1){
-// 	// empty jet collection, return AlphaT = 0 
-// 	return std::make_pair( 0., sum_et);
-//       }
-
-//       // Minimum Delta Et for two pseudo-jets 
-//       double min_delta_sum_et = sum_et;
-
-//       for (unsigned int i = 0; i < (1U << (jetPTNew.size() - 1)); i++) { //@@ iterate through different combinations 
-// 	double delta_sum_et = 0.;
-
-// 	for (unsigned int j = 0; j < jetPTNew.size(); ++j) { //@@ iterate through jets 
-// 	  if (i & (1U << j))
-// 	    delta_sum_et -= jetPTNew[j];
-// 	  else
-// 	    delta_sum_et += jetPTNew[j];
-// 	}
-// 	delta_sum_et = std::abs(delta_sum_et);
-// 	if (delta_sum_et < min_delta_sum_et) {
-// 	  min_delta_sum_et = delta_sum_et;
-// 	}
-
-//       }
-
-//       // Return a large value of alphaT 
-//       if ( (sum_et*sum_et - (sum_px*sum_px+sum_py*sum_py)) <= 0 ){
-// 	return std::make_pair(11.,  sum_et);
-//       }
-
-//       // Alpha_T 
-//       float alphaT = 0.5 * (sum_et - min_delta_sum_et) / sqrt( sum_et*sum_et - (sum_px*sum_px+sum_py*sum_py) );
-//       if (alphaT > 10){
-// 	alphaT = 10;
-//       }
-//      return std::make_pair( alphaT, sum_et );
-
-
-//     }
-
 }
 
 
 void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
-  NVTX = 0;
+
+  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetHandle; 
+  iEvent.getByToken(hltAk4CaloJetToken_, hltAk4CaloJetHandle);
+  std::cout << "Calojets = " << hltAk4CaloJetHandle.isValid() << "\n";
   
+  if (hltAk4CaloJetHandle.isValid()){
+    std::vector<TLorentzVector> myJets;
+    reco::CaloJetCollection::const_iterator jetIt;
+    for(jetIt = hltAk4CaloJetHandle->begin(); jetIt != hltAk4CaloJetHandle->end(); ++jetIt){
+      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
+      myJets.push_back(j);
+      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
+    }
+  }
+
+
+  NVTX = 0;
 #ifdef SIMULATION
   // Get NVTX from simulation
   edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
   iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
-
 
   std::vector<PileupSummaryInfo>::const_iterator PVI;
   for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
@@ -1093,19 +1072,19 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   PThat = *pthat;
 #endif
 
-
-
     edm::Handle<edm::TriggerResults> triggerBits;
     iEvent.getByToken(triggerBits_, triggerBits);
     
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-    std::cout << "\n === TRIGGER PATHS === " << std::endl;
+
     for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-      std::cout << "Trigger " << names.triggerName(i) << ", prescale " << (triggerBits->accept(i) ? "PASS" : "fail (or not run)") << std::endl;
+
+      if ( (triggerBits->accept(i)) ){
+	  std::cout << "Trigger " << names.triggerName(i) << std::endl;
+	  int a;
+	  std::cin >> a;
+	}
     }
-
-
-
 
 
   // ------------------------------------------------------------------------------------------------------------------------
@@ -1117,8 +1096,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   // // Get the PAT TriggerEvent
   // edm::Handle< pat::TriggerEvent > triggerEvent;
   // iEvent.getByLabel( "patTriggerEvent", triggerEvent );
-
-  
 
 
   // // Get a vector of all HLT paths
@@ -1148,410 +1125,474 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   
     // Input jets without eta or pT requirements
     // --------------------------------------------------------------------------------
+#ifdef L1
     std::vector<const reco::Candidate*> gctCenUnskimmed                 = getCollections( iEvent, srcGctJetCentral_);
-    std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, srcGen4Jet_);
-    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed             = getCollections( iEvent, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4CaloIDUnskimmed           = getCollections( iEvent, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4PFUnskimmed               = getCollections( iEvent, srcHLTAk4PF );
-    // std::vector<const reco::Candidate*> recoAk4CaloUnskimmed            = getCollections( iEvent, srcAk4Calo );
-    // std::vector<const reco::Candidate*> recoAk4PFUnskimmed              = getCollections( iEvent, srcAk4PF   );
-    //std::vector<const reco::PFJet*>     hltAk4PFJetUnskimmed            = getPFCollections( iEvent, srcHLTAk4PF );
-
     std::vector<const reco::Candidate*> gctForUnskimmed                 = getCollections( iEvent, srcGctJetForward_);
+#endif
+#ifdef SIMULATION
+    std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, srcGen4Jet_);
     std::vector<const reco::Candidate*> genJet4ForUnskimmed             = getCollections( iEvent, srcGen4Jet_);
-    std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed          = getCollections( iEvent, srcHLTAk4Calo );
-    std::vector<const reco::Candidate*> hltAk4CaloIDForUnskimmed        = getCollections( iEvent, srcHLTAk4CaloID );
-    std::vector<const reco::Candidate*> hltAk4PFForUnskimmed            = getCollections( iEvent, srcHLTAk4PF );
-    // std::vector<const reco::Candidate*> recoAk4CaloForUnskimmed         = getCollections( iEvent, srcAk4Calo );
-    // std::vector<const reco::Candidate*> recoAk4PFForUnskimmed           = getCollections( iEvent, srcAk4PF   );
-
- 
-    for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
-	jetPt[*iLvl] ->clear(); 
-	jetPx[*iLvl] ->clear(); 
-	jetPy[*iLvl] ->clear(); 
-	jetPhi[*iLvl]->clear();
-	jetEta[*iLvl]->clear();
-    }
-
-
-    // Clear previous event's objects
-    // --------------------------------------------------------------------------------
-
-    genElectronPt->clear();
-    genElectronEta->clear();
-    genElectronPhi->clear();
-    genMuonPt ->clear();
-    genMuonEta->clear();
-    genMuonPhi->clear();
-    genPhotonPt ->clear();
-    genPhotonEta->clear();
-    genPhotonPhi->clear();
-
-    genMuonMatchedGenMuonPt          .clear();
-    genMuonMatchedGenJetPt           .clear();
-    genMuonMatchedHLTPFJetPt         .clear();
-    genMuonMatchedHLTPFJetMuonEF     .clear();
-    genMuonMatchedHLTPFJetElectronEF .clear();
-
-    genElectronMatchedGenElectronPt      .clear();
-    genElectronMatchedGenJetPt           .clear();
-    genElectronMatchedHLTPFJetPt         .clear();
-    genElectronMatchedHLTPFJetMuonEF     .clear();
-    genElectronMatchedHLTPFJetElectronEF .clear();
-
-    nIsoElectrons = 0;
-    nIsoMuons     = 0;
-
-    
-
-    // Gen particles
-    // --------------------------------------------------------------------------------
-
-    genLeptonVeto      = false;
-    genElectronVeto    = false;
-    genMuonVeto        = false;
-    genPhotonVeto      = false;
-    genIsoLeptonVeto   = false;
-    genIsoElectronVeto = false;
-
-
-    std::vector<int> selLeptonIndices;
-    int particleIndex(0);
-
-    if (makeGenParticles){
-      edm::Handle< std::vector<reco::GenParticle> > genParticles;
-      iEvent.getByLabel(srcGenParticles_, genParticles);
-      for(std::vector<reco::GenParticle>::const_iterator iter = genParticles->begin(); iter != genParticles->end(); ++iter){
-    	const reco::GenParticle& genParticle = *iter;
-
-    	double genParticlePt  = genParticle.p4().pt();
-    	double genParticleEta = genParticle.p4().eta();
-    	double genParticlePhi = genParticle.p4().phi();
-
-
-    	if(TMath::Abs(genParticle.pdgId()) == 11){    	// Electron
-    	  if ( (genParticlePt >= genElectronMinPt) && (TMath::Abs(genParticleEta) <= genElectronMaxEta) ){
-    	    genElectronPt ->push_back( genParticlePt  );
-    	    genElectronEta->push_back( genParticleEta );
-    	    genElectronPhi->push_back( genParticlePhi );
-    	    genLeptonVeto   = true;
-    	    genElectronVeto = true;
-	    selLeptonIndices.push_back( particleIndex );
-    	  }
-    	} // End lepton requirement
-    	else if(TMath::Abs(genParticle.pdgId()) == 13){ // Muon
-    	  if ( (genParticlePt >= genMuonMinPt) && (TMath::Abs(genParticleEta) <= genMuonMaxEta) ){
-    	    genMuonPt ->push_back( genParticlePt  );
-   	    genMuonEta->push_back( genParticleEta );
-    	    genMuonPhi->push_back( genParticlePhi );
-    	    genLeptonVeto = true;
-	    genMuonVeto   = true;
-	    selLeptonIndices.push_back( particleIndex );
-    	  }
-    	} // End Muon requirement
-    	else if(TMath::Abs(genParticle.pdgId()) == 22){ // Photon
-    	  if ( (genParticlePt >= genPhotonMinPt) && (TMath::Abs(genParticleEta) <= genPhotonMaxEta) ){
-    	    genPhotonPt ->push_back( genParticlePt  );
-   	    genPhotonEta->push_back( genParticleEta );
-    	    genPhotonPhi->push_back( genParticlePhi );
-    	    genPhotonVeto = true;
-    	  }
-    	} // End Photon requirement
-
-	particleIndex++;
-      } // End loop
-    } // End gen particles
-
-
-
-
-    // Jet lepton cleaning
-    // --------------------------------------------------------------------------------
-
-    // std::cout << "\nBefore cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
-    // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
-#ifdef LEPTON_XCLEANING
-    if (genMuonVeto){
-      //crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, nIsoMuons, 0.3, 40. );
-      crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, hltAk4CaloUnskimmed, 
-				 nIsoMuons, 0.3, 40.,
-				 hltAk4PFJetUnskimmed,
-				 genMuonMatchedGenMuonPt,
-				 genMuonMatchedGenJetPt,
-				 genMuonMatchedHLTPFJetPt,
-				 genMuonMatchedHLTPFJetMuonEF,
-				 genMuonMatchedHLTPFJetElectronEF);
-
-    }
-    if (genElectronVeto){
-      // crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltAk4PFUnskimmed, 
-      // 				 nIsoElectrons, 0.3, 40. );
-      crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltAk4PFUnskimmed,  hltAk4CaloUnskimmed,
-				 nIsoElectrons, 0.3, 40. ,
-				 hltAk4PFJetUnskimmed,
-				 genElectronMatchedGenElectronPt,
-                                 genElectronMatchedGenJetPt,
-                                 genElectronMatchedHLTPFJetPt,
-                                 genElectronMatchedHLTPFJetMuonEF,
-                                 genElectronMatchedHLTPFJetElectronEF);
-
-    }
-    // std::cout << "\nAfter cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
-    // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
 #endif
 
 
+    //edm::Handle<reco::Candidate> hltAk4CaloHandle; 
+    edm::Handle<edm::View<reco::CaloJetCollection> > hltAk4CaloHandle; 
+    //iEvent.getByToken(hltAk4CaloCollection_, hltAk4CaloHandle);
+
+    //std::cout << hltAk4CaloHandle->size() << "\n";
+
+    // for (size_t j = 0; j < hltAk4CaloHandle->size(); ++j) {
+    //   const reco::CaloJet& object = hltAk4CaloHandle->at(j);
+    //   std::cout << &object << "\n";
+    // }
 
 
-    // Skim jet collections
-    // ----------------------------------------
-
-    // Central jets
-    // --------------------
-    std::vector<const reco::Candidate*> gctCen              = skimJets(gctCenUnskimmed,              minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> genAk4              = skimJets(genJet4Unskimmed,             minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> hltAk4Calo          = skimJets(hltAk4CaloUnskimmed,          minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> hltAk4CaloID        = skimJets(hltAk4CaloIDUnskimmed,        minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> hltAk4PF            = skimJets(hltAk4PFUnskimmed,            minPt, minEtaCen, maxEtaCen );
-    // std::vector<const reco::Candidate*> recoAk4Calo         = skimJets(recoAk4CaloUnskimmed,         minPt, minEtaCen, maxEtaCen );
-    // std::vector<const reco::Candidate*> recoAk4PF           = skimJets(recoAk4PFUnskimmed,           minPt, minEtaCen, maxEtaCen );
-
-
-    // Forward jets
-    // --------------------
-    std::vector<const reco::Candidate*> gctFor                 = skimJets(gctForUnskimmed,                 minPt, minEtaFor, maxEtaFor );
-    std::vector<const reco::Candidate*> genAk4For              = skimJets(genJet4ForUnskimmed,             minPt, minEtaFor, maxEtaFor );
-    std::vector<const reco::Candidate*> hltAk4CaloFor          = skimJets(hltAk4CaloForUnskimmed,          minPt, minEtaFor, maxEtaFor );
-    std::vector<const reco::Candidate*> hltAk4CaloIDFor        = skimJets(hltAk4CaloIDForUnskimmed,        minPt, minEtaFor, maxEtaFor );
-    std::vector<const reco::Candidate*> hltAk4PFFor            = skimJets(hltAk4PFForUnskimmed,            minPt, minEtaFor, maxEtaFor );
-    // std::vector<const reco::Candidate*> recoAk4CaloFor         = skimJets(recoAk4CaloForUnskimmed,         minPt, minEtaFor, maxEtaFor );
-    // std::vector<const reco::Candidate*> recoAk4PFFor           = skimJets(recoAk4PFForUnskimmed,           minPt, minEtaFor, maxEtaFor );
-
-
-    // Jets
-    // --------------------------------------------------------------------------------
-
-
-    // Forward jet
-    genAk4ForMaxPt    = 0;
-    //recoAk4PFForMaxPt = 0;
-    hltAk4PFForMaxPt  = 0;
-    if ( genAk4For.size()   > 0){    genAk4ForMaxPt =    genAk4For.at(0)->pt(); }
-    //if (recoAk4PFFor.size() > 0){ recoAk4PFForMaxPt = recoAk4PFFor.at(0)->pt(); }
-    if ( hltAk4PFFor.size() > 0){  hltAk4PFForMaxPt =  hltAk4PFFor.at(0)->pt(); }
-
-    // Lead jet 
-    genAk4LeadJetPt= 0;
-    //recoAk4PFLeadJetPt= 0;
-    hltAk4PFLeadJetPt= 0;
-    hltAk4CaloLeadJetPt= 0;
-    hltAk4CaloIDLeadJetPt= 0;
-    if ( genAk4.size()     > 0){ genAk4LeadJetPt      =     genAk4.at(0)->pt(); }
-    //if (recoAk4PF.size()   > 0){ recoAk4PFLeadJetPt   =  recoAk4PF.at(0)->pt(); }
-    if ( hltAk4PF.size()   > 0){ hltAk4PFLeadJetPt    =   hltAk4PF.at(0)->pt(); }
-    if ( hltAk4Calo.size() > 0){ hltAk4CaloLeadJetPt  = hltAk4Calo.at(0)->pt(); }
-    if ( hltAk4CaloID.size() > 0){ hltAk4CaloIDLeadJetPt  = hltAk4CaloID.at(0)->pt(); }
-
-    // Second jet 
-    genAk4SecondJetPt= 0;
-    //    recoAk4PFSecondJetPt= 0;
-    hltAk4PFSecondJetPt= 0;
-    hltAk4CaloSecondJetPt= 0;
-    hltAk4CaloIDSecondJetPt= 0;
-    if ( genAk4.size()     > 1){ genAk4SecondJetPt      =     genAk4.at(1)->pt(); }
-    //    if (recoAk4PF.size()   > 1){ recoAk4PFSecondJetPt   =  recoAk4PF.at(1)->pt(); }
-    if ( hltAk4PF.size()   > 1){ hltAk4PFSecondJetPt    =   hltAk4PF.at(1)->pt(); }
-    if ( hltAk4Calo.size() > 1){ hltAk4CaloSecondJetPt  = hltAk4Calo.at(1)->pt(); }
-    if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDSecondJetPt  = hltAk4CaloID.at(1)->pt(); }
-
-    // Dijet avg 
-    genAk4DijetAvgPt= 0;
-    //    recoAk4PFDijetAvgPt= 0;
-    hltAk4PFDijetAvgPt= 0;
-    hltAk4CaloDijetAvgPt= 0;
-    hltAk4CaloIDDijetAvgPt= 0;
-    if ( genAk4.size()     > 1){ genAk4DijetAvgPt      = 0.5*(genAk4.at(0)->pt()     + genAk4.at(1)->pt()); }
-    //    if (recoAk4PF.size()   > 1){ recoAk4PFDijetAvgPt   = 0.5*(recoAk4PF.at(0)->pt()  + recoAk4PF.at(1)->pt()); }
-    if ( hltAk4PF.size()   > 1){ hltAk4PFDijetAvgPt    = 0.5*(hltAk4PF.at(0)->pt()   + hltAk4PF.at(1)->pt()); }
-    if ( hltAk4Calo.size() > 1){ hltAk4CaloDijetAvgPt  = 0.5*(hltAk4Calo.at(0)->pt() + hltAk4Calo.at(1)->pt()); }
-    if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDDijetAvgPt  = 0.5*(hltAk4CaloID.at(0)->pt() + hltAk4CaloID.at(1)->pt()); }
-
-
-
-    // ********************************************************************************
-    // *                                  Energy sums                                 *
-    // ********************************************************************************
-    getValue(iEvent,   srcGctMht_, mhtPt_["gct"], mhtPhi_["gct"]);
-    getValue(iEvent,   srcGctMet_, metPt_["gct"], metPhi_["gct"]);
-    getSumEtL1(iEvent, srcGctMht_, ht_["gct"], false);
-    getSumEtL1(iEvent, srcGctMet_, et_["gct"], false); 
-    if( ht_["gct"] > 0.){
-      mhtDivHt_["gct"] = mhtPt_["gct"]/ht_["gct"];
-    }
-    else{
-      mhtDivHt_["gct"] = 0;
-    }
-
-    // genMet
-    getValue(iEvent, srcGenMetCalo_,                metPt_["genMetCalo"],                metPhi_["genMetCalo"]);
-    getValue(iEvent, srcGenMetCaloAndNonPrompt_,    metPt_["genMetCaloAndNonPrompt"],    metPhi_["genMetCaloAndNonPrompt"]);
-    getValue(iEvent, srcGenMetTrue_,                metPt_["genMetTrue"],                metPhi_["genMetTrue"]);
-    // hltMet
-    getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
-    getValue(iEvent, srcHLTMetCleanCalo_,           metPt_["hltMetCleanCalo"],           metPhi_["hltMetCleanCalo"]);
-    getValue(iEvent, srcHLTMetCleanUsingJetIDCalo_, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
-    getValue(iEvent, srcHLTMetPF_,                  metPt_["hltMetPF"],                  metPhi_["hltMetPF"]);
-    // hltMHT
-    getValue(iEvent, srcHLTMhtCalo_,             mhtPt_["hltMhtCalo"],             mhtPhi_["hltMhtCalo"]);
-    getValue(iEvent, srcHLTMhtPF_,               mhtPt_["hltMhtPF"],               mhtPhi_["hltMhtPF"]);
-
-
-    // ********************************************************************************
-    // *                           Loop over Jet collections                          *
-    // ********************************************************************************
-
-    // HT and AlphaT
-    genAk4AlphaTHT40              = calculateAlphaTHT( genAk4,      40.);
-    hltAk4CaloAlphaTHT40          = calculateAlphaTHT( hltAk4Calo,  40.);
-    hltAk4CaloIDAlphaTHT40        = calculateAlphaTHT( hltAk4CaloID,  40.);
-    hltAk4PFAlphaTHT40            = calculateAlphaTHT( hltAk4PF,    40.);
-    // recoAk4CaloAlphaTHT40         = calculateAlphaTHT( recoAk4Calo, 40.);
-    // recoAk4PFAlphaTHT40           = calculateAlphaTHT( recoAk4PF,   40.);
-
-    // Dynamic HT and AlphaT 
-    // genAk4DynamicAlphaTHT40    = calculateDynamicAlphaTPairs( genAk4,    dynamicJetThreshold );
-    // hltAk4PFDynamicAlphaTHT40  = calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold );
-
-    calculateDynamicAlphaTPairs( genAk4, dynamicJetThreshold, genAk4DynamicAlphaT40, genAk4DynamicHT40 );
-    calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold, hltAk4PFDynamicAlphaT40, hltAk4PFDynamicHT40 );
-
-
-    //    recoAk4PFDynamicAlphaTHT40 = calculateDynamicAlphaTPairs( recoAk4PF, dynamicJetThreshold );
-
-
-    // ********************************************************************************
-    // Calculate: Biased deltaPhi, tagJet index, AlphaTVector, BetaTScalar, BetaTVector
-    // ********************************************************************************
-    // genAk4BiasedDPhi    = calculateBiasedDeltaPhi( genAk4,    genAk4BiasedDPhiIndex);
-    // recoAk4PFBiasedDPhi = calculateBiasedDeltaPhi( recoAk4PF, recoAk4PFBiasedDPhiIndex);
-    // hltAk4PFBiasedDPhi  = calculateBiasedDeltaPhi( hltAk4PF,  hltAk4PFBiasedDPhiIndex);
-
-    calculateBDPhiAlphaBetaT( genAk4,    40., genAk4BiasedDPhi,  genAk4BiasedDPhiIndex, 
-			      genAk4VecAlphaT40,    genAk4ScaBetaT40,    genAk4VecBetaT40);
-    // calculateBDPhiAlphaBetaT( recoAk4PF, 40., recoAk4PFBiasedDPhi, recoAk4PFBiasedDPhiIndex,
-    // 			      recoAk4PFVecAlphaT40, recoAk4PFScaBetaT40, recoAk4PFVecBetaT40);
-    calculateBDPhiAlphaBetaT( hltAk4PF,  40., hltAk4PFBiasedDPhi,  hltAk4PFBiasedDPhiIndex, 
-			      hltAk4PFVecAlphaT40,  hltAk4PFScaBetaT40,  hltAk4PFVecBetaT40);
-
-
-    // ******************************************************************************** 
-    // Calculate: DeltaR of leading jets L1-Gen, HLT-Gen
-    // ******************************************************************************** 
-    L1GenDeltaR  = leadL1GenDeltaR(    gctCenUnskimmed,  gctForUnskimmed, genJet4Unskimmed );
-    HLTGenDeltaR = leadHLTGenDeltaR( hltAk4PFUnskimmed, genJet4Unskimmed );
-    hpuVeto      = (L1GenDeltaR < 0.5);
-
-
-    // MHT
-    genAk4MHT40              = calculateMHT( genAk4,      40.);
-    hltAk4CaloMHT40          = calculateMHT( hltAk4Calo,  40.);
-    hltAk4CaloIDMHT40          = calculateMHT( hltAk4CaloID,  40.);
-    hltAk4PFMHT40            = calculateMHT( hltAk4PF,    40.);
-    // recoAk4CaloMHT40         = calculateMHT( recoAk4Calo, 40.);
-    // recoAk4PFMHT40           = calculateMHT( recoAk4PF,   40.);
-
-    genAk4ForMHT40           = calculateMHT( genAk4For,      40.);
-    hltAk4PFForMHT40         = calculateMHT( hltAk4PFFor,    40.);
-    //recoAk4PFForMHT40        = calculateMHT( recoAk4PFFor,   40.);
-
-    // AlphaT prime
-    genAk4_AlphaTPrime40        = calculateAlphaTPrime( genAk4MHT40.first,      genAk4AlphaTHT40.second );
-    hltAk4Calo_AlphaTPrime40    = calculateAlphaTPrime( hltAk4CaloMHT40.first,  hltAk4CaloAlphaTHT40.second );
-    hltAk4CaloID_AlphaTPrime40  = calculateAlphaTPrime( hltAk4CaloIDMHT40.first,  hltAk4CaloIDAlphaTHT40.second );
-    hltAk4PF_AlphaTPrime40      = calculateAlphaTPrime( hltAk4PFMHT40.first,    hltAk4PFAlphaTHT40.second );
-    // recoAk4Calo_AlphaTPrime40   = calculateAlphaTPrime( recoAk4CaloMHT40.first, recoAk4CaloAlphaTHT40.second );
-    // recoAk4PF_AlphaTPrime40     = calculateAlphaTPrime( recoAk4PFMHT40.first,   recoAk4PFAlphaTHT40.second );
-
-
-    // ****************************************
-    // MHT-MET deltaPhi
-    // ****************************************
-    hltMetCaloPFMht40_DeltaPhi = fabs( deltaPhi( metPhi_["hltMetCalo"], hltAk4PFMHT40.second ) );
-    genMetCaloMht40_DeltaPhi   = fabs( deltaPhi( metPhi_["genMetCalo"], genAk4MHT40.second )   );
-
-
-
-    // Count analysis jet multiplicity
-    genAk4NJet40              = calculateNJet( genAk4,      40.);
-    hltAk4CaloIDNJet40        = calculateNJet( hltAk4CaloID,  40.);
-    hltAk4CaloNJet40          = calculateNJet( hltAk4Calo,  40.);
-    hltAk4PFNJet40            = calculateNJet( hltAk4PF,    40.);
-    // recoAk4CaloNJet40         = calculateNJet( recoAk4Calo, 40.);
-    // recoAk4PFNJet40           = calculateNJet( recoAk4PF,   40.);
-
-
-    // analysis bins
-    // ----------------------------------------
+    edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;
+    //iEvent.getByToken(hltCaloMetCollection_, hltCaloMetHandle);
+    iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);
     
-    genAk4NJetBin40           = calculateNJetBin( genAk4,      40.);
-    hltAk4CaloNJetBin40       = calculateNJetBin( hltAk4Calo,  40.);
-    hltAk4CaloIDNJetBin40     = calculateNJetBin( hltAk4CaloID,  40.);
-    hltAk4PFNJetBin40         = calculateNJetBin( hltAk4PF,    40.);
-    // recoAk4CaloNJetBin40      = calculateNJetBin( recoAk4Calo, 40.);
-    // recoAk4PFNJetBin40        = calculateNJetBin( recoAk4PF,   40.);
 
+    std::cout << hltCaloMetHandle.isValid() << "\n";
 
-    genAk4HTBin40           = calculateHTBin( genAk4AlphaTHT40.second,      genAk4AlphaTHT40.first );
-    hltAk4CaloHTBin40       = calculateHTBin( hltAk4CaloAlphaTHT40.second,  hltAk4CaloAlphaTHT40.first );
-    hltAk4CaloIDHTBin40     = calculateHTBin( hltAk4CaloIDAlphaTHT40.second,  hltAk4CaloIDAlphaTHT40.first );
-    hltAk4PFHTBin40         = calculateHTBin( hltAk4PFAlphaTHT40.second,    hltAk4PFAlphaTHT40.first );
-    // recoAk4CaloHTBin40      = calculateHTBin( recoAk4CaloAlphaTHT40.second, recoAk4CaloAlphaTHT40.first );
-    // recoAk4PFHTBin40        = calculateHTBin( recoAk4PFAlphaTHT40.second,   recoAk4PFAlphaTHT40.first );
+    //    if(!handle.isValid()){
+
+    // const reco::CaloMET &hltCaloMetH = hltCaloMetHandle->front();
+    // std::cout << hltCaloMetH.pt() << "\t" << hltCaloMetH.phi() << "\n";
 
 
 
-    // Store jet collections
-    // ----------------------------------------
+    //getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
 
-    storeJet( "gctCen",                 gctCen,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "genAk4",                 genAk4,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4Calo",             hltAk4Calo,             jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloID",           hltAk4CaloID,           jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4PF",               hltAk4PF,               jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4Calo",            recoAk4Calo,            jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4PF",              recoAk4PF,              jetPt, jetPx, jetPy, jetEta, jetPhi );
 
-    storeJet( "gctFor",                 gctFor,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "genAk4For",              genAk4For,              jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloFor",          hltAk4CaloFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloIDFor",        hltAk4CaloIDFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4PFFor",            hltAk4PFFor,            jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4CaloFor",         recoAk4CaloFor,         jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4PFFor",           recoAk4PFFor,           jetPt, jetPx, jetPy, jetEta, jetPhi );
+    //    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed             = getCollections( iEvent, srcHLTAk4Calo2 );
+//     std::vector<const reco::Candidate*> hltAk4CaloIDUnskimmed           = getCollections( iEvent, srcHLTAk4Calo );
+//     std::vector<const reco::Candidate*> hltAk4PFUnskimmed               = getCollections( iEvent, srcHLTAk4PF );
+//     // std::vector<const reco::Candidate*> recoAk4CaloUnskimmed            = getCollections( iEvent, srcAk4Calo );
+//     // std::vector<const reco::Candidate*> recoAk4PFUnskimmed              = getCollections( iEvent, srcAk4PF   );
+//     //std::vector<const reco::PFJet*>     hltAk4PFJetUnskimmed            = getPFCollections( iEvent, srcHLTAk4PF );
+
+//     std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed          = getCollections( iEvent, srcHLTAk4Calo );
+//     std::vector<const reco::Candidate*> hltAk4CaloIDForUnskimmed        = getCollections( iEvent, srcHLTAk4CaloID );
+//     std::vector<const reco::Candidate*> hltAk4PFForUnskimmed            = getCollections( iEvent, srcHLTAk4PF );
+//     // std::vector<const reco::Candidate*> recoAk4CaloForUnskimmed         = getCollections( iEvent, srcAk4Calo );
+//     // std::vector<const reco::Candidate*> recoAk4PFForUnskimmed           = getCollections( iEvent, srcAk4PF   );
+
+ 
+//     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
+// 	jetPt[*iLvl] ->clear(); 
+// 	jetPx[*iLvl] ->clear(); 
+// 	jetPy[*iLvl] ->clear(); 
+// 	jetPhi[*iLvl]->clear();
+// 	jetEta[*iLvl]->clear();
+//     }
+
+
+//     // Clear previous event's objects
+//     // --------------------------------------------------------------------------------
+
+//     genElectronPt->clear();
+//     genElectronEta->clear();
+//     genElectronPhi->clear();
+//     genMuonPt ->clear();
+//     genMuonEta->clear();
+//     genMuonPhi->clear();
+//     genPhotonPt ->clear();
+//     genPhotonEta->clear();
+//     genPhotonPhi->clear();
+
+//     genMuonMatchedGenMuonPt          .clear();
+//     genMuonMatchedGenJetPt           .clear();
+//     genMuonMatchedHLTPFJetPt         .clear();
+//     genMuonMatchedHLTPFJetMuonEF     .clear();
+//     genMuonMatchedHLTPFJetElectronEF .clear();
+
+//     genElectronMatchedGenElectronPt      .clear();
+//     genElectronMatchedGenJetPt           .clear();
+//     genElectronMatchedHLTPFJetPt         .clear();
+//     genElectronMatchedHLTPFJetMuonEF     .clear();
+//     genElectronMatchedHLTPFJetElectronEF .clear();
+
+//     nIsoElectrons = 0;
+//     nIsoMuons     = 0;
 
     
-    // L1 seeds
-    // ----------------------------------------
 
-    L1HTT175        = ( ht_["gct"]    >= 175);
-    L1ETM70         = ( metPt_["gct"] >= 70);
-    L1HTT175OrETM70 = (L1HTT175 || L1ETM70);
+//     // Gen particles
+//     // --------------------------------------------------------------------------------
 
-    L1Jet_DPhi  = -1;
-    if (jetPhi["gctCen"]->size() > 1){
-      L1Jet_DPhi      = fabs( deltaPhi( (*jetPhi["gctCen"])[0], (*jetPhi["gctCen"])[1] ) );
-    }
+//     genLeptonVeto      = false;
+//     genElectronVeto    = false;
+//     genMuonVeto        = false;
+//     genPhotonVeto      = false;
+//     genIsoLeptonVeto   = false;
+//     genIsoElectronVeto = false;
 
+
+//     std::vector<int> selLeptonIndices;
+//     int particleIndex(0);
+
+//     if (makeGenParticles){
+//       edm::Handle< std::vector<reco::GenParticle> > genParticles;
+//       iEvent.getByLabel(srcGenParticles_, genParticles);
+//       for(std::vector<reco::GenParticle>::const_iterator iter = genParticles->begin(); iter != genParticles->end(); ++iter){
+//     	const reco::GenParticle& genParticle = *iter;
+
+//     	double genParticlePt  = genParticle.p4().pt();
+//     	double genParticleEta = genParticle.p4().eta();
+//     	double genParticlePhi = genParticle.p4().phi();
+
+
+//     	if(TMath::Abs(genParticle.pdgId()) == 11){    	// Electron
+//     	  if ( (genParticlePt >= genElectronMinPt) && (TMath::Abs(genParticleEta) <= genElectronMaxEta) ){
+//     	    genElectronPt ->push_back( genParticlePt  );
+//     	    genElectronEta->push_back( genParticleEta );
+//     	    genElectronPhi->push_back( genParticlePhi );
+//     	    genLeptonVeto   = true;
+//     	    genElectronVeto = true;
+// 	    selLeptonIndices.push_back( particleIndex );
+//     	  }
+//     	} // End lepton requirement
+//     	else if(TMath::Abs(genParticle.pdgId()) == 13){ // Muon
+//     	  if ( (genParticlePt >= genMuonMinPt) && (TMath::Abs(genParticleEta) <= genMuonMaxEta) ){
+//     	    genMuonPt ->push_back( genParticlePt  );
+//    	    genMuonEta->push_back( genParticleEta );
+//     	    genMuonPhi->push_back( genParticlePhi );
+//     	    genLeptonVeto = true;
+// 	    genMuonVeto   = true;
+// 	    selLeptonIndices.push_back( particleIndex );
+//     	  }
+//     	} // End Muon requirement
+//     	else if(TMath::Abs(genParticle.pdgId()) == 22){ // Photon
+//     	  if ( (genParticlePt >= genPhotonMinPt) && (TMath::Abs(genParticleEta) <= genPhotonMaxEta) ){
+//     	    genPhotonPt ->push_back( genParticlePt  );
+//    	    genPhotonEta->push_back( genParticleEta );
+//     	    genPhotonPhi->push_back( genParticlePhi );
+//     	    genPhotonVeto = true;
+//     	  }
+//     	} // End Photon requirement
+
+// 	particleIndex++;
+//       } // End loop
+//     } // End gen particles
+
+
+
+
+//     // Jet lepton cleaning
+//     // --------------------------------------------------------------------------------
+
+//     // std::cout << "\nBefore cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
+//     // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
+// #ifdef LEPTON_XCLEANING
+//     if (genMuonVeto){
+//       //crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, nIsoMuons, 0.3, 40. );
+//       crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, hltAk4CaloUnskimmed, 
+// 				 nIsoMuons, 0.3, 40.,
+// 				 hltAk4PFJetUnskimmed,
+// 				 genMuonMatchedGenMuonPt,
+// 				 genMuonMatchedGenJetPt,
+// 				 genMuonMatchedHLTPFJetPt,
+// 				 genMuonMatchedHLTPFJetMuonEF,
+// 				 genMuonMatchedHLTPFJetElectronEF);
+
+//     }
+//     if (genElectronVeto){
+//       // crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltAk4PFUnskimmed, 
+//       // 				 nIsoElectrons, 0.3, 40. );
+//       crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltAk4PFUnskimmed,  hltAk4CaloUnskimmed,
+// 				 nIsoElectrons, 0.3, 40. ,
+// 				 hltAk4PFJetUnskimmed,
+// 				 genElectronMatchedGenElectronPt,
+//                                  genElectronMatchedGenJetPt,
+//                                  genElectronMatchedHLTPFJetPt,
+//                                  genElectronMatchedHLTPFJetMuonEF,
+//                                  genElectronMatchedHLTPFJetElectronEF);
+
+//     }
+//     // std::cout << "\nAfter cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
+//     // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
+// #endif
+
+
+
+
+//     // Skim jet collections
+//     // ----------------------------------------
+
+// #ifdef L1
+//     std::vector<const reco::Candidate*> gctFor                 = skimJets(gctForUnskimmed,                 minPt, minEtaFor, maxEtaFor ); 
+//     std::vector<const reco::Candidate*> gctCen              = skimJets(gctCenUnskimmed,              minPt, minEtaCen, maxEtaCen );
+// #endif
+// #ifdef SIMULATION 
+//     std::vector<const reco::Candidate*> genAk4              = skimJets(genJet4Unskimmed,             minPt, minEtaCen, maxEtaCen );
+//     std::vector<const reco::Candidate*> genAk4For              = skimJets(genJet4ForUnskimmed,             minPt, minEtaFor, maxEtaFor );
+// #endif
+
+
+//     // Central jets
+//     // --------------------
+
+//     std::vector<const reco::Candidate*> hltAk4Calo          = skimJets(hltAk4CaloUnskimmed,          minPt, minEtaCen, maxEtaCen );
+//     std::vector<const reco::Candidate*> hltAk4CaloID        = skimJets(hltAk4CaloIDUnskimmed,        minPt, minEtaCen, maxEtaCen );
+//     std::vector<const reco::Candidate*> hltAk4PF            = skimJets(hltAk4PFUnskimmed,            minPt, minEtaCen, maxEtaCen );
+//     // std::vector<const reco::Candidate*> recoAk4Calo         = skimJets(recoAk4CaloUnskimmed,         minPt, minEtaCen, maxEtaCen );
+//     // std::vector<const reco::Candidate*> recoAk4PF           = skimJets(recoAk4PFUnskimmed,           minPt, minEtaCen, maxEtaCen );
+
+
+//     // Forward jets
+//     // --------------------
+
+
+//     std::vector<const reco::Candidate*> hltAk4CaloFor          = skimJets(hltAk4CaloForUnskimmed,          minPt, minEtaFor, maxEtaFor );
+//     std::vector<const reco::Candidate*> hltAk4CaloIDFor        = skimJets(hltAk4CaloIDForUnskimmed,        minPt, minEtaFor, maxEtaFor );
+//     std::vector<const reco::Candidate*> hltAk4PFFor            = skimJets(hltAk4PFForUnskimmed,            minPt, minEtaFor, maxEtaFor );
+//     // std::vector<const reco::Candidate*> recoAk4CaloFor         = skimJets(recoAk4CaloForUnskimmed,         minPt, minEtaFor, maxEtaFor );
+//     // std::vector<const reco::Candidate*> recoAk4PFFor           = skimJets(recoAk4PFForUnskimmed,           minPt, minEtaFor, maxEtaFor );
+
+
+//     // Jets
+//     // --------------------------------------------------------------------------------
+
+
+//     // Forward jet
+// #ifdef SIMULATION 
+//     genAk4ForMaxPt    = 0;
+//     if ( genAk4For.size()   > 0){    genAk4ForMaxPt =    genAk4For.at(0)->pt(); }
+// #endif
+//     //recoAk4PFForMaxPt = 0;
+//     hltAk4PFForMaxPt  = 0;
+//     //if (recoAk4PFFor.size() > 0){ recoAk4PFForMaxPt = recoAk4PFFor.at(0)->pt(); }
+//     if ( hltAk4PFFor.size() > 0){  hltAk4PFForMaxPt =  hltAk4PFFor.at(0)->pt(); }
+
+//     // Lead jet 
+// #ifdef SIMULATION 
+//     genAk4LeadJetPt= 0;
+//     if ( genAk4.size()     > 0){ genAk4LeadJetPt      =     genAk4.at(0)->pt(); }
+// #endif
+//     //recoAk4PFLeadJetPt= 0;
+//     hltAk4PFLeadJetPt= 0;
+//     hltAk4CaloLeadJetPt= 0;
+//     hltAk4CaloIDLeadJetPt= 0;
+//     //if (recoAk4PF.size()   > 0){ recoAk4PFLeadJetPt   =  recoAk4PF.at(0)->pt(); }
+//     if ( hltAk4PF.size()   > 0){ hltAk4PFLeadJetPt    =   hltAk4PF.at(0)->pt(); }
+//     if ( hltAk4Calo.size() > 0){ hltAk4CaloLeadJetPt  = hltAk4Calo.at(0)->pt(); }
+//     if ( hltAk4CaloID.size() > 0){ hltAk4CaloIDLeadJetPt  = hltAk4CaloID.at(0)->pt(); }
+
+//     // Second jet
+// #ifdef SIMULATION 
+//     genAk4SecondJetPt= 0;
+//     if ( genAk4.size()     > 1){ genAk4SecondJetPt      =     genAk4.at(1)->pt(); }
+// #endif
+//     //    recoAk4PFSecondJetPt= 0;
+//     hltAk4PFSecondJetPt= 0;
+//     hltAk4CaloSecondJetPt= 0;
+//     hltAk4CaloIDSecondJetPt= 0;
+//     //    if (recoAk4PF.size()   > 1){ recoAk4PFSecondJetPt   =  recoAk4PF.at(1)->pt(); }
+//     if ( hltAk4PF.size()   > 1){ hltAk4PFSecondJetPt    =   hltAk4PF.at(1)->pt(); }
+//     if ( hltAk4Calo.size() > 1){ hltAk4CaloSecondJetPt  = hltAk4Calo.at(1)->pt(); }
+//     if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDSecondJetPt  = hltAk4CaloID.at(1)->pt(); }
+
+//     // Dijet avg 
+// #ifdef SIMULATION
+//     genAk4DijetAvgPt= 0;
+//     if ( genAk4.size()     > 1){ genAk4DijetAvgPt      = 0.5*(genAk4.at(0)->pt()     + genAk4.at(1)->pt()); }
+// #endif
+//     //    recoAk4PFDijetAvgPt= 0;
+//     hltAk4PFDijetAvgPt= 0;
+//     hltAk4CaloDijetAvgPt= 0;
+//     hltAk4CaloIDDijetAvgPt= 0;
+//     //    if (recoAk4PF.size()   > 1){ recoAk4PFDijetAvgPt   = 0.5*(recoAk4PF.at(0)->pt()  + recoAk4PF.at(1)->pt()); }
+//     if ( hltAk4PF.size()   > 1){ hltAk4PFDijetAvgPt    = 0.5*(hltAk4PF.at(0)->pt()   + hltAk4PF.at(1)->pt()); }
+//     if ( hltAk4Calo.size() > 1){ hltAk4CaloDijetAvgPt  = 0.5*(hltAk4Calo.at(0)->pt() + hltAk4Calo.at(1)->pt()); }
+//     if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDDijetAvgPt  = 0.5*(hltAk4CaloID.at(0)->pt() + hltAk4CaloID.at(1)->pt()); }
+
+//     // ********************************************************************************
+//     // *                                  Energy sums                                 *
+//     // ********************************************************************************
     
-    // Perform jet matching
-    // ----------------------------------------
+// #ifdef L1
+//     getValue(iEvent,   srcGctMht_, mhtPt_["gct"], mhtPhi_["gct"]);
+//     getValue(iEvent,   srcGctMet_, metPt_["gct"], metPhi_["gct"]);
+//     getSumEtL1(iEvent, srcGctMht_, ht_["gct"], false);
+//     getSumEtL1(iEvent, srcGctMet_, et_["gct"], false); 
 
-    genMatchedAk4HLTPF  = matchJetCollections( jetPt["genAk4"],   jetEta["genAk4"],   jetPhi["genAk4"],
-    					       jetPt["hltAk4PF"], jetEta["hltAk4PF"], jetPhi["hltAk4PF"], 20., 0.25 );
+//     if  ( ht_["gct"] > 0.){ mhtDivHt_["gct"] = mhtPt_["gct"]/ht_["gct"]; }
+//     else                  { mhtDivHt_["gct"] = 0; }
+// #endif
+// #ifdef SIMULATION
+//     // genMet
+//     getValue(iEvent, srcGenMetCalo_,                metPt_["genMetCalo"],                metPhi_["genMetCalo"]);
+//     getValue(iEvent, srcGenMetCaloAndNonPrompt_,    metPt_["genMetCaloAndNonPrompt"],    metPhi_["genMetCaloAndNonPrompt"]);
+//     getValue(iEvent, srcGenMetTrue_,                metPt_["genMetTrue"],                metPhi_["genMetTrue"]);
+// #endif
+//     // hltMet
+//     getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
+//     getValue(iEvent, srcHLTMetCleanCalo_,           metPt_["hltMetCleanCalo"],           metPhi_["hltMetCleanCalo"]);
+//     getValue(iEvent, srcHLTMetCleanUsingJetIDCalo_, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
+//     getValue(iEvent, srcHLTMetPF_,                  metPt_["hltMetPF"],                  metPhi_["hltMetPF"]);
+//     // hltMHT
+//     getValue(iEvent, srcHLTMhtCalo_,                mhtPt_["hltMhtCalo"],                mhtPhi_["hltMhtCalo"]);
+//     getValue(iEvent, srcHLTMhtPF_,                  mhtPt_["hltMhtPF"],                  mhtPhi_["hltMhtPF"]);
+
+
+//     // ********************************************************************************
+//     // *                           Loop over Jet collections                          *
+//     // ********************************************************************************
+
+//     // HT and AlphaT
+// #ifdef SIMULATION
+//     genAk4AlphaTHT40              = calculateAlphaTHT( genAk4,      40.);
+// #endif
+//     hltAk4CaloAlphaTHT40          = calculateAlphaTHT( hltAk4Calo,  40.);
+//     hltAk4CaloIDAlphaTHT40        = calculateAlphaTHT( hltAk4CaloID,  40.);
+//     hltAk4PFAlphaTHT40            = calculateAlphaTHT( hltAk4PF,    40.);
+//     // recoAk4CaloAlphaTHT40         = calculateAlphaTHT( recoAk4Calo, 40.);
+//     // recoAk4PFAlphaTHT40           = calculateAlphaTHT( recoAk4PF,   40.);
+
+//     // Dynamic HT and AlphaT 
+//     // genAk4DynamicAlphaTHT40    = calculateDynamicAlphaTPairs( genAk4,    dynamicJetThreshold );
+//     // hltAk4PFDynamicAlphaTHT40  = calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold );
+// #ifdef SIMULATION
+//     calculateDynamicAlphaTPairs( genAk4, dynamicJetThreshold, genAk4DynamicAlphaT40, genAk4DynamicHT40 );
+// #endif
+//     calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold, hltAk4PFDynamicAlphaT40, hltAk4PFDynamicHT40 );
+
+//     //    recoAk4PFDynamicAlphaTHT40 = calculateDynamicAlphaTPairs( recoAk4PF, dynamicJetThreshold );
+
+//     // ********************************************************************************
+//     // Calculate: Biased deltaPhi, tagJet index, AlphaTVector, BetaTScalar, BetaTVector
+//     // ********************************************************************************
+//     // genAk4BiasedDPhi    = calculateBiasedDeltaPhi( genAk4,    genAk4BiasedDPhiIndex);
+//     // recoAk4PFBiasedDPhi = calculateBiasedDeltaPhi( recoAk4PF, recoAk4PFBiasedDPhiIndex);
+//     // hltAk4PFBiasedDPhi  = calculateBiasedDeltaPhi( hltAk4PF,  hltAk4PFBiasedDPhiIndex);
+
+// #ifdef SIMULATION
+//     calculateBDPhiAlphaBetaT( genAk4,    40., genAk4BiasedDPhi,  genAk4BiasedDPhiIndex, 
+// 			      genAk4VecAlphaT40,    genAk4ScaBetaT40,    genAk4VecBetaT40);
+// #endif
+//     // calculateBDPhiAlphaBetaT( recoAk4PF, 40., recoAk4PFBiasedDPhi, recoAk4PFBiasedDPhiIndex,
+//     // 			      recoAk4PFVecAlphaT40, recoAk4PFScaBetaT40, recoAk4PFVecBetaT40);
+//     calculateBDPhiAlphaBetaT( hltAk4PF,  40., hltAk4PFBiasedDPhi,  hltAk4PFBiasedDPhiIndex, 
+// 			      hltAk4PFVecAlphaT40,  hltAk4PFScaBetaT40,  hltAk4PFVecBetaT40);
+
+
+//     // ******************************************************************************** 
+//     // Calculate: DeltaR of leading jets L1-Gen, HLT-Gen
+//     // ******************************************************************************** 
+
+// #ifdef SIMULATION
+//     L1GenDeltaR  = leadL1GenDeltaR(    gctCenUnskimmed,  gctForUnskimmed, genJet4Unskimmed );
+//     HLTGenDeltaR = leadHLTGenDeltaR( hltAk4PFUnskimmed, genJet4Unskimmed );
+//     hpuVeto      = (L1GenDeltaR < 0.5);
+
+//     genAk4_AlphaTPrime40     = calculateAlphaTPrime( genAk4MHT40.first,      genAk4AlphaTHT40.second );
+//     genAk4MHT40              = calculateMHT( genAk4,      40.);
+//     genAk4ForMHT40           = calculateMHT( genAk4For,      40.);
+// #endif
+
+//     // MHT
+//     hltAk4CaloMHT40          = calculateMHT( hltAk4Calo,  40.);
+//     hltAk4CaloIDMHT40        = calculateMHT( hltAk4CaloID,40.);
+//     hltAk4PFMHT40            = calculateMHT( hltAk4PF,    40.);
+//     // recoAk4CaloMHT40         = calculateMHT( recoAk4Calo, 40.);
+//     // recoAk4PFMHT40           = calculateMHT( recoAk4PF,   40.);
+
+//     hltAk4PFForMHT40         = calculateMHT( hltAk4PFFor,    40.);
+//     //recoAk4PFForMHT40        = calculateMHT( recoAk4PFFor,   40.);
+
+//     // AlphaT prime
+//     hltAk4Calo_AlphaTPrime40    = calculateAlphaTPrime( hltAk4CaloMHT40.first,  hltAk4CaloAlphaTHT40.second );
+//     hltAk4CaloID_AlphaTPrime40  = calculateAlphaTPrime( hltAk4CaloIDMHT40.first,  hltAk4CaloIDAlphaTHT40.second );
+//     hltAk4PF_AlphaTPrime40      = calculateAlphaTPrime( hltAk4PFMHT40.first,    hltAk4PFAlphaTHT40.second );
+//     // recoAk4Calo_AlphaTPrime40   = calculateAlphaTPrime( recoAk4CaloMHT40.first, recoAk4CaloAlphaTHT40.second );
+//     // recoAk4PF_AlphaTPrime40     = calculateAlphaTPrime( recoAk4PFMHT40.first,   recoAk4PFAlphaTHT40.second );
+
+
+//     // ****************************************
+//     // MHT-MET deltaPhi
+//     // ****************************************
+//     hltMetCaloPFMht40_DeltaPhi = fabs( deltaPhi( metPhi_["hltMetCalo"], hltAk4PFMHT40.second ) );
+//     //genMetCaloMht40_DeltaPhi   = fabs( deltaPhi( metPhi_["genMetCalo"], genAk4MHT40.second )   );
+
+//     // ----------------------------------------
+//     // Analysis binning
+//     // ----------------------------------------
     
-    // genMatchedAk4RECOPF = matchJetCollections( jetPt["genAk4"],    jetEta["genAk4"],    jetPhi["genAk4"],
-    // 					       jetPt["recoAk4PF"], jetEta["recoAk4PF"], jetPhi["recoAk4PF"], 20., 0.25 );
+// #ifdef SIMULATION
+//     genAk4NJet40              = calculateNJet( genAk4,      40.);
+//     genAk4NJetBin40           = calculateNJetBin( genAk4,      40.);
+//     genAk4HTBin40           = calculateHTBin( genAk4AlphaTHT40.second,      genAk4AlphaTHT40.first );
+// #endif
+//     hltAk4CaloIDNJet40        = calculateNJet( hltAk4CaloID,  40.);
+//     hltAk4CaloNJet40          = calculateNJet( hltAk4Calo,  40.);
+//     hltAk4PFNJet40            = calculateNJet( hltAk4PF,    40.);
+//     // recoAk4CaloNJet40         = calculateNJet( recoAk4Calo, 40.);
+//     // recoAk4PFNJet40           = calculateNJet( recoAk4PF,   40.);
+
+
+//     hltAk4CaloNJetBin40       = calculateNJetBin( hltAk4Calo,  40.);
+//     hltAk4CaloIDNJetBin40     = calculateNJetBin( hltAk4CaloID,  40.);
+//     hltAk4PFNJetBin40         = calculateNJetBin( hltAk4PF,    40.);
+//     // recoAk4CaloNJetBin40      = calculateNJetBin( recoAk4Calo, 40.);
+//     // recoAk4PFNJetBin40        = calculateNJetBin( recoAk4PF,   40.);
+
+
+//     hltAk4CaloHTBin40       = calculateHTBin( hltAk4CaloAlphaTHT40.second,  hltAk4CaloAlphaTHT40.first );
+//     hltAk4CaloIDHTBin40     = calculateHTBin( hltAk4CaloIDAlphaTHT40.second,  hltAk4CaloIDAlphaTHT40.first );
+//     hltAk4PFHTBin40         = calculateHTBin( hltAk4PFAlphaTHT40.second,    hltAk4PFAlphaTHT40.first );
+//     // recoAk4CaloHTBin40      = calculateHTBin( recoAk4CaloAlphaTHT40.second, recoAk4CaloAlphaTHT40.first );
+//     // recoAk4PFHTBin40        = calculateHTBin( recoAk4PFAlphaTHT40.second,   recoAk4PFAlphaTHT40.first );
+
+
+//     // ----------------------------------------
+//     // Store jet collections
+//     // ----------------------------------------
+
+// #ifdef SIMULATION
+//     storeJet( "genAk4",                 genAk4,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     storeJet( "genAk4For",              genAk4For,              jetPt, jetPx, jetPy, jetEta, jetPhi );
+// #endif
+
+//     storeJet( "hltAk4Calo",             hltAk4Calo,             jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     storeJet( "hltAk4CaloID",           hltAk4CaloID,           jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     storeJet( "hltAk4PF",               hltAk4PF,               jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     // storeJet( "recoAk4Calo",            recoAk4Calo,            jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     // storeJet( "recoAk4PF",              recoAk4PF,              jetPt, jetPx, jetPy, jetEta, jetPhi );
+
+
+//     storeJet( "hltAk4CaloFor",          hltAk4CaloFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     storeJet( "hltAk4CaloIDFor",        hltAk4CaloIDFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     storeJet( "hltAk4PFFor",            hltAk4PFFor,            jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     // storeJet( "recoAk4CaloFor",         recoAk4CaloFor,         jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     // storeJet( "recoAk4PFFor",           recoAk4PFFor,           jetPt, jetPx, jetPy, jetEta, jetPhi );
+
+// #ifdef L1
+//     // ----------------------------------------
+//     // L1 seeds
+//     // ----------------------------------------
+
+//     storeJet( "gctCen",                 gctCen,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+//     storeJet( "gctFor",                 gctFor,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+
+//     L1HTT175        = ( ht_["gct"]    >= 175);
+//     L1ETM70         = ( metPt_["gct"] >= 70);
+//     L1HTT175OrETM70 = (L1HTT175 || L1ETM70);
+
+//     L1Jet_DPhi  = -1;
+//     if (jetPhi["gctCen"]->size() > 1){
+//       L1Jet_DPhi      = fabs( deltaPhi( (*jetPhi["gctCen"])[0], (*jetPhi["gctCen"])[1] ) );
+//     }
+// #endif
+    
+//     // ----------------------------------------
+//     // Perform jet matching
+//     // ----------------------------------------
+// #ifdef SIMULATION
+//     genMatchedAk4HLTPF  = matchJetCollections( jetPt["genAk4"],   jetEta["genAk4"],   jetPhi["genAk4"],
+//     					       jetPt["hltAk4PF"], jetEta["hltAk4PF"], jetPhi["hltAk4PF"], 20., 0.25 );
+// #endif
+//     // genMatchedAk4RECOPF = matchJetCollections( jetPt["genAk4"],    jetEta["genAk4"],    jetPhi["genAk4"],
+//     // 					       jetPt["recoAk4PF"], jetEta["recoAk4PF"], jetPhi["recoAk4PF"], 20., 0.25 );
     
 
 
