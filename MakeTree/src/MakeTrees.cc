@@ -168,13 +168,6 @@ class MakeTrees : public edm::EDAnalyzer {
     float L1Jet_DPhi;
 
 
-    //VInputTag srcHLTAk4Calo;
-    edm::EDGetTokenT<VInputTag> srcHLTAk4Calo;
-
-    edm::EDGetTokenT<edm::View<reco::CaloJetCollection> > hltAk4CaloCollection_;
-
-    edm::EDGetTokenT<edm::View< reco::MET> > hltCaloMetCollection_;
-  edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
 
 
     VInputTag srcHLTAk4CaloID;
@@ -401,7 +394,8 @@ class MakeTrees : public edm::EDAnalyzer {
   edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetIDToken_;
   edm::EDGetTokenT<reco::PFJetCollection>   hltAk4PFJetToken_;
 
-
+  edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
+  edm::EDGetTokenT<reco::METCollection>     hltPFMetToken_;
 
   edm::EDGetTokenT<reco::CandidateCollection> hltAk4CaloJetToken2_;
 
@@ -797,12 +791,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcUctMht_ = pset.getParameter<edm::InputTag>("srcUctMht");
     srcUctJet_ = pset.getParameter<edm::InputTag>("srcUctJet");
 
-    srcHLTMetCalo_                = pset.getParameter<edm::InputTag>("srcHLTMetCalo");
-    srcHLTMetCleanCalo_           = pset.getParameter<edm::InputTag>("srcHLTMetCleanCalo");   
-    srcHLTMetCleanUsingJetIDCalo_ = pset.getParameter<edm::InputTag>("srcHLTMetCleanUsingJetIDCalo");
-    srcHLTMetPF_                  = pset.getParameter<edm::InputTag>("srcHLTMetPF");
-    srcHLTMhtCalo_                = pset.getParameter<edm::InputTag>("srcHLTMhtCalo");
-    srcHLTMhtPF_                  = pset.getParameter<edm::InputTag>("srcHLTMhtPF");
 
     // Gen 
     srcGenMetCalo_                = pset.getParameter<edm::InputTag>("srcGenMetCalo");
@@ -829,26 +817,10 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     hltAk4CaloJetIDToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloIDSrc"));
     hltAk4PFJetToken_     = consumes<reco::PFJetCollection>(pset.getParameter<edm::InputTag>("hltAk4PFSrc"));
 
+    hltCaloMetToken_      = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
+    hltPFMetToken_        = consumes<reco::METCollection>(pset.getParameter<edm::InputTag>("hltPFMetSrc"));
 
 
-
-
-    hltCaloMetCollection_  = consumes<edm::View< reco::MET> > ( pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
-
-
-    hltCaloMetTag_    = pset.getParameter<edm::InputTag>("hltCaloMetSrc");
-    hltCaloMetToken_  = consumes<reco::CaloMETCollection>( hltCaloMetTag_ );
-
-
-    hltAk4CaloJetToken2_ = consumes<reco::CandidateCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
-
-
-//hltCaloMetToken_  = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
-
-
-
-    srcHLTAk4CaloID       = pset.getParameter<VInputTag>("srcHLTAk4CaloID");
-    srcHLTAk4PF            = pset.getParameter<VInputTag>("srcHLTAk4PF");
 
 #ifdef RECO    
     srcAk4Calo       = pset.getParameter<VInputTag>("srcAk4Calo");
@@ -949,6 +921,15 @@ namespace {
 	  phi = handle->at(0).phi();
 	}
     }
+  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::CaloMET> >& handle, Float_t& pt, Float_t& phi) {
+	if(!handle.isValid()){ pt  = 0; phi = 0; }
+	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
+  }
+  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::MET> >& handle, Float_t& pt, Float_t& phi) {
+	if(!handle.isValid()){ pt  = 0; phi = 0; }
+	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
+  }
+
 
   //   void getSumEtL1(const edm::Event& evt, const edm::InputTag& tag, Float_t& sumet,bool upgrade) {
   // 	if(!upgrade) {
@@ -1142,19 +1123,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   hltCaloJetIDForUnskimmed = hltCaloJetIDUnskimmed;
   hltPFJetForUnskimmed     = hltPFJetUnskimmed;
 
-
-
-  edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;  iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);
    
-  std::cout << hltCaloMetHandle.isValid() << "\n";
-
-    //    if(!handle.isValid()){
-
-    // const reco::CaloMET &hltCaloMetH = hltCaloMetHandle->front();
-    // std::cout << hltCaloMetH.pt() << "\t" << hltCaloMetH.phi() << "\n";
-
-    //getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
-
 
 //     std::vector<const reco::Candidate*> hltAk4CaloIDUnskimmed           = getCollections( iEvent, srcHLTAk4Calo );
 //     // std::vector<const reco::Candidate*> recoAk4CaloUnskimmed            = getCollections( iEvent, srcAk4Calo );
@@ -1174,8 +1143,8 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     }
 
 
-//     // Clear previous event's objects
-//     // --------------------------------------------------------------------------------
+    // Clear previous event's objects
+    // --------------------------------------------------------------------------------
 
 //     genElectronPt->clear();
 //     genElectronEta->clear();
@@ -1213,7 +1182,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     genPhotonVeto      = false;
 //     genIsoLeptonVeto   = false;
 //     genIsoElectronVeto = false;
-
 
 //     std::vector<int> selLeptonIndices;
 //     int particleIndex(0);
@@ -1268,8 +1236,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     // Jet lepton cleaning
 //     // --------------------------------------------------------------------------------
 
-//     // std::cout << "\nBefore cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
-//     // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
 // #ifdef LEPTON_XCLEANING
 //     if (genMuonVeto){
 //       //crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, nIsoMuons, 0.3, 40. );
@@ -1338,61 +1304,61 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // --------------------------------------------------------------------------------
 
 
-//     // Forward jet
-// #ifdef SIMULATION 
-//     genAk4ForMaxPt    = 0;
-//     if ( genAk4For.size()   > 0){    genAk4ForMaxPt =    genAk4For.at(0)->pt(); }
-// #endif
-//     //recoAk4PFForMaxPt = 0;
-//     hltAk4PFForMaxPt  = 0;
-//     //if (recoAk4PFFor.size() > 0){ recoAk4PFForMaxPt = recoAk4PFFor.at(0)->pt(); }
-//     if ( hltAk4PFFor.size() > 0){  hltAk4PFForMaxPt =  hltAk4PFFor.at(0)->pt(); }
+    // Forward jet
+#ifdef SIMULATION 
+    genAk4ForMaxPt    = 0;
+    if ( genAk4For.size()   > 0){    genAk4ForMaxPt =    genAk4For.at(0)->pt(); }
+#endif
+    //recoAk4PFForMaxPt = 0;
+    hltAk4PFForMaxPt  = 0;
+    //if (recoAk4PFFor.size() > 0){ recoAk4PFForMaxPt = recoAk4PFFor.at(0)->pt(); }
+    if ( hltAk4PFFor.size() > 0){  hltAk4PFForMaxPt =  hltAk4PFFor.at(0)->pt(); }
 
-//     // Lead jet 
-// #ifdef SIMULATION 
-//     genAk4LeadJetPt= 0;
-//     if ( genAk4.size()     > 0){ genAk4LeadJetPt      =     genAk4.at(0)->pt(); }
-// #endif
-//     //recoAk4PFLeadJetPt= 0;
-//     hltAk4PFLeadJetPt= 0;
-//     hltAk4CaloLeadJetPt= 0;
-//     hltAk4CaloIDLeadJetPt= 0;
-//     //if (recoAk4PF.size()   > 0){ recoAk4PFLeadJetPt   =  recoAk4PF.at(0)->pt(); }
-//     if ( hltAk4PF.size()   > 0){ hltAk4PFLeadJetPt    =   hltAk4PF.at(0)->pt(); }
-//     if ( hltAk4Calo.size() > 0){ hltAk4CaloLeadJetPt  = hltAk4Calo.at(0)->pt(); }
-//     if ( hltAk4CaloID.size() > 0){ hltAk4CaloIDLeadJetPt  = hltAk4CaloID.at(0)->pt(); }
+    // Lead jet 
+#ifdef SIMULATION 
+    genAk4LeadJetPt= 0;
+    if ( genAk4.size()     > 0){ genAk4LeadJetPt      =     genAk4.at(0)->pt(); }
+#endif
+    //recoAk4PFLeadJetPt= 0;
+    hltAk4PFLeadJetPt= 0;
+    hltAk4CaloLeadJetPt= 0;
+    hltAk4CaloIDLeadJetPt= 0;
+    //if (recoAk4PF.size()   > 0){ recoAk4PFLeadJetPt   =  recoAk4PF.at(0)->pt(); }
+    if ( hltAk4PF.size()   > 0){ hltAk4PFLeadJetPt    =   hltAk4PF.at(0)->pt(); }
+    if ( hltAk4Calo.size() > 0){ hltAk4CaloLeadJetPt  = hltAk4Calo.at(0)->pt(); }
+    if ( hltAk4CaloID.size() > 0){ hltAk4CaloIDLeadJetPt  = hltAk4CaloID.at(0)->pt(); }
 
-//     // Second jet
-// #ifdef SIMULATION 
-//     genAk4SecondJetPt= 0;
-//     if ( genAk4.size()     > 1){ genAk4SecondJetPt      =     genAk4.at(1)->pt(); }
-// #endif
-//     //    recoAk4PFSecondJetPt= 0;
-//     hltAk4PFSecondJetPt= 0;
-//     hltAk4CaloSecondJetPt= 0;
-//     hltAk4CaloIDSecondJetPt= 0;
-//     //    if (recoAk4PF.size()   > 1){ recoAk4PFSecondJetPt   =  recoAk4PF.at(1)->pt(); }
-//     if ( hltAk4PF.size()   > 1){ hltAk4PFSecondJetPt    =   hltAk4PF.at(1)->pt(); }
-//     if ( hltAk4Calo.size() > 1){ hltAk4CaloSecondJetPt  = hltAk4Calo.at(1)->pt(); }
-//     if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDSecondJetPt  = hltAk4CaloID.at(1)->pt(); }
+    // Second jet
+#ifdef SIMULATION 
+    genAk4SecondJetPt= 0;
+    if ( genAk4.size()     > 1){ genAk4SecondJetPt      =     genAk4.at(1)->pt(); }
+#endif
+    //    recoAk4PFSecondJetPt= 0;
+    hltAk4PFSecondJetPt= 0;
+    hltAk4CaloSecondJetPt= 0;
+    hltAk4CaloIDSecondJetPt= 0;
+    //    if (recoAk4PF.size()   > 1){ recoAk4PFSecondJetPt   =  recoAk4PF.at(1)->pt(); }
+    if ( hltAk4PF.size()   > 1){ hltAk4PFSecondJetPt    =   hltAk4PF.at(1)->pt(); }
+    if ( hltAk4Calo.size() > 1){ hltAk4CaloSecondJetPt  = hltAk4Calo.at(1)->pt(); }
+    if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDSecondJetPt  = hltAk4CaloID.at(1)->pt(); }
 
-//     // Dijet avg 
-// #ifdef SIMULATION
-//     genAk4DijetAvgPt= 0;
-//     if ( genAk4.size()     > 1){ genAk4DijetAvgPt      = 0.5*(genAk4.at(0)->pt()     + genAk4.at(1)->pt()); }
-// #endif
-//     //    recoAk4PFDijetAvgPt= 0;
-//     hltAk4PFDijetAvgPt= 0;
-//     hltAk4CaloDijetAvgPt= 0;
-//     hltAk4CaloIDDijetAvgPt= 0;
-//     //    if (recoAk4PF.size()   > 1){ recoAk4PFDijetAvgPt   = 0.5*(recoAk4PF.at(0)->pt()  + recoAk4PF.at(1)->pt()); }
-//     if ( hltAk4PF.size()   > 1){ hltAk4PFDijetAvgPt    = 0.5*(hltAk4PF.at(0)->pt()   + hltAk4PF.at(1)->pt()); }
-//     if ( hltAk4Calo.size() > 1){ hltAk4CaloDijetAvgPt  = 0.5*(hltAk4Calo.at(0)->pt() + hltAk4Calo.at(1)->pt()); }
-//     if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDDijetAvgPt  = 0.5*(hltAk4CaloID.at(0)->pt() + hltAk4CaloID.at(1)->pt()); }
+    // Dijet avg 
+#ifdef SIMULATION
+    genAk4DijetAvgPt= 0;
+    if ( genAk4.size()     > 1){ genAk4DijetAvgPt      = 0.5*(genAk4.at(0)->pt()     + genAk4.at(1)->pt()); }
+#endif
+    //    recoAk4PFDijetAvgPt= 0;
+    hltAk4PFDijetAvgPt= 0;
+    hltAk4CaloDijetAvgPt= 0;
+    hltAk4CaloIDDijetAvgPt= 0;
+    //    if (recoAk4PF.size()   > 1){ recoAk4PFDijetAvgPt   = 0.5*(recoAk4PF.at(0)->pt()  + recoAk4PF.at(1)->pt()); }
+    if ( hltAk4PF.size()   > 1){ hltAk4PFDijetAvgPt    = 0.5*(hltAk4PF.at(0)->pt()   + hltAk4PF.at(1)->pt()); }
+    if ( hltAk4Calo.size() > 1){ hltAk4CaloDijetAvgPt  = 0.5*(hltAk4Calo.at(0)->pt() + hltAk4Calo.at(1)->pt()); }
+    if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDDijetAvgPt  = 0.5*(hltAk4CaloID.at(0)->pt() + hltAk4CaloID.at(1)->pt()); }
 
-//     // ********************************************************************************
-//     // *                                  Energy sums                                 *
-//     // ********************************************************************************
+    // ********************************************************************************
+    // *                                  Energy sums                                 *
+    // ********************************************************************************
     
 // #ifdef L1
 //     getValue(iEvent,   srcGctMht_, mhtPt_["gct"], mhtPhi_["gct"]);
@@ -1409,12 +1375,27 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     getValue(iEvent, srcGenMetCaloAndNonPrompt_,    metPt_["genMetCaloAndNonPrompt"],    metPhi_["genMetCaloAndNonPrompt"]);
 //     getValue(iEvent, srcGenMetTrue_,                metPt_["genMetTrue"],                metPhi_["genMetTrue"]);
 // #endif
-//     // hltMet
-//     getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
-//     getValue(iEvent, srcHLTMetCleanCalo_,           metPt_["hltMetCleanCalo"],           metPhi_["hltMetCleanCalo"]);
-//     getValue(iEvent, srcHLTMetCleanUsingJetIDCalo_, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
-//     getValue(iEvent, srcHLTMetPF_,                  metPt_["hltMetPF"],                  metPhi_["hltMetPF"]);
-//     // hltMHT
+
+    // hltMet
+    // getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
+    // getValue(iEvent, srcHLTMetCleanCalo_,           metPt_["hltMetCleanCalo"],           metPhi_["hltMetCleanCalo"]);
+    // getValue(iEvent, srcHLTMetCleanUsingJetIDCalo_, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
+
+    //    if(!handle.isValid()){
+
+    // const reco::CaloMET &hltCaloMetH = hltCaloMetHandle->front();
+    // std::cout << hltCaloMetH.pt() << "\t" << hltCaloMetH.phi() << "\n";
+
+  edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;  iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);    
+  getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
+
+  edm::Handle<reco::METCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
+  getValue(iEvent, hltPFMetHandle,                metPt_["hltMetPF"],                metPhi_["hltMetPF"]);
+
+
+
+  //    getValue(iEvent, srcHLTMetPF_,                  metPt_["hltMetPF"],                  metPhi_["hltMetPF"]);
+//     // hltmht
 //     getValue(iEvent, srcHLTMhtCalo_,                mhtPt_["hltMhtCalo"],                mhtPhi_["hltMhtCalo"]);
 //     getValue(iEvent, srcHLTMhtPF_,                  mhtPt_["hltMhtPF"],                  mhtPhi_["hltMhtPF"]);
 
