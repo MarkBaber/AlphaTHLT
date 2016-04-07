@@ -67,6 +67,8 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
     # HLT jets
     hltAk4CaloSrc          = cms.InputTag("hltAK4CaloJetsCorrected"),
+    hltAk4CaloIDSrc        = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
+    hltAk4PFSrc            = cms.InputTag("hltAK4PFJetsCorrected"),
 
     
     HLTResults = cms.InputTag("TriggerResults"),
@@ -74,7 +76,6 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     #hltCaloMetSrc = cms.InputTag( "hltMet","","HLT2"),
     hltCaloMetSrc = cms.InputTag( "hltMetClean"),  #","","HLT2"),
 
-    inputJetTag = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
 
 
     srcHLTAk4PF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           

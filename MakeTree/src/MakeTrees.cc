@@ -398,6 +398,10 @@ class MakeTrees : public edm::EDAnalyzer {
 
 
   edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetToken_;
+  edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetIDToken_;
+  edm::EDGetTokenT<reco::PFJetCollection>   hltAk4PFJetToken_;
+
+
 
   edm::EDGetTokenT<reco::CandidateCollection> hltAk4CaloJetToken2_;
 
@@ -821,11 +825,13 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcGctJetForward_ = pset.getParameter<VInputTag>("srcGctJetForward");
 #endif
 
+    hltAk4CaloJetToken_   = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
+    hltAk4CaloJetIDToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloIDSrc"));
+    hltAk4PFJetToken_     = consumes<reco::PFJetCollection>(pset.getParameter<edm::InputTag>("hltAk4PFSrc"));
 
-    //srcHLTAk4Calo         = pset.getParameter<VInputTag>("srcHLTAk4Calo");
-    //srcHLTAk4Calo         = consumes<VInputTag> ( pset.getParameter<VInputTag>("srcHLTAk4Calo"));
 
-    //hltAk4CaloCollection_ = consumes<edm::View<reco::CaloJetCollection> > ( pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
+
+
 
     hltCaloMetCollection_  = consumes<edm::View< reco::MET> > ( pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
 
@@ -833,7 +839,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     hltCaloMetTag_    = pset.getParameter<edm::InputTag>("hltCaloMetSrc");
     hltCaloMetToken_  = consumes<reco::CaloMETCollection>( hltCaloMetTag_ );
 
-    hltAk4CaloJetToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
+
     hltAk4CaloJetToken2_ = consumes<reco::CandidateCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
 
 
@@ -877,43 +883,42 @@ namespace {
 		const { return candA->pt() > candB->pt(); }
     };
 
+
   // Turn a set of InputTags into a collection of candidate pointers.
-  std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const VInputTag& collections) {
+  //edm::Handle<std::vector<reco::CaloJet> >&
+  std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::Handle<std::vector<reco::CaloJet> >& handle) {
+    //std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::EDGetTokenT<reco::CandidateCollection>& token){
     std::vector<const reco::Candidate*> output;
-    // Loop over collections
-    for (size_t i = 0; i < collections.size(); ++i) {
-      edm::Handle<edm::View<reco::Candidate> > handle;
-      evt.getByLabel(collections[i], handle);
-      // Loop over objects in current collection
-      for (size_t j = 0; j < handle->size(); ++j) {
-	const reco::Candidate& object = handle->at(j);
-	output.push_back(&object);
+    // edm::Handle<reco::CandidateCollection> handle;
+    // evt.getByToken(token, handle);
+
+    if (handle.isValid()){
+      std::vector<TLorentzVector> myJets;
+      //reco::CandidateCollection::const_iterator jetIt;
+      reco::CaloJetCollection::const_iterator jetIt;
+      for(jetIt = handle->begin(); jetIt != handle->end(); ++jetIt){
+	TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
+	myJets.push_back(j);
       }
     }
     return output;
   }
 
-  // Turn a set of InputTags into a collection of candidate pointers.
-  //edm::Handle<std::vector<reco::CaloJet> >&
-  //std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::Handle<std::vector<reco::CaloJet> >& handle) {
-  //std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::Handle<reco::CandidateCollection>& handle) {
-  std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::EDGetTokenT<reco::CandidateCollection>& token){
+
+  std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::Handle<std::vector<reco::PFJet> >& handle) {
     std::vector<const reco::Candidate*> output;
 
-    edm::Handle<reco::CandidateCollection> handle;
-    evt.getByToken(token, handle);
-
-    std::vector<TLorentzVector> myJets;
-    reco::CandidateCollection::const_iterator jetIt;
-
-    for(jetIt = handle->begin(); jetIt != handle->end(); ++jetIt){
-      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
-      myJets.push_back(j);
-      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
+    if (handle.isValid()){
+      std::vector<TLorentzVector> myJets;
+      reco::PFJetCollection::const_iterator jetIt;
+      for(jetIt = handle->begin(); jetIt != handle->end(); ++jetIt){
+	TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
+	myJets.push_back(j);
+      }
     }
-
     return output;
   }
+
 
   // // Turn a set of InputTags into a collection of candidate pointers.
   // std::vector<const reco::PFJet*> getPFCollections(const edm::Event& evt, const VInputTag& collections) {
@@ -1071,8 +1076,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
       if ( (triggerBits->accept(i)) ){
 	  std::cout << "Trigger " << names.triggerName(i) << std::endl;
-	  int a;
-	  std::cin >> a;
 	}
     }
 
@@ -1124,92 +1127,51 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     std::vector<const reco::Candidate*> genJet4ForUnskimmed             = getCollections( iEvent, srcGen4Jet_);
 #endif
 
+  std::vector<const reco::Candidate*> hltCaloJetUnskimmed, hltCaloJetForUnskimmed;
+  std::vector<const reco::Candidate*> hltCaloJetIDUnskimmed, hltCaloJetIDForUnskimmed;
+  std::vector<const reco::Candidate*> hltPFJetUnskimmed,   hltPFJetForUnskimmed;
 
-  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetHandle; 
-  iEvent.getByToken(hltAk4CaloJetToken_, hltAk4CaloJetHandle);
-  std::cout << "Calojets = " << hltAk4CaloJetHandle.isValid() << "\n";
+  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetHandle; iEvent.getByToken(hltAk4CaloJetToken_, hltAk4CaloJetHandle);
+  if (hltAk4CaloJetHandle.isValid()){ hltCaloJetUnskimmed = getCollections( iEvent, hltAk4CaloJetHandle); }
+  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetIDHandle; iEvent.getByToken(hltAk4CaloJetIDToken_, hltAk4CaloJetIDHandle);
+  if (hltAk4CaloJetIDHandle.isValid()){ hltCaloJetIDUnskimmed = getCollections( iEvent, hltAk4CaloJetIDHandle); }
+  edm::Handle<reco::PFJetCollection> hltAk4PFJetHandle; iEvent.getByToken(hltAk4PFJetToken_, hltAk4PFJetHandle);
+  if (hltAk4PFJetHandle.isValid())  { hltPFJetUnskimmed   = getCollections( iEvent, hltAk4PFJetHandle); }
 
-  edm::Handle<reco::CandidateCollection> handle;
-  iEvent.getByToken(hltAk4CaloJetToken2_, handle);
-  std::cout << "Calojets = " << handle.isValid() << "\n";
-
-  if (handle.isValid()){
-
-    std::vector<const reco::Candidate*> genJet4Unskimmed = getCollections( iEvent, hltAk4CaloJetToken2_);
-
-    reco::CandidateCollection::const_iterator jetIt;
-    for(jetIt = handle->begin(); jetIt != handle->end(); ++jetIt){
-      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
-      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
-    }
-
-  }
-
-  // const VInputTag& collections;
-  //   for (size_t i = 0; i < collections.size(); ++i) {
-  //     edm::Handle<edm::View<reco::Candidate> > handle;
-  //     evt.getByLabel(collections[i], handle);
-  //     // Loop over objects in current collection
-  //     for (size_t j = 0; j < handle->size(); ++j) {
-  // 	const reco::Candidate& object = handle->at(j);
-  //     }
-  //   }
-
-  
-  if (hltAk4CaloJetHandle.isValid()){
-
-    //std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, hltAk4CaloJetHandle);
-    //std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, hltAk4CaloJetToken_);
-
-    std::vector<TLorentzVector> myJets;
-    reco::CaloJetCollection::const_iterator jetIt;
-    for(jetIt = hltAk4CaloJetHandle->begin(); jetIt != hltAk4CaloJetHandle->end(); ++jetIt){
-      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
-      myJets.push_back(j);
-      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
-    }
-  }
+  hltCaloJetForUnskimmed   = hltCaloJetUnskimmed;
+  hltCaloJetIDForUnskimmed = hltCaloJetIDUnskimmed;
+  hltPFJetForUnskimmed     = hltPFJetUnskimmed;
 
 
 
-    edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;
-    //iEvent.getByToken(hltCaloMetCollection_, hltCaloMetHandle);
-    iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);
-    
-
-    std::cout << hltCaloMetHandle.isValid() << "\n";
+  edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;  iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);
+   
+  std::cout << hltCaloMetHandle.isValid() << "\n";
 
     //    if(!handle.isValid()){
 
     // const reco::CaloMET &hltCaloMetH = hltCaloMetHandle->front();
     // std::cout << hltCaloMetH.pt() << "\t" << hltCaloMetH.phi() << "\n";
 
-
-
     //getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
 
 
-    //    std::vector<const reco::Candidate*> hltAk4CaloUnskimmed             = getCollections( iEvent, srcHLTAk4Calo2 );
 //     std::vector<const reco::Candidate*> hltAk4CaloIDUnskimmed           = getCollections( iEvent, srcHLTAk4Calo );
-//     std::vector<const reco::Candidate*> hltAk4PFUnskimmed               = getCollections( iEvent, srcHLTAk4PF );
 //     // std::vector<const reco::Candidate*> recoAk4CaloUnskimmed            = getCollections( iEvent, srcAk4Calo );
 //     // std::vector<const reco::Candidate*> recoAk4PFUnskimmed              = getCollections( iEvent, srcAk4PF   );
 //     //std::vector<const reco::PFJet*>     hltAk4PFJetUnskimmed            = getPFCollections( iEvent, srcHLTAk4PF );
-
-//     std::vector<const reco::Candidate*> hltAk4CaloForUnskimmed          = getCollections( iEvent, srcHLTAk4Calo );
 //     std::vector<const reco::Candidate*> hltAk4CaloIDForUnskimmed        = getCollections( iEvent, srcHLTAk4CaloID );
-//     std::vector<const reco::Candidate*> hltAk4PFForUnskimmed            = getCollections( iEvent, srcHLTAk4PF );
 //     // std::vector<const reco::Candidate*> recoAk4CaloForUnskimmed         = getCollections( iEvent, srcAk4Calo );
 //     // std::vector<const reco::Candidate*> recoAk4PFForUnskimmed           = getCollections( iEvent, srcAk4PF   );
 
  
-//     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
-// 	jetPt[*iLvl] ->clear(); 
-// 	jetPx[*iLvl] ->clear(); 
-// 	jetPy[*iLvl] ->clear(); 
-// 	jetPhi[*iLvl]->clear();
-// 	jetEta[*iLvl]->clear();
-//     }
+    for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
+	jetPt[*iLvl] ->clear(); 
+	jetPx[*iLvl] ->clear(); 
+	jetPy[*iLvl] ->clear(); 
+	jetPhi[*iLvl]->clear();
+	jetEta[*iLvl]->clear();
+    }
 
 
 //     // Clear previous event's objects
@@ -1341,42 +1303,39 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 
 
-//     // Skim jet collections
-//     // ----------------------------------------
+    // Skim jet collections
+    // ----------------------------------------
 
-// #ifdef L1
-//     std::vector<const reco::Candidate*> gctFor                 = skimJets(gctForUnskimmed,                 minPt, minEtaFor, maxEtaFor ); 
-//     std::vector<const reco::Candidate*> gctCen              = skimJets(gctCenUnskimmed,              minPt, minEtaCen, maxEtaCen );
-// #endif
-// #ifdef SIMULATION 
-//     std::vector<const reco::Candidate*> genAk4              = skimJets(genJet4Unskimmed,             minPt, minEtaCen, maxEtaCen );
-//     std::vector<const reco::Candidate*> genAk4For              = skimJets(genJet4ForUnskimmed,             minPt, minEtaFor, maxEtaFor );
-// #endif
-
-
-//     // Central jets
-//     // --------------------
-
-//     std::vector<const reco::Candidate*> hltAk4Calo          = skimJets(hltAk4CaloUnskimmed,          minPt, minEtaCen, maxEtaCen );
-//     std::vector<const reco::Candidate*> hltAk4CaloID        = skimJets(hltAk4CaloIDUnskimmed,        minPt, minEtaCen, maxEtaCen );
-//     std::vector<const reco::Candidate*> hltAk4PF            = skimJets(hltAk4PFUnskimmed,            minPt, minEtaCen, maxEtaCen );
-//     // std::vector<const reco::Candidate*> recoAk4Calo         = skimJets(recoAk4CaloUnskimmed,         minPt, minEtaCen, maxEtaCen );
-//     // std::vector<const reco::Candidate*> recoAk4PF           = skimJets(recoAk4PFUnskimmed,           minPt, minEtaCen, maxEtaCen );
+#ifdef L1
+    std::vector<const reco::Candidate*> gctFor                 = skimJets(gctForUnskimmed,                 minPt, minEtaFor, maxEtaFor ); 
+    std::vector<const reco::Candidate*> gctCen              = skimJets(gctCenUnskimmed,              minPt, minEtaCen, maxEtaCen );
+#endif
+#ifdef SIMULATION 
+    std::vector<const reco::Candidate*> genAk4              = skimJets(genJet4Unskimmed,             minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> genAk4For              = skimJets(genJet4ForUnskimmed,             minPt, minEtaFor, maxEtaFor );
+#endif
 
 
-//     // Forward jets
-//     // --------------------
+    // Central jets
+    // --------------------
+    std::vector<const reco::Candidate*> hltAk4Calo          = skimJets(hltCaloJetUnskimmed,          minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> hltAk4CaloID        = skimJets(hltCaloJetIDUnskimmed,        minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> hltAk4PF            = skimJets(hltPFJetUnskimmed,            minPt, minEtaCen, maxEtaCen );
+    // std::vector<const reco::Candidate*> recoAk4Calo         = skimJets(recoAk4CaloUnskimmed,         minPt, minEtaCen, maxEtaCen );
+    // std::vector<const reco::Candidate*> recoAk4PF           = skimJets(recoAk4PFUnskimmed,           minPt, minEtaCen, maxEtaCen );
 
 
-//     std::vector<const reco::Candidate*> hltAk4CaloFor          = skimJets(hltAk4CaloForUnskimmed,          minPt, minEtaFor, maxEtaFor );
-//     std::vector<const reco::Candidate*> hltAk4CaloIDFor        = skimJets(hltAk4CaloIDForUnskimmed,        minPt, minEtaFor, maxEtaFor );
-//     std::vector<const reco::Candidate*> hltAk4PFFor            = skimJets(hltAk4PFForUnskimmed,            minPt, minEtaFor, maxEtaFor );
-//     // std::vector<const reco::Candidate*> recoAk4CaloFor         = skimJets(recoAk4CaloForUnskimmed,         minPt, minEtaFor, maxEtaFor );
-//     // std::vector<const reco::Candidate*> recoAk4PFFor           = skimJets(recoAk4PFForUnskimmed,           minPt, minEtaFor, maxEtaFor );
+    // Forward jets
+    // --------------------
+    std::vector<const reco::Candidate*> hltAk4CaloFor          = skimJets(hltCaloJetForUnskimmed,          minPt, minEtaFor, maxEtaFor );
+    std::vector<const reco::Candidate*> hltAk4CaloIDFor        = skimJets(hltCaloJetIDForUnskimmed,        minPt, minEtaFor, maxEtaFor );
+    std::vector<const reco::Candidate*> hltAk4PFFor            = skimJets(hltPFJetForUnskimmed,            minPt, minEtaFor, maxEtaFor );
+    // std::vector<const reco::Candidate*> recoAk4CaloFor         = skimJets(recoAk4CaloForUnskimmed,         minPt, minEtaFor, maxEtaFor );
+    // std::vector<const reco::Candidate*> recoAk4PFFor           = skimJets(recoAk4PFForUnskimmed,           minPt, minEtaFor, maxEtaFor );
 
 
-//     // Jets
-//     // --------------------------------------------------------------------------------
+    // Jets
+    // --------------------------------------------------------------------------------
 
 
 //     // Forward jet
