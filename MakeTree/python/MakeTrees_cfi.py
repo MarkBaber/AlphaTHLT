@@ -71,7 +71,8 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     hltAk4PFSrc            = cms.InputTag("hltAK4PFJetsCorrected"),
 
     
-    HLTResults = cms.InputTag("TriggerResults"),
+    #HLTResults = cms.InputTag("TriggerResults"),         # Emulated
+    HLTResults = cms.InputTag("TriggerResults","","HLT"), # Recorded (In data)
 
     #hltCaloMetSrc = cms.InputTag( "hltMet","","HLT2"),
     hltCaloMetSrc = cms.InputTag( "hltMet"),

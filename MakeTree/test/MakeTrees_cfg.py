@@ -26,7 +26,7 @@ elif (bx == "50ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40
 elif (bx == "AVE30BX50"): from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU30bx50_26May15v2_cfi import *
 elif (bx == "20PU25ns"):  from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
 elif (bx == "40PU25ns"):  from AlphaTHLT.MakeTree.samples._74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3_25Jul15_cfi import *
-elif (bx =="Data"):       from AlphaTHLT.MakeTree.samples.Run2015D_03Apr16_cfi import *
+elif (bx =="Data"):       from AlphaTHLT.MakeTree.samples.Run2015D_07Apr16_cfi import *
 else:  
     print "Error: Bunch spacing '", bx, "' not recognised\n"
     exit(0)
