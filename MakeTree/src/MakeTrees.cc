@@ -399,6 +399,7 @@ class MakeTrees : public edm::EDAnalyzer {
 
   edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetToken_;
 
+  edm::EDGetTokenT<reco::CandidateCollection> hltAk4CaloJetToken2_;
 
 
 };
@@ -833,6 +834,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     hltCaloMetToken_  = consumes<reco::CaloMETCollection>( hltCaloMetTag_ );
 
     hltAk4CaloJetToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
+    hltAk4CaloJetToken2_ = consumes<reco::CandidateCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
 
 
 //hltCaloMetToken_  = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
@@ -866,16 +868,13 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 MakeTrees::~MakeTrees() {
 }
 
-
 namespace {
 
     // Predicate to sort candidates by descending pt
     class CandPtSorter {
 	public:
 	    bool operator()(const reco::Candidate* candA, const reco::Candidate* candB)
-		const {
-		    return candA->pt() > candB->pt();
-		}
+		const { return candA->pt() > candB->pt(); }
     };
 
   // Turn a set of InputTags into a collection of candidate pointers.
@@ -894,6 +893,27 @@ namespace {
     return output;
   }
 
+  // Turn a set of InputTags into a collection of candidate pointers.
+  //edm::Handle<std::vector<reco::CaloJet> >&
+  //std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::Handle<std::vector<reco::CaloJet> >& handle) {
+  //std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::Handle<reco::CandidateCollection>& handle) {
+  std::vector<const reco::Candidate*> getCollections(const edm::Event& evt, const edm::EDGetTokenT<reco::CandidateCollection>& token){
+    std::vector<const reco::Candidate*> output;
+
+    edm::Handle<reco::CandidateCollection> handle;
+    evt.getByToken(token, handle);
+
+    std::vector<TLorentzVector> myJets;
+    reco::CandidateCollection::const_iterator jetIt;
+
+    for(jetIt = handle->begin(); jetIt != handle->end(); ++jetIt){
+      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
+      myJets.push_back(j);
+      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
+    }
+
+    return output;
+  }
 
   // // Turn a set of InputTags into a collection of candidate pointers.
   // std::vector<const reco::PFJet*> getPFCollections(const edm::Event& evt, const VInputTag& collections) {
@@ -925,129 +945,99 @@ namespace {
 	}
     }
 
-    void getSumEtL1(const edm::Event& evt, const edm::InputTag& tag, Float_t& sumet,bool upgrade) {
-	if(!upgrade) {
-	    edm::Handle<l1extra::L1EtMissParticleCollection> handle;
-	    evt.getByLabel(tag, handle);
-	    sumet = handle->at(0).etTotal();
-	} else{
-	    edm::Handle<edm::View<reco::Candidate> > handle;
-	    evt.getByLabel(tag, handle);
-	    sumet = handle->at(0).pt();
-	}
-    }
+  //   void getSumEtL1(const edm::Event& evt, const edm::InputTag& tag, Float_t& sumet,bool upgrade) {
+  // 	if(!upgrade) {
+  // 	    edm::Handle<l1extra::L1EtMissParticleCollection> handle;
+  // 	    evt.getByLabel(tag, handle);
+  // 	    sumet = handle->at(0).etTotal();
+  // 	} else{
+  // 	    edm::Handle<edm::View<reco::Candidate> > handle;
+  // 	    evt.getByLabel(tag, handle);
+  // 	    sumet = handle->at(0).pt();
+  // 	}
+  //   }
 
-    const double PI = 3.14159265359;
-
-
-    // inline float deltaPhi( float phi1, float phi2 ){
-
-    // 	float const  PI        = ROOT::Math::Pi();
-    // 	float const  TWOPI     = 2.*PI;
-    // 	float dPhi = (phi1 - phi2);
-    // 	while (dPhi >= PI) dPhi -= TWOPI;
-    // 	while (dPhi < -PI) dPhi += TWOPI;
-    // 	return dPhi;
-
-    // }
-
-
-  UInt_t calculateNJet(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
+  // UInt_t calculateNJet(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
     
-    UInt_t NJets(0);
-    for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
-      if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
-      NJets++;
-    }
-    return NJets;
-  }
-  Int_t calculateNJetBin(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
-    // Returns the following:
-    // 0 = No bin
-    //-1 = eq2a,-2 = eq3a,-3 = ge4a
-    // 1 = eq2j, 2 = eq3j, 3 = ge4j
-    Int_t NJetBin(-1); 
-    for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
-      if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
-      NJetBin++;
-      if (NJetBin == 3){ break; }
-    }
-    if ( NJetBin == -1){ NJetBin = 0; } // No jets
+  //   UInt_t NJets(0);
+  //   for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
+  //     if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
+  //     NJets++;
+  //   }
+  //   return NJets;
+  // }
+  // Int_t calculateNJetBin(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
+  //   // Returns the following:
+  //   // 0 = No bin
+  //   //-1 = eq2a,-2 = eq3a,-3 = ge4a
+  //   // 1 = eq2j, 2 = eq3j, 3 = ge4j
+  //   Int_t NJetBin(-1); 
+  //   for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
+  //     if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
+  //     NJetBin++;
+  //     if (NJetBin == 3){ break; }
+  //   }
+  //   if ( NJetBin == -1){ NJetBin = 0; } // No jets
 
-    // Asymmetric bin
-    if ( NJetBin > 0 ){ // Require two jets
-      if ( jets.at(1)->pt() < 100. ){ NJetBin *= -1; } // Bin is asymmetric
-    }
+  //   // Asymmetric bin
+  //   if ( NJetBin > 0 ){ // Require two jets
+  //     if ( jets.at(1)->pt() < 100. ){ NJetBin *= -1; } // Bin is asymmetric
+  //   }
 
-    return NJetBin;
-  }
+  //   return NJetBin;
+  // }
 
-  Int_t calculateHTBin( float ht, float alphaT ){
+  // Int_t calculateHTBin( float ht, float alphaT ){
 
-    Int_t HTBin(-1); 
-    if ( ht >= 200){
-      if (ht < 250)     { // 200 < HT < 250
-	if (alphaT >= 0.65){ HTBin = 0; }
-      }
-      else if (ht < 300){ // 250 < HT < 300
-	if (alphaT >= 0.60){ HTBin = 1; }
-      }
-      else if (ht < 350){ // 300 < HT < 350
-	if (alphaT >= 0.55){ HTBin = 2; }
-      }
-      else if (ht < 400){ // 350 < HT < 400
-	if (alphaT >= 0.53){ HTBin = 3; }
-      }
-      else if (ht < 500){ // 400 < HT < 500
-	if (alphaT >= 0.52){ HTBin = 4; }
-      }
-      else{               // HT > 500
-	if (alphaT >= 0.52){ HTBin = 5; }
-      }
+  //   Int_t HTBin(-1); 
+  //   if ( ht >= 200){
+  //     if (ht < 250)     { // 200 < HT < 250
+  // 	if (alphaT >= 0.65){ HTBin = 0; }
+  //     }
+  //     else if (ht < 300){ // 250 < HT < 300
+  // 	if (alphaT >= 0.60){ HTBin = 1; }
+  //     }
+  //     else if (ht < 350){ // 300 < HT < 350
+  // 	if (alphaT >= 0.55){ HTBin = 2; }
+  //     }
+  //     else if (ht < 400){ // 350 < HT < 400
+  // 	if (alphaT >= 0.53){ HTBin = 3; }
+  //     }
+  //     else if (ht < 500){ // 400 < HT < 500
+  // 	if (alphaT >= 0.52){ HTBin = 4; }
+  //     }
+  //     else{               // HT > 500
+  // 	if (alphaT >= 0.52){ HTBin = 5; }
+  //     }
 
-    }
+  //   }
 
-    return HTBin;
-  }
+  //   return HTBin;
+  // }
 
 
-  std::pair<float, float> calculateMHT(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
-    TLorentzVector mhtVec;
+  // std::pair<float, float> calculateMHT(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
+  //   TLorentzVector mhtVec;
 
-    for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
+  //   for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
       
-      if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
+  //     if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
 
-      TLorentzVector jet;
-      jet.SetPtEtaPhiM( jets.at(iJet)->pt(), jets.at(iJet)->eta(), jets.at(iJet)->phi(), jets.at(iJet)->mass() );
-      mhtVec += jet;
+  //     TLorentzVector jet;
+  //     jet.SetPtEtaPhiM( jets.at(iJet)->pt(), jets.at(iJet)->eta(), jets.at(iJet)->phi(), jets.at(iJet)->mass() );
+  //     mhtVec += jet;
       
-    }
-    // Rotate by 180 degrees
-    mhtVec = -mhtVec;
+  //   }
+  //   // Rotate by 180 degrees
+  //   mhtVec = -mhtVec;
 
-    return std::make_pair( mhtVec.Pt(), mhtVec.Phi() );
-  }
+  //   return std::make_pair( mhtVec.Pt(), mhtVec.Phi() );
+  // }
 
 }
 
 
 void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
-
-
-  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetHandle; 
-  iEvent.getByToken(hltAk4CaloJetToken_, hltAk4CaloJetHandle);
-  std::cout << "Calojets = " << hltAk4CaloJetHandle.isValid() << "\n";
-  
-  if (hltAk4CaloJetHandle.isValid()){
-    std::vector<TLorentzVector> myJets;
-    reco::CaloJetCollection::const_iterator jetIt;
-    for(jetIt = hltAk4CaloJetHandle->begin(); jetIt != hltAk4CaloJetHandle->end(); ++jetIt){
-      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
-      myJets.push_back(j);
-      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
-    }
-  }
 
 
   NVTX = 0;
@@ -1135,16 +1125,51 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 #endif
 
 
-    //edm::Handle<reco::Candidate> hltAk4CaloHandle; 
-    edm::Handle<edm::View<reco::CaloJetCollection> > hltAk4CaloHandle; 
-    //iEvent.getByToken(hltAk4CaloCollection_, hltAk4CaloHandle);
+  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetHandle; 
+  iEvent.getByToken(hltAk4CaloJetToken_, hltAk4CaloJetHandle);
+  std::cout << "Calojets = " << hltAk4CaloJetHandle.isValid() << "\n";
 
-    //std::cout << hltAk4CaloHandle->size() << "\n";
+  edm::Handle<reco::CandidateCollection> handle;
+  iEvent.getByToken(hltAk4CaloJetToken2_, handle);
+  std::cout << "Calojets = " << handle.isValid() << "\n";
 
-    // for (size_t j = 0; j < hltAk4CaloHandle->size(); ++j) {
-    //   const reco::CaloJet& object = hltAk4CaloHandle->at(j);
-    //   std::cout << &object << "\n";
-    // }
+  if (handle.isValid()){
+
+    std::vector<const reco::Candidate*> genJet4Unskimmed = getCollections( iEvent, hltAk4CaloJetToken2_);
+
+    reco::CandidateCollection::const_iterator jetIt;
+    for(jetIt = handle->begin(); jetIt != handle->end(); ++jetIt){
+      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
+      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
+    }
+
+  }
+
+  // const VInputTag& collections;
+  //   for (size_t i = 0; i < collections.size(); ++i) {
+  //     edm::Handle<edm::View<reco::Candidate> > handle;
+  //     evt.getByLabel(collections[i], handle);
+  //     // Loop over objects in current collection
+  //     for (size_t j = 0; j < handle->size(); ++j) {
+  // 	const reco::Candidate& object = handle->at(j);
+  //     }
+  //   }
+
+  
+  if (hltAk4CaloJetHandle.isValid()){
+
+    //std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, hltAk4CaloJetHandle);
+    //std::vector<const reco::Candidate*> genJet4Unskimmed                = getCollections( iEvent, hltAk4CaloJetToken_);
+
+    std::vector<TLorentzVector> myJets;
+    reco::CaloJetCollection::const_iterator jetIt;
+    for(jetIt = hltAk4CaloJetHandle->begin(); jetIt != hltAk4CaloJetHandle->end(); ++jetIt){
+      TLorentzVector j; j.SetPtEtaPhiE(jetIt->pt(),jetIt->eta(), jetIt->phi(), jetIt->energy());
+      myJets.push_back(j);
+      std::cout << jetIt->pt() << " " << jetIt->eta() << " " << jetIt->phi() << "\n";
+    }
+  }
+
 
 
     edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;
