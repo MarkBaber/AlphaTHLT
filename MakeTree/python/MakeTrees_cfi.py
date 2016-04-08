@@ -78,8 +78,6 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     hltCaloMetSrc = cms.InputTag( "hltMet"),
     hltPFMetSrc   = cms.InputTag( "hltPFMETProducer"),
 
-
-
     srcHLTAk4PF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
     srcHLTAk4Calo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrected","","")), 
     srcHLTAk4CaloID        = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")), 
