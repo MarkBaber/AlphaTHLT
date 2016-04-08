@@ -301,9 +301,9 @@ class MakeTrees : public edm::EDAnalyzer {
 
     UInt_t maxjet_;
     bool usePU_; 
-    UInt_t run_;
-    UInt_t lumi_;
-    ULong64_t event_;
+    unsigned int run;
+    unsigned int lumi;
+    unsigned int event;
 
     // Jet skim cuts
     double minPt;
@@ -475,6 +475,11 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("NVTX",  &NVTX,  "NVTX/i");
     tree->Branch("PThat", &PThat, "PThat/f");
 
+    tree->Branch("run",  &run,  "run/i");
+    tree->Branch("lumi", &lumi, "lumi/i");
+    tree->Branch("evt",  &event,"evt/i");
+
+
 
     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
 
@@ -503,36 +508,43 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
     } // End ilvl loop
 
-    // Maximum forward jet PT
+
+
+
+#ifdef SIMULATION
     tree->Branch("genAk4For_MaxPt",      &genAk4ForMaxPt,               "genAk4For_MaxPt/f");
+    tree->Branch("genAk4Lead_Pt",      &genAk4LeadJetPt,               "genAk4Lead_Pt/f");
+    tree->Branch("genAk4DijetAvg_Pt",      &genAk4DijetAvgPt,               "genAk4DijetAvg_Pt/f");
+    tree->Branch("genAk4Second_Pt",      &genAk4SecondJetPt,               "genAk4Second_Pt/f");
+#endif
+
+    // Maximum forward jet PT
     //tree->Branch("recoAk4PFFor_MaxPt",   &recoAk4PFForMaxPt,            "recoAk4PFFor_MaxPt/f");
     tree->Branch("hltAk4PFFor_MaxPt",    &hltAk4PFForMaxPt,             "hltAk4PFFor_MaxPt/f");
 
 
     // Lead jet 
-    tree->Branch("genAk4Lead_Pt",      &genAk4LeadJetPt,               "genAk4Lead_Pt/f");
     //    tree->Branch("recoAk4PFLead_Pt",   &recoAk4PFLeadJetPt,            "recoAk4PFLead_Pt/f");
     tree->Branch("hltAk4PFLead_Pt",    &hltAk4PFLeadJetPt,             "hltAk4PFLead_Pt/f");
     tree->Branch("hltAk4CaloLead_Pt",  &hltAk4CaloLeadJetPt,           "hltAk4CaloLead_Pt/f");
     tree->Branch("hltAk4CaloIDLead_Pt",  &hltAk4CaloIDLeadJetPt,           "hltAk4CaloIDLead_Pt/f");
     // Second jet 
-    tree->Branch("genAk4Second_Pt",      &genAk4SecondJetPt,               "genAk4Second_Pt/f");
     //tree->Branch("recoAk4PFSecond_Pt",   &recoAk4PFSecondJetPt,            "recoAk4PFSecond_Pt/f");
     tree->Branch("hltAk4PFSecond_Pt",    &hltAk4PFSecondJetPt,             "hltAk4PFSecond_Pt/f");
     tree->Branch("hltAk4CaloSecond_Pt",  &hltAk4CaloSecondJetPt,           "hltAk4CaloSecond_Pt/f");
     tree->Branch("hltAk4CaloIDSecond_Pt",  &hltAk4CaloIDSecondJetPt,           "hltAk4CaloIDSecond_Pt/f");
     // Dijet avg 
-    tree->Branch("genAk4DijetAvg_Pt",      &genAk4DijetAvgPt,               "genAk4DijetAvg_Pt/f");
+
     //tree->Branch("recoAk4PFDijetAvg_Pt",   &recoAk4PFDijetAvgPt,            "recoAk4PFDijetAvg_Pt/f");
     tree->Branch("hltAk4PFDijetAvg_Pt",    &hltAk4PFDijetAvgPt,             "hltAk4PFDijetAvg_Pt/f");
     tree->Branch("hltAk4CaloDijetAvg_Pt",  &hltAk4CaloDijetAvgPt,           "hltAk4CaloDijetAvg_Pt/f");
     tree->Branch("hltAk4CaloIDDijetAvg_Pt",  &hltAk4CaloIDDijetAvgPt,           "hltAk4CaloIDDijetAvg_Pt/f");
 
-
+#ifdef SIMULATION
     tree->Branch("hpuVeto",                  &hpuVeto,                      "hpuVeto/b");
     tree->Branch("leadL1GenDeltaR",          &L1GenDeltaR,                  "leadL1GenDeltaR/f");
     tree->Branch("leadHLTGenDeltaR",         &HLTGenDeltaR,                 "leadHLTGenDeltaR/f");
-
+#endif
 
     // Biased deltaPhi
     tree->Branch("genAk4_BiasedDPhi",         &genAk4BiasedDPhi,         "genAk4_BiasedDPhi/f");
@@ -543,9 +555,22 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("hltAk4PF_BiasedDPhiIndex",  &hltAk4PFBiasedDPhiIndex,  "hltAk4PF_BiasedDPhiIndex/I");
 
 
-    // AlphaT, HT  
+#ifdef SIMULATION
     tree->Branch("genAk4_AlphaT40",      &genAk4AlphaTHT40.first,       "genAk4_AlphaT40/f");
     tree->Branch("genAk4_HT40",          &genAk4AlphaTHT40.second,      "genAk4_HT40/f");
+    tree->Branch("genAk4_AlphaTPrime40",      &genAk4_AlphaTPrime40,      "genAk4_AlphaTPrime40/f");
+    tree->Branch("genAk4_DynamicAlphaTHT40",    "std::vector<std::pair<float,float>>", &genAk4DynamicAlphaTHT40);
+    tree->Branch("genAk4_DynamicAlphaT40",   "std::vector<float>", &genAk4DynamicAlphaT40);
+    tree->Branch("genAk4_DynamicHT40",       "std::vector<float>", &genAk4DynamicHT40);
+
+    tree->Branch("genAk4_MhtPT40",       &genAk4MHT40.first,       "genAk4_MhtPT40/f");
+    tree->Branch("genAk4_MhtPhi40",      &genAk4MHT40.second,      "genAk4_MhtPhi40/f");
+    tree->Branch("genAk4For_MhtPT40",       &genAk4ForMHT40.first,       "genAk4For_MhtPT40/f");
+    tree->Branch("genAk4For_MhtPhi40",      &genAk4ForMHT40.second,      "genAk4For_MhtPhi40/f");
+
+#endif
+
+    // AlphaT, HT  
     tree->Branch("hltAk4PF_AlphaT40",    &hltAk4PFAlphaTHT40.first,     "hltAk4PF_AlphaT40/f");
     tree->Branch("hltAk4PF_HT40",        &hltAk4PFAlphaTHT40.second,    "hltAk4PF_HT40/f");
     tree->Branch("hltAk4Calo_AlphaT40",  &hltAk4CaloAlphaTHT40.first,   "hltAk4Calo_AlphaT40/f");
@@ -558,8 +583,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // tree->Branch("recoAk4Calo_AlphaT40", &recoAk4CaloAlphaTHT40.first,  "recoAk4Calo_AlphaT40/f");
     // tree->Branch("recoAk4Calo_HT40",     &recoAk4CaloAlphaTHT40.second, "recoAk4Calo_HT40/f");
 
-
-    tree->Branch("genAk4_AlphaTPrime40",      &genAk4_AlphaTPrime40,      "genAk4_AlphaTPrime40/f");
     tree->Branch("hltAk4Calo_AlphaTPrime40",  &hltAk4Calo_AlphaTPrime40,  "hltAk4Calo_AlphaTPrime40/f");
     tree->Branch("hltAk4CaloID_AlphaTPrime40",  &hltAk4CaloID_AlphaTPrime40,  "hltAk4CaloID_AlphaTPrime40/f");
     tree->Branch("hltAk4PF_AlphaTPrime40",    &hltAk4PF_AlphaTPrime40,    "hltAk4PF_AlphaTPrime40/f");
@@ -568,11 +591,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
     // Dynamic AlphaT, HT
-    tree->Branch("genAk4_DynamicAlphaTHT40",    "std::vector<std::pair<float,float>>", &genAk4DynamicAlphaTHT40);
     tree->Branch("hltAk4PF_DynamicAlphaTHT40",  "std::vector<std::pair<float,float>>", &hltAk4PFDynamicAlphaTHT40);
-
-    tree->Branch("genAk4_DynamicAlphaT40",   "std::vector<float>", &genAk4DynamicAlphaT40);
-    tree->Branch("genAk4_DynamicHT40",       "std::vector<float>", &genAk4DynamicHT40);
     tree->Branch("hltAk4PF_DynamicAlphaT40", "std::vector<float>", &hltAk4PFDynamicAlphaT40);
     tree->Branch("hltAk4PF_DynamicHT40",     "std::vector<float>", &hltAk4PFDynamicHT40);
 
@@ -580,8 +599,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
     // MHT
-    tree->Branch("genAk4_MhtPT40",       &genAk4MHT40.first,       "genAk4_MhtPT40/f");
-    tree->Branch("genAk4_MhtPhi40",      &genAk4MHT40.second,      "genAk4_MhtPhi40/f");
     tree->Branch("hltAk4PF_MhtPT40",     &hltAk4PFMHT40.first,     "hltAk4PF_MhtPT40/f");
     tree->Branch("hltAk4PF_MhtPhi40",    &hltAk4PFMHT40.second,    "hltAk4PF_MhtPhi40/f");
     tree->Branch("hltAk4Calo_MhtPT40",   &hltAk4CaloMHT40.first,   "hltAk4Calo_MhtPT40/f");
@@ -594,8 +611,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // tree->Branch("recoAk4Calo_MhtPT40",  &recoAk4CaloMHT40.first,  "recoAk4Calo_MhtPT40/f");
     // tree->Branch("recoAk4Calo_MhtPhi40", &recoAk4CaloMHT40.second, "recoAk4Calo_MhtPhi40/f");
 
-    tree->Branch("genAk4For_MhtPT40",       &genAk4ForMHT40.first,       "genAk4For_MhtPT40/f");
-    tree->Branch("genAk4For_MhtPhi40",      &genAk4ForMHT40.second,      "genAk4For_MhtPhi40/f");
     tree->Branch("hltAk4PFFor_MhtPT40",     &hltAk4PFForMHT40.first,     "hltAk4PFFor_MhtPT40/f");
     tree->Branch("hltAk4PFFor_MhtPhi40",    &hltAk4PFForMHT40.second,    "hltAk4PFFor_MhtPhi40/f");
     // tree->Branch("recoAk4PFFor_MhtPT40",    &recoAk4PFForMHT40.first,    "recoAk4PFFor_MhtPT40/f");
@@ -603,29 +618,30 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
     tree->Branch("hltMetCaloPFMht40_DeltaPhi", &hltMetCaloPFMht40_DeltaPhi, "hltMetCaloPFMht40_DeltaPhi/f");
-    tree->Branch("genMetCaloMht40_DeltaPhi",   &genMetCaloMht40_DeltaPhi,   "genMetCaloMht40_DeltaPhi/f");
+    //tree->Branch("genMetCaloMht40_DeltaPhi",   &genMetCaloMht40_DeltaPhi,   "genMetCaloMht40_DeltaPhi/f");
 
-    tree->Branch("genAk4_NJet40",      &genAk4NJet40,       "genAk4_NJet40/i");
+    //tree->Branch("genAk4_NJet40",      &genAk4NJet40,       "genAk4_NJet40/i");
     tree->Branch("hltAk4PF_NJet40",    &hltAk4PFNJet40,     "hltAk4PF_NJet40/i");
     tree->Branch("hltAk4Calo_NJet40",  &hltAk4CaloNJet40,   "hltAk4Calo_NJet40/i");
     tree->Branch("hltAk4CaloID_NJet40",  &hltAk4CaloIDNJet40,   "hltAk4CaloID_NJet40/i");
     // tree->Branch("recoAk4PF_NJet40",   &recoAk4PFNJet40,    "recoAk4PF_NJet40/i");
     // tree->Branch("recoAk4Calo_NJet40", &recoAk4CaloNJet40,  "recoAk4Calo_NJet40/i");
 
-    tree->Branch("genAk4_NJetBin40",      &genAk4NJetBin40,       "genAk4_NJetBin40/I");
+    //tree->Branch("genAk4_NJetBin40",      &genAk4NJetBin40,       "genAk4_NJetBin40/I");
     tree->Branch("hltAk4PF_NJetBin40",    &hltAk4PFNJetBin40,     "hltAk4PF_NJetBin40/I");
     tree->Branch("hltAk4Calo_NJetBin40",  &hltAk4CaloNJetBin40,   "hltAk4Calo_NJetBin40/I");
     tree->Branch("hltAk4CaloID_NJetBin40",  &hltAk4CaloIDNJetBin40,   "hltAk4CaloID_NJetBin40/I");
     // tree->Branch("recoAk4PF_NJetBin40",   &recoAk4PFNJetBin40,    "recoAk4PF_NJetBin40/I");
     // tree->Branch("recoAk4Calo_NJetBin40", &recoAk4CaloNJetBin40,  "recoAk4Calo_NJetBin40/I");
 
-    tree->Branch("genAk4_HTBin40",      &genAk4HTBin40,       "genAk4_HTBin40/I");
+    //tree->Branch("genAk4_HTBin40",      &genAk4HTBin40,       "genAk4_HTBin40/I");
     tree->Branch("hltAk4PF_HTBin40",    &hltAk4PFHTBin40,     "hltAk4PF_HTBin40/I");
     tree->Branch("hltAk4Calo_HTBin40",  &hltAk4CaloHTBin40,   "hltAk4Calo_HTBin40/I");
     tree->Branch("hltAk4CaloID_HTBin40",  &hltAk4CaloIDHTBin40,   "hltAk4CaloID_HTBin40/I");
     // tree->Branch("recoAk4PF_HTBin40",   &recoAk4PFHTBin40,    "recoAk4PF_HTBin40/I");
     // tree->Branch("recoAk4Calo_HTBin40", &recoAk4CaloHTBin40,  "recoAk4Calo_HTBin40/I");
 
+#ifdef L1
     // Energy sums
     tree->Branch("gct_Ht",       &ht_["gct"],      "gct_Ht/f");
     tree->Branch("gct_MhtPt",    &mhtPt_["gct"],   "gct_MhtPt/f");
@@ -635,7 +651,9 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("gct_Et",     &et_["gct"],     "gct_Et/f");
     tree->Branch("gct_MetPt",  &metPt_["gct"],  "gct_MetPt/f");
     tree->Branch("gct_MetPhi", &metPhi_["gct"], "gct_MetPhi/f");
+#endif
 
+#ifdef SIMULATION
     // GEN MET
     tree->Branch("genMetCalo_MetPt",              &metPt_["genMetCalo"],              "genMetCalo_MetPt/f");
     tree->Branch("genMetCaloAndNonPrompt_MetPt",  &metPt_["genMetCaloAndNonPrompt"],  "genMetCaloAndNonPrompt_MetPt/f");
@@ -643,6 +661,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("genMetCalo_MetPhi",             &metPhi_["genMetCalo"],             "genMetCalo_MetPhi/f");
     tree->Branch("genMetCaloAndNonPrompt_MetPhi", &metPhi_["genMetCaloAndNonPrompt"], "genMetCaloAndNonPrompt_MetPhi/f");
     tree->Branch("genMetTrue_MetPhi",             &metPhi_["genMetTrue"],             "genMetTrue_MetPhi/f");
+#endif
 
     // RECO MET
     tree->Branch("hltMetCalo_MetPT",                 &metPt_["hltMetCalo"],                 "hltMetCalo_MetPt/f");
@@ -657,6 +676,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("hltMhtCalo_MhtPT",              &mhtPt_["hltMhtCalo"],             "hltMhtCalo_MetPt/f");
     tree->Branch("hltMhtPF_MhtPT",                &mhtPt_["hltMhtPF"],               "hltMhtPF_MetPt/f");
 
+#ifdef SIMULATION
     // Gen leptons
     tree->Branch("genLeptonVeto",    &genLeptonVeto,       "genLeptonVeto/b");
     tree->Branch("genElectronVeto",  &genElectronVeto,     "genElectronVeto/b");
@@ -672,12 +692,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("genPhoton_Eta",    "std::vector<float>", &genPhotonEta);
     tree->Branch("genPhoton_Phi",    "std::vector<float>", &genPhotonPhi);		
 
-
     tree->Branch("genMatchedAk4HLTPF", "std::vector<int>", &genMatchedAk4HLTPF);
-
-
-    tree->Branch("nIsoMuons",     &nIsoMuons,     "nIsoMuons/i");
-    tree->Branch("nIsoElectrons", &nIsoElectrons, "nIsoMuons/i");
 
     tree->Branch("genMuonMatchedGenMuon_Pt",          "std::vector<float>", &genMuonMatchedGenMuonPt);
     tree->Branch("genMuonMatchedGenJet_Pt",           "std::vector<float>", &genMuonMatchedGenJetPt);
@@ -690,17 +705,19 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("genElectronMatchedHLTPFJet_Pt",         "std::vector<float>",     &genElectronMatchedHLTPFJetPt);
     tree->Branch("genElectronMatchedHLTPFJet_MuonEF",     "std::vector<float>",     &genElectronMatchedHLTPFJetMuonEF);
     tree->Branch("genElectronMatchedHLTPFJet_ElectronEF", "std::vector<float>",     &genElectronMatchedHLTPFJetElectronEF);
+#endif
 
-
+    tree->Branch("nIsoMuons",     &nIsoMuons,     "nIsoMuons/i");
+    tree->Branch("nIsoElectrons", &nIsoElectrons, "nIsoMuons/i");
 
     // Store L1 seeds
     // ------------------------------------------------------------
-
+#ifdef L1
     tree->Branch("L1HTT175",        &L1HTT175,         "L1HTT175/b");
     tree->Branch("L1ETM70",         &L1ETM70,          "L1ETM70/b");
     tree->Branch("L1HTT175OrETM70", &L1HTT175OrETM70,  "L1HTT175OrETM70/b");
     tree->Branch("L1Jet_DPhi",      &L1Jet_DPhi,       "L1Jet_DPhi/f");
-
+#endif
 
     // Store HLT paths
     // ------------------------------------------------------------
@@ -942,6 +959,13 @@ namespace {
 
 
 void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
+
+
+
+  run   = (unsigned int) iEvent.id().run();
+  lumi  = (unsigned int) iEvent.id().luminosityBlock();
+  event = (unsigned int) iEvent.id().event();
+
 
 
   NVTX = 0;
