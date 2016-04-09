@@ -19,6 +19,7 @@ def main():
     # ****************************************
 
     baseDir = "/vols/cms04/mb1512/Batch"
+    cmsswDir= "/vols/ssd00/cms/mbaber/NewAlphaTHLT/CMSSW_8_0_3_patch1/src/AlphaTHLT/MakeTree/test"
     
     # ****************************************
 
@@ -170,8 +171,8 @@ def main():
         tempShText +=     "export FILENAME=\""  + outputROOTName + "\"\n\n"
 
         tempShText +=     "# IC Batch Job Script\n"
-        tempShText +=     "export CMSSW_PROJECT_SRC=\"SUSY/UCTHLT/CMSSW_7_4_7/src\"\n"
-        tempShText +=     "cd /home/hep/mb1512/$CMSSW_PROJECT_SRC\n\n"
+        tempShText +=     "export CMSSW_PROJECT_SRC=\""+ cmsswDir + "\"\n"
+        tempShText +=     "cd $CMSSW_PROJECT_SRC\n\n"
 
         tempShText +=     "# source cms stuff\n"
         tempShText +=     "source /vols/cms/grid/setup.sh\n"
