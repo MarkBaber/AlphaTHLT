@@ -66,22 +66,22 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     genPhotonMaxEta           = cms.double( 2.5 ),                           
 
     # HLT jets
-    hltAk4CaloSrc          = cms.InputTag("hltAK4CaloJetsCorrected"),
-    hltAk4CaloIDSrc        = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
-    hltAk4PFSrc            = cms.InputTag("hltAK4PFJetsCorrected"),
+    hltCaloSrc          = cms.InputTag("hltAK4CaloJetsCorrected"),
+    hltCaloIDSrc        = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
+    hltPFSrc            = cms.InputTag("hltAK4PFJetsCorrected"),
 
     
-    #HLTResults = cms.InputTag("TriggerResults"),         # Emulated
-    HLTResults = cms.InputTag("TriggerResults","","HLT"), # Recorded (In data)
+    HLTResults     = cms.InputTag("TriggerResults"),          # Emulated
+    HLTResultsData = cms.InputTag("TriggerResults","","HLT"), # Recorded (In data)
 
     #hltCaloMetSrc = cms.InputTag( "hltMet","","HLT2"),
     hltCaloMetSrc = cms.InputTag( "hltMet"),
     hltPFMetSrc   = cms.InputTag( "hltPFMETProducer"),
 
-    srcHLTAk4PF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
-    srcHLTAk4Calo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrected","","")), 
-    srcHLTAk4CaloID        = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")), 
-    srcHLTAk4CaloNoFastJet = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassedNoFastJet","","")),                           
+    srcHLTPF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
+    srcHLTCalo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrected","","")), 
+    srcHLTCaloID        = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")), 
+    srcHLTCaloNoFastJet = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassedNoFastJet","","")),                           
 
     #Reco inputs
 #     srcCaloJet = cms.VInputTag(cms.InputTag("ak5CaloJets")),
@@ -89,12 +89,6 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 #     srcCaloJet = cms.VInputTag(cms.InputTag("PUsubAK5CaloJetProducer")),
 #     srcPfJet   = cms.VInputTag(cms.InputTag("PUsubAK5PFJetProducer")),
                            
-
-    # srcAk4Calo = cms.VInputTag(cms.InputTag("ak4CaloJetsL1FastL2L3")),
-    # srcAk4PF   = cms.VInputTag(cms.InputTag("ak4PFJetsCHSL1FastL2L3")),
-    srcAk4Calo = cms.VInputTag(),
-    srcAk4PF   = cms.VInputTag(),
-    
 
     #Parameters for HT
     #htThreshold = cms.double(30.0),

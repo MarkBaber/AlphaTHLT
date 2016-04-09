@@ -1,6 +1,7 @@
 // **************************************************
 // Switches
 // **************************************************
+#define DATA
 //#define SIMULATION
 //#define L1
 //#define RECO
@@ -87,8 +88,8 @@ class MakeTrees : public edm::EDAnalyzer {
     std::vector< const reco::Candidate*> skimJets(const std::vector<const reco::Candidate*>& inJets, double minPt, double minEta, double maxEta);
 
     float leadL1GenDeltaR( const std::vector<const reco::Candidate*>& gctCen, const std::vector<const reco::Candidate*>& gctFor, 
-			   const std::vector<const reco::Candidate*>& genAk4);
-    float leadHLTGenDeltaR( const std::vector<const reco::Candidate*>& hltAk4, const std::vector<const reco::Candidate*>& genAk4);
+			   const std::vector<const reco::Candidate*>& gen);
+    float leadHLTGenDeltaR( const std::vector<const reco::Candidate*>& hlt, const std::vector<const reco::Candidate*>& gen);
 
     void   lepJetDeltaR( std::vector<Float_t>* leptonEta, std::vector<Float_t>* leptonPhi, const std::vector<const reco::Candidate*>& jet,
                          std::vector<int>   &matchedJetIndexDeltaR, std::vector<float> &lepJetMinDeltaR );
@@ -113,21 +114,6 @@ class MakeTrees : public edm::EDAnalyzer {
 
 
   private:
-    //Get the UCT stuff
-    edm::InputTag srcUctMET_;
-    edm::InputTag srcUctMht_;
-    edm::InputTag srcUctJet_;
-
-    //Get the Stage 2 stuff
-    edm::InputTag srcS2Met_;
-    edm::InputTag srcS2DonutMht_;
-    VInputTag srcS2DonutJetCentral_;
-
-    edm::InputTag srcS2GlobalMht_;
-    VInputTag srcS2GlobalJetCentral_;
-
-    edm::InputTag srcS2NopusMht_;
-    VInputTag srcS2NopusJetCentral_;
 
     //Get the GCT stuff
     edm::InputTag srcGctMht_;
@@ -138,7 +124,6 @@ class MakeTrees : public edm::EDAnalyzer {
 
     //Get the Gen stuff
     VInputTag srcGen4Jet_;
-    //VInputTag srcGen5Jet_;
 
     edm::InputTag srcGenMetCalo_;
     edm::InputTag srcGenMetCaloAndNonPrompt_;
@@ -150,7 +135,6 @@ class MakeTrees : public edm::EDAnalyzer {
     edm::InputTag srcHLTMetPF_;
     edm::InputTag srcHLTMhtCalo_;
     edm::InputTag srcHLTMhtPF_;
-
 
     edm::InputTag srcGenParticles_;
     bool          makeGenParticles;
@@ -167,16 +151,6 @@ class MakeTrees : public edm::EDAnalyzer {
     bool L1HTT175OrETM70;
     float L1Jet_DPhi;
 
-
-
-
-    VInputTag srcHLTAk4CaloID;
-    //VInputTag srcHLTAk4CaloNoFastJet;
-    VInputTag srcHLTAk4PF;
-    VInputTag srcHLTAk4PFNoPU;
-
-    VInputTag srcAk4Calo;
-    VInputTag srcAk4PF;
 
 
     //Define the levels
@@ -230,44 +204,44 @@ class MakeTrees : public edm::EDAnalyzer {
     std::map<TString, bool> hltPathFired;
 
 
-    std::pair<float,float> genAk4AlphaTHT40;
-    std::pair<float,float> hltAk4PFAlphaTHT40;
-    std::pair<float,float> hltAk4CaloAlphaTHT40;
-    std::pair<float,float> hltAk4CaloIDAlphaTHT40;
-  //    std::pair<float,float> hltAk4CaloNoFastJetAlphaTHT40;
-  // std::pair<float,float> recoAk4PFAlphaTHT40;
-  // std::pair<float,float> recoAk4CaloAlphaTHT40;
+    std::pair<float,float> genAlphaTHT40;
+    std::pair<float,float> hltPFAlphaTHT40;
+    std::pair<float,float> hltCaloAlphaTHT40;
+    std::pair<float,float> hltCaloIDAlphaTHT40;
+  //    std::pair<float,float> hltCaloNoFastJetAlphaTHT40;
+  // std::pair<float,float> recoPFAlphaTHT40;
+  // std::pair<float,float> recoCaloAlphaTHT40;
 
 
-  float genAk4_AlphaTPrime40;
-  float hltAk4Calo_AlphaTPrime40;
-  float hltAk4CaloID_AlphaTPrime40;
-  float hltAk4PF_AlphaTPrime40;  
-  // float recoAk4Calo_AlphaTPrime40;
-  // float recoAk4PF_AlphaTPrime40; 
+  float gen_AlphaTPrime40;
+  float hltCalo_AlphaTPrime40;
+  float hltCaloID_AlphaTPrime40;
+  float hltPF_AlphaTPrime40;  
+  // float recoCalo_AlphaTPrime40;
+  // float recoPF_AlphaTPrime40; 
 
     // Dynamic HT, AlphaT
     float dynamicJetThreshold;
-    std::vector<std::pair<float,float> > genAk4DynamicAlphaTHT40;
-    std::vector<std::pair<float,float> > hltAk4PFDynamicAlphaTHT40;
-    std::vector<float> genAk4DynamicAlphaT40;
-    std::vector<float> genAk4DynamicHT40;
-    std::vector<float> hltAk4PFDynamicAlphaT40;
-    std::vector<float> hltAk4PFDynamicHT40;
+    std::vector<std::pair<float,float> > genDynamicAlphaTHT40;
+    std::vector<std::pair<float,float> > hltPFDynamicAlphaTHT40;
+    std::vector<float> genDynamicAlphaT40;
+    std::vector<float> genDynamicHT40;
+    std::vector<float> hltPFDynamicAlphaT40;
+    std::vector<float> hltPFDynamicHT40;
 
-  //    std::vector<std::pair<float,float> > recoAk4PFDynamicAlphaTHT40;
+  //    std::vector<std::pair<float,float> > recoPFDynamicAlphaTHT40;
 
 
-    std::pair<float,float> genAk4MHT40;
-    std::pair<float,float> hltAk4PFMHT40;
-    std::pair<float,float> hltAk4CaloMHT40;
-    std::pair<float,float> hltAk4CaloIDMHT40;
-    // std::pair<float,float> recoAk4PFMHT40;
-    // std::pair<float,float> recoAk4CaloMHT40;
+    std::pair<float,float> genMHT40;
+    std::pair<float,float> hltPFMHT40;
+    std::pair<float,float> hltCaloMHT40;
+    std::pair<float,float> hltCaloIDMHT40;
+    // std::pair<float,float> recoPFMHT40;
+    // std::pair<float,float> recoCaloMHT40;
 
-    std::pair<float,float> genAk4ForMHT40;
-    std::pair<float,float> hltAk4PFForMHT40;
-  //std::pair<float,float> recoAk4PFForMHT40;
+    std::pair<float,float> genForMHT40;
+    std::pair<float,float> hltPFForMHT40;
+  //std::pair<float,float> recoPFForMHT40;
 
   // DeltaR between leading jets of collections
   float L1GenDeltaR;
@@ -277,26 +251,26 @@ class MakeTrees : public edm::EDAnalyzer {
   float hltMetCaloPFMht40_DeltaPhi;
   float genMetCaloMht40_DeltaPhi;
 
-  UInt_t genAk4NJet40;
-  UInt_t hltAk4PFNJet40;
-  UInt_t hltAk4CaloNJet40;
-  UInt_t hltAk4CaloIDNJet40;
-  // UInt_t recoAk4PFNJet40;
-  // UInt_t recoAk4CaloNJet40;
+  UInt_t genNJet40;
+  UInt_t hltPFNJet40;
+  UInt_t hltCaloNJet40;
+  UInt_t hltCaloIDNJet40;
+  // UInt_t recoPFNJet40;
+  // UInt_t recoCaloNJet40;
   
-  Int_t genAk4NJetBin40;
-  Int_t hltAk4PFNJetBin40;
-  Int_t hltAk4CaloNJetBin40;
-  Int_t hltAk4CaloIDNJetBin40;
-  // Int_t recoAk4PFNJetBin40;
-  // Int_t recoAk4CaloNJetBin40;
+  Int_t genNJetBin40;
+  Int_t hltPFNJetBin40;
+  Int_t hltCaloNJetBin40;
+  Int_t hltCaloIDNJetBin40;
+  // Int_t recoPFNJetBin40;
+  // Int_t recoCaloNJetBin40;
 
-  Int_t genAk4HTBin40;
-  Int_t hltAk4PFHTBin40;
-  Int_t hltAk4CaloHTBin40;
-  Int_t hltAk4CaloIDHTBin40;
-  // Int_t recoAk4PFHTBin40;
-  // Int_t recoAk4CaloHTBin40;
+  Int_t genHTBin40;
+  Int_t hltPFHTBin40;
+  Int_t hltCaloHTBin40;
+  Int_t hltCaloIDHTBin40;
+  // Int_t recoPFHTBin40;
+  // Int_t recoCaloHTBin40;
 
 
     UInt_t maxjet_;
@@ -317,42 +291,42 @@ class MakeTrees : public edm::EDAnalyzer {
   
     float PThat;
 
-  float genAk4ForMaxPt;
-  //  float recoAk4PFForMaxPt;
-  float hltAk4PFForMaxPt;
+  float genForMaxPt;
+  //  float recoPFForMaxPt;
+  float hltPFForMaxPt;
 
   // Lead jet
-  float genAk4LeadJetPt;
-  //  float recoAk4PFLeadJetPt;
-  float hltAk4PFLeadJetPt;
-  float hltAk4CaloLeadJetPt;
-  float hltAk4CaloIDLeadJetPt;
+  float genLeadJetPt;
+  //  float recoPFLeadJetPt;
+  float hltPFLeadJetPt;
+  float hltCaloLeadJetPt;
+  float hltCaloIDLeadJetPt;
   // Second jet
-  float genAk4SecondJetPt;
-  //  float recoAk4PFSecondJetPt;
-  float hltAk4PFSecondJetPt;
-  float hltAk4CaloSecondJetPt;
-  float hltAk4CaloIDSecondJetPt;
+  float genSecondJetPt;
+  //  float recoPFSecondJetPt;
+  float hltPFSecondJetPt;
+  float hltCaloSecondJetPt;
+  float hltCaloIDSecondJetPt;
   // Dijet avg
-  float genAk4DijetAvgPt;
-  //  float recoAk4PFDijetAvgPt;
-  float hltAk4PFDijetAvgPt;
-  float hltAk4CaloDijetAvgPt;
-  float hltAk4CaloIDDijetAvgPt;
+  float genDijetAvePt;
+  //  float recoPFDijetAvePt;
+  float hltPFDijetAvePt;
+  float hltCaloDijetAvePt;
+  float hltCaloIDDijetAvePt;
 
 
   // Biased deltaPhi
-  float genAk4BiasedDPhi;   
-  //  float recoAk4PFBiasedDPhi; 
-  float hltAk4PFBiasedDPhi;  
+  float genBiasedDPhi;   
+  //  float recoPFBiasedDPhi; 
+  float hltPFBiasedDPhi;  
   // Tag jet index
-  Int_t genAk4BiasedDPhiIndex;   
-  //  Int_t recoAk4PFBiasedDPhiIndex; 
-  Int_t hltAk4PFBiasedDPhiIndex;  
+  Int_t genBiasedDPhiIndex;   
+  //  Int_t recoPFBiasedDPhiIndex; 
+  Int_t hltPFBiasedDPhiIndex;  
 
 
   // Matched indices
-  std::vector<int> genMatchedAk4HLTPF;
+  std::vector<int> genMatchedHLTPF;
 
   // Znunu emulation
   //std::vector<int> genMuonMatchedGenMuonIndex;
@@ -375,15 +349,16 @@ class MakeTrees : public edm::EDAnalyzer {
 
   edm::InputTag hltCaloMetTag_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+  edm::EDGetTokenT<edm::TriggerResults> triggerBitsData_;
 
-  edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetToken_;
-  edm::EDGetTokenT<reco::CaloJetCollection> hltAk4CaloJetIDToken_;
-  edm::EDGetTokenT<reco::PFJetCollection>   hltAk4PFJetToken_;
+  edm::EDGetTokenT<reco::CaloJetCollection> hltCaloJetToken_;
+  edm::EDGetTokenT<reco::CaloJetCollection> hltCaloJetIDToken_;
+  edm::EDGetTokenT<reco::PFJetCollection>   hltPFJetToken_;
 
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
   edm::EDGetTokenT<reco::METCollection>     hltPFMetToken_;
 
-  edm::EDGetTokenT<reco::CandidateCollection> hltAk4CaloJetToken2_;
+  //edm::EDGetTokenT<reco::CandidateCollection> hltCaloJetToken2_;
 
 
 };
@@ -397,20 +372,20 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
 #ifdef SIMULATION
-    lvl_.push_back("genAk4");
-    lvl_.push_back("genAk4For");
+    lvl_.push_back("gen");
+    lvl_.push_back("genFor");
 #endif
-    lvl_.push_back("hltAk4PF");
-    lvl_.push_back("hltAk4PFFor");
-    lvl_.push_back("hltAk4Calo");
-    lvl_.push_back("hltAk4CaloFor");
-    lvl_.push_back("hltAk4CaloID");
-    lvl_.push_back("hltAk4CaloIDFor");
+    lvl_.push_back("hltPF");
+    lvl_.push_back("hltPFFor");
+    lvl_.push_back("hltCalo");
+    lvl_.push_back("hltCaloFor");
+    lvl_.push_back("hltCaloID");
+    lvl_.push_back("hltCaloIDFor");
 
-    // lvl_.push_back("recoAk4PF");
-    // lvl_.push_back("recoAk4PFFor");
-    // lvl_.push_back("recoAk4Calo");
-    // lvl_.push_back("recoAk4CaloFor");
+    // lvl_.push_back("recoPF");
+    // lvl_.push_back("recoPFFor");
+    // lvl_.push_back("recoCalo");
+    // lvl_.push_back("recoCaloFor");
 #ifdef L1
     lvl_.push_back("gctCen");
     lvl_.push_back("gctFor");
@@ -433,28 +408,28 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     genPhotonPhi   = new std::vector<Float_t>();
 
     // Forward jet max Pt
-    genAk4ForMaxPt    = 0;
-    //    recoAk4PFForMaxPt = 0;
-    hltAk4PFForMaxPt  = 0;
+    genForMaxPt    = 0;
+    //    recoPFForMaxPt = 0;
+    hltPFForMaxPt  = 0;
 
     // Lead jet 
-    genAk4LeadJetPt    = 0;
-    //    recoAk4PFLeadJetPt = 0;
-    hltAk4PFLeadJetPt  = 0;
-    hltAk4CaloLeadJetPt= 0;
-    hltAk4CaloIDLeadJetPt= 0;
+    genLeadJetPt    = 0;
+    //    recoPFLeadJetPt = 0;
+    hltPFLeadJetPt  = 0;
+    hltCaloLeadJetPt= 0;
+    hltCaloIDLeadJetPt= 0;
     // Second jet 
-    genAk4SecondJetPt    = 0;
-    //    recoAk4PFSecondJetPt = 0;
-    hltAk4PFSecondJetPt  = 0;
-    hltAk4CaloSecondJetPt= 0;
-    hltAk4CaloIDSecondJetPt= 0;
+    genSecondJetPt    = 0;
+    //    recoPFSecondJetPt = 0;
+    hltPFSecondJetPt  = 0;
+    hltCaloSecondJetPt= 0;
+    hltCaloIDSecondJetPt= 0;
     // Dijet avg 
-    genAk4DijetAvgPt    = 0;
-    //    recoAk4PFDijetAvgPt = 0;
-    hltAk4PFDijetAvgPt  = 0;
-    hltAk4CaloDijetAvgPt= 0;
-    hltAk4CaloIDDijetAvgPt= 0;
+    genDijetAvePt    = 0;
+    //    recoPFDijetAvePt = 0;
+    hltPFDijetAvePt  = 0;
+    hltCaloDijetAvePt= 0;
+    hltCaloIDDijetAvePt= 0;
 
 
     genMuonMatchedGenMuonPt          = std::vector<float>();
@@ -469,8 +444,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     genElectronMatchedHLTPFJetMuonEF     = std::vector<float>();
     genElectronMatchedHLTPFJetElectronEF = std::vector<float>();
 
-
-
     // Event
     tree->Branch("NVTX",  &NVTX,  "NVTX/i");
     tree->Branch("PThat", &PThat, "PThat/f");
@@ -478,8 +451,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("run",  &run,  "run/i");
     tree->Branch("lumi", &lumi, "lumi/i");
     tree->Branch("evt",  &event,"evt/i");
-
-
 
     for(std::vector<TString>::const_iterator iLvl=lvl_.begin(); iLvl!=lvl_.end(); iLvl++){
 
@@ -512,33 +483,33 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
 #ifdef SIMULATION
-    tree->Branch("genAk4For_MaxPt",      &genAk4ForMaxPt,               "genAk4For_MaxPt/f");
-    tree->Branch("genAk4Lead_Pt",      &genAk4LeadJetPt,               "genAk4Lead_Pt/f");
-    tree->Branch("genAk4DijetAvg_Pt",      &genAk4DijetAvgPt,               "genAk4DijetAvg_Pt/f");
-    tree->Branch("genAk4Second_Pt",      &genAk4SecondJetPt,               "genAk4Second_Pt/f");
+    tree->Branch("genFor_MaxPt",      &genForMaxPt,               "genFor_MaxPt/f");
+    tree->Branch("genLead_Pt",      &genLeadJetPt,               "genLead_Pt/f");
+    tree->Branch("genDijetAve_Pt",      &genDijetAvePt,               "genDijetAve_Pt/f");
+    tree->Branch("genSecond_Pt",      &genSecondJetPt,               "genSecond_Pt/f");
 #endif
 
     // Maximum forward jet PT
-    //tree->Branch("recoAk4PFFor_MaxPt",   &recoAk4PFForMaxPt,            "recoAk4PFFor_MaxPt/f");
-    tree->Branch("hltAk4PFFor_MaxPt",    &hltAk4PFForMaxPt,             "hltAk4PFFor_MaxPt/f");
+    //tree->Branch("recoPFFor_MaxPt",   &recoPFForMaxPt,            "recoPFFor_MaxPt/f");
+    tree->Branch("hltPFFor_MaxPt",    &hltPFForMaxPt,             "hltPFFor_MaxPt/f");
 
 
     // Lead jet 
-    //    tree->Branch("recoAk4PFLead_Pt",   &recoAk4PFLeadJetPt,            "recoAk4PFLead_Pt/f");
-    tree->Branch("hltAk4PFLead_Pt",    &hltAk4PFLeadJetPt,             "hltAk4PFLead_Pt/f");
-    tree->Branch("hltAk4CaloLead_Pt",  &hltAk4CaloLeadJetPt,           "hltAk4CaloLead_Pt/f");
-    tree->Branch("hltAk4CaloIDLead_Pt",  &hltAk4CaloIDLeadJetPt,           "hltAk4CaloIDLead_Pt/f");
+    //    tree->Branch("recoPFLead_Pt",   &recoPFLeadJetPt,            "recoPFLead_Pt/f");
+    tree->Branch("hltPFLead_Pt",    &hltPFLeadJetPt,             "hltPFLead_Pt/f");
+    tree->Branch("hltCaloLead_Pt",  &hltCaloLeadJetPt,           "hltCaloLead_Pt/f");
+    tree->Branch("hltCaloIDLead_Pt",&hltCaloIDLeadJetPt,         "hltCaloIDLead_Pt/f");
     // Second jet 
-    //tree->Branch("recoAk4PFSecond_Pt",   &recoAk4PFSecondJetPt,            "recoAk4PFSecond_Pt/f");
-    tree->Branch("hltAk4PFSecond_Pt",    &hltAk4PFSecondJetPt,             "hltAk4PFSecond_Pt/f");
-    tree->Branch("hltAk4CaloSecond_Pt",  &hltAk4CaloSecondJetPt,           "hltAk4CaloSecond_Pt/f");
-    tree->Branch("hltAk4CaloIDSecond_Pt",  &hltAk4CaloIDSecondJetPt,           "hltAk4CaloIDSecond_Pt/f");
+    //tree->Branch("recoPFSecond_Pt",   &recoPFSecondJetPt,            "recoPFSecond_Pt/f");
+    tree->Branch("hltPFSecond_Pt",    &hltPFSecondJetPt,             "hltPFSecond_Pt/f");
+    tree->Branch("hltCaloSecond_Pt",  &hltCaloSecondJetPt,           "hltCaloSecond_Pt/f");
+    tree->Branch("hltCaloIDSecond_Pt",&hltCaloIDSecondJetPt,         "hltCaloIDSecond_Pt/f");
     // Dijet avg 
 
-    //tree->Branch("recoAk4PFDijetAvg_Pt",   &recoAk4PFDijetAvgPt,            "recoAk4PFDijetAvg_Pt/f");
-    tree->Branch("hltAk4PFDijetAvg_Pt",    &hltAk4PFDijetAvgPt,             "hltAk4PFDijetAvg_Pt/f");
-    tree->Branch("hltAk4CaloDijetAvg_Pt",  &hltAk4CaloDijetAvgPt,           "hltAk4CaloDijetAvg_Pt/f");
-    tree->Branch("hltAk4CaloIDDijetAvg_Pt",  &hltAk4CaloIDDijetAvgPt,           "hltAk4CaloIDDijetAvg_Pt/f");
+    //tree->Branch("recoPFDijetAve_Pt",   &recoPFDijetAvePt,            "recoPFDijetAve_Pt/f");
+    tree->Branch("hltPFDijetAve_Pt",    &hltPFDijetAvePt,             "hltPFDijetAve_Pt/f");
+    tree->Branch("hltCaloDijetAve_Pt",  &hltCaloDijetAvePt,           "hltCaloDijetAve_Pt/f");
+    tree->Branch("hltCaloIDDijetAve_Pt",&hltCaloIDDijetAvePt,         "hltCaloIDDijetAve_Pt/f");
 
 #ifdef SIMULATION
     tree->Branch("hpuVeto",                  &hpuVeto,                      "hpuVeto/b");
@@ -547,99 +518,99 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 #endif
 
     // Biased deltaPhi
-    tree->Branch("genAk4_BiasedDPhi",         &genAk4BiasedDPhi,         "genAk4_BiasedDPhi/f");
-    //    tree->Branch("recoAk4PF_BiasedDPhi",      &recoAk4PFBiasedDPhi,      "recoAk4PF_BiasedDPhi/f");
-    tree->Branch("hltAk4PF_BiasedDPhi",       &hltAk4PFBiasedDPhi,       "hltAk4PF_BiasedDPhi/f");
-    tree->Branch("genAk4_BiasedDPhiIndex",    &genAk4BiasedDPhiIndex,    "genAk4_BiasedDPhiIndex/I");
-    //tree->Branch("recoAk4PF_BiasedDPhiIndex", &recoAk4PFBiasedDPhiIndex, "recoAk4PF_BiasedDPhiIndex/I");
-    tree->Branch("hltAk4PF_BiasedDPhiIndex",  &hltAk4PFBiasedDPhiIndex,  "hltAk4PF_BiasedDPhiIndex/I");
+    tree->Branch("gen_BiasedDPhi",         &genBiasedDPhi,         "gen_BiasedDPhi/f");
+    //    tree->Branch("recoPF_BiasedDPhi",      &recoPFBiasedDPhi,      "recoPF_BiasedDPhi/f");
+    tree->Branch("hltPF_BiasedDPhi",       &hltPFBiasedDPhi,       "hltPF_BiasedDPhi/f");
+    tree->Branch("gen_BiasedDPhiIndex",    &genBiasedDPhiIndex,    "gen_BiasedDPhiIndex/I");
+    //tree->Branch("recoPF_BiasedDPhiIndex", &recoPFBiasedDPhiIndex, "recoPF_BiasedDPhiIndex/I");
+    tree->Branch("hltPF_BiasedDPhiIndex",  &hltPFBiasedDPhiIndex,  "hltPF_BiasedDPhiIndex/I");
 
 
 #ifdef SIMULATION
-    tree->Branch("genAk4_AlphaT40",      &genAk4AlphaTHT40.first,       "genAk4_AlphaT40/f");
-    tree->Branch("genAk4_HT40",          &genAk4AlphaTHT40.second,      "genAk4_HT40/f");
-    tree->Branch("genAk4_AlphaTPrime40",      &genAk4_AlphaTPrime40,      "genAk4_AlphaTPrime40/f");
-    tree->Branch("genAk4_DynamicAlphaTHT40",    "std::vector<std::pair<float,float>>", &genAk4DynamicAlphaTHT40);
-    tree->Branch("genAk4_DynamicAlphaT40",   "std::vector<float>", &genAk4DynamicAlphaT40);
-    tree->Branch("genAk4_DynamicHT40",       "std::vector<float>", &genAk4DynamicHT40);
+    tree->Branch("gen_AlphaT40",      &genAlphaTHT40.first,       "gen_AlphaT40/f");
+    tree->Branch("gen_HT40",          &genAlphaTHT40.second,      "gen_HT40/f");
+    tree->Branch("gen_AlphaTPrime40",      &gen_AlphaTPrime40,      "gen_AlphaTPrime40/f");
+    tree->Branch("gen_DynamicAlphaTHT40",    "std::vector<std::pair<float,float>>", &genDynamicAlphaTHT40);
+    tree->Branch("gen_DynamicAlphaT40",   "std::vector<float>", &genDynamicAlphaT40);
+    tree->Branch("gen_DynamicHT40",       "std::vector<float>", &genDynamicHT40);
 
-    tree->Branch("genAk4_MhtPT40",       &genAk4MHT40.first,       "genAk4_MhtPT40/f");
-    tree->Branch("genAk4_MhtPhi40",      &genAk4MHT40.second,      "genAk4_MhtPhi40/f");
-    tree->Branch("genAk4For_MhtPT40",       &genAk4ForMHT40.first,       "genAk4For_MhtPT40/f");
-    tree->Branch("genAk4For_MhtPhi40",      &genAk4ForMHT40.second,      "genAk4For_MhtPhi40/f");
+    tree->Branch("gen_MhtPT40",       &genMHT40.first,       "gen_MhtPT40/f");
+    tree->Branch("gen_MhtPhi40",      &genMHT40.second,      "gen_MhtPhi40/f");
+    tree->Branch("genFor_MhtPT40",       &genForMHT40.first,       "genFor_MhtPT40/f");
+    tree->Branch("genFor_MhtPhi40",      &genForMHT40.second,      "genFor_MhtPhi40/f");
 
 #endif
 
     // AlphaT, HT  
-    tree->Branch("hltAk4PF_AlphaT40",    &hltAk4PFAlphaTHT40.first,     "hltAk4PF_AlphaT40/f");
-    tree->Branch("hltAk4PF_HT40",        &hltAk4PFAlphaTHT40.second,    "hltAk4PF_HT40/f");
-    tree->Branch("hltAk4Calo_AlphaT40",  &hltAk4CaloAlphaTHT40.first,   "hltAk4Calo_AlphaT40/f");
-    tree->Branch("hltAk4Calo_HT40",      &hltAk4CaloAlphaTHT40.second,  "hltAk4Calo_HT40/f");
-    tree->Branch("hltAk4CaloID_AlphaT40",  &hltAk4CaloIDAlphaTHT40.first,   "hltAk4CaloID_AlphaT40/f");
-    tree->Branch("hltAk4CaloID_HT40",      &hltAk4CaloIDAlphaTHT40.second,  "hltAk4CaloID_HT40/f");
+    tree->Branch("hltPF_AlphaT40",    &hltPFAlphaTHT40.first,     "hltPF_AlphaT40/f");
+    tree->Branch("hltPF_HT40",        &hltPFAlphaTHT40.second,    "hltPF_HT40/f");
+    tree->Branch("hltCalo_AlphaT40",  &hltCaloAlphaTHT40.first,   "hltCalo_AlphaT40/f");
+    tree->Branch("hltCalo_HT40",      &hltCaloAlphaTHT40.second,  "hltCalo_HT40/f");
+    tree->Branch("hltCaloID_AlphaT40",  &hltCaloIDAlphaTHT40.first,   "hltCaloID_AlphaT40/f");
+    tree->Branch("hltCaloID_HT40",      &hltCaloIDAlphaTHT40.second,  "hltCaloID_HT40/f");
 
-    // tree->Branch("recoAk4PF_AlphaT40",   &recoAk4PFAlphaTHT40.first,    "recoAk4PF_AlphaT40/f");
-    // tree->Branch("recoAk4PF_HT40",       &recoAk4PFAlphaTHT40.second,   "recoAk4PF_HT40/f");
-    // tree->Branch("recoAk4Calo_AlphaT40", &recoAk4CaloAlphaTHT40.first,  "recoAk4Calo_AlphaT40/f");
-    // tree->Branch("recoAk4Calo_HT40",     &recoAk4CaloAlphaTHT40.second, "recoAk4Calo_HT40/f");
+    // tree->Branch("recoPF_AlphaT40",   &recoPFAlphaTHT40.first,    "recoPF_AlphaT40/f");
+    // tree->Branch("recoPF_HT40",       &recoPFAlphaTHT40.second,   "recoPF_HT40/f");
+    // tree->Branch("recoCalo_AlphaT40", &recoCaloAlphaTHT40.first,  "recoCalo_AlphaT40/f");
+    // tree->Branch("recoCalo_HT40",     &recoCaloAlphaTHT40.second, "recoCalo_HT40/f");
 
-    tree->Branch("hltAk4Calo_AlphaTPrime40",  &hltAk4Calo_AlphaTPrime40,  "hltAk4Calo_AlphaTPrime40/f");
-    tree->Branch("hltAk4CaloID_AlphaTPrime40",  &hltAk4CaloID_AlphaTPrime40,  "hltAk4CaloID_AlphaTPrime40/f");
-    tree->Branch("hltAk4PF_AlphaTPrime40",    &hltAk4PF_AlphaTPrime40,    "hltAk4PF_AlphaTPrime40/f");
-    // tree->Branch("recoAk4Calo_AlphaTPrime40", &recoAk4Calo_AlphaTPrime40, "recoAk4Calo_AlphaTPrime40/f");
-    // tree->Branch("recoAk4PF_AlphaTPrime40",   &recoAk4PF_AlphaTPrime40,   "recoAk4PF_AlphaTPrime40/f");
+    tree->Branch("hltCalo_AlphaTPrime40",  &hltCalo_AlphaTPrime40,  "hltCalo_AlphaTPrime40/f");
+    tree->Branch("hltCaloID_AlphaTPrime40",  &hltCaloID_AlphaTPrime40,  "hltCaloID_AlphaTPrime40/f");
+    tree->Branch("hltPF_AlphaTPrime40",    &hltPF_AlphaTPrime40,    "hltPF_AlphaTPrime40/f");
+    // tree->Branch("recoCalo_AlphaTPrime40", &recoCalo_AlphaTPrime40, "recoCalo_AlphaTPrime40/f");
+    // tree->Branch("recoPF_AlphaTPrime40",   &recoPF_AlphaTPrime40,   "recoPF_AlphaTPrime40/f");
 
 
     // Dynamic AlphaT, HT
-    tree->Branch("hltAk4PF_DynamicAlphaTHT40",  "std::vector<std::pair<float,float>>", &hltAk4PFDynamicAlphaTHT40);
-    tree->Branch("hltAk4PF_DynamicAlphaT40", "std::vector<float>", &hltAk4PFDynamicAlphaT40);
-    tree->Branch("hltAk4PF_DynamicHT40",     "std::vector<float>", &hltAk4PFDynamicHT40);
+    tree->Branch("hltPF_DynamicAlphaTHT40",  "std::vector<std::pair<float,float>>", &hltPFDynamicAlphaTHT40);
+    tree->Branch("hltPF_DynamicAlphaT40", "std::vector<float>", &hltPFDynamicAlphaT40);
+    tree->Branch("hltPF_DynamicHT40",     "std::vector<float>", &hltPFDynamicHT40);
 
-    //tree->Branch("recoAk4PF_DynamicAlphaTHT40", "std::vector<std::pair<float,float>>", &recoAk4PFDynamicAlphaTHT40);
+    //tree->Branch("recoPF_DynamicAlphaTHT40", "std::vector<std::pair<float,float>>", &recoPFDynamicAlphaTHT40);
 
 
     // MHT
-    tree->Branch("hltAk4PF_MhtPT40",     &hltAk4PFMHT40.first,     "hltAk4PF_MhtPT40/f");
-    tree->Branch("hltAk4PF_MhtPhi40",    &hltAk4PFMHT40.second,    "hltAk4PF_MhtPhi40/f");
-    tree->Branch("hltAk4Calo_MhtPT40",   &hltAk4CaloMHT40.first,   "hltAk4Calo_MhtPT40/f");
-    tree->Branch("hltAk4Calo_MhtPhi40",  &hltAk4CaloMHT40.second,  "hltAk4Calo_MhtPhi40/f");
-    tree->Branch("hltAk4CaloID_MhtPT40",   &hltAk4CaloIDMHT40.first,   "hltAk4CaloID_MhtPT40/f");
-    tree->Branch("hltAk4CaloID_MhtPhi40",  &hltAk4CaloIDMHT40.second,  "hltAk4CaloID_MhtPhi40/f");
+    tree->Branch("hltPF_MhtPT40",     &hltPFMHT40.first,     "hltPF_MhtPT40/f");
+    tree->Branch("hltPF_MhtPhi40",    &hltPFMHT40.second,    "hltPF_MhtPhi40/f");
+    tree->Branch("hltCalo_MhtPT40",   &hltCaloMHT40.first,   "hltCalo_MhtPT40/f");
+    tree->Branch("hltCalo_MhtPhi40",  &hltCaloMHT40.second,  "hltCalo_MhtPhi40/f");
+    tree->Branch("hltCaloID_MhtPT40",   &hltCaloIDMHT40.first,   "hltCaloID_MhtPT40/f");
+    tree->Branch("hltCaloID_MhtPhi40",  &hltCaloIDMHT40.second,  "hltCaloID_MhtPhi40/f");
 
-    // tree->Branch("recoAk4PF_MhtPT40",    &recoAk4PFMHT40.first,    "recoAk4PF_MhtPT40/f");
-    // tree->Branch("recoAk4PF_MhtPhi40",   &recoAk4PFMHT40.second,   "recoAk4PF_MhtPhi40/f");
-    // tree->Branch("recoAk4Calo_MhtPT40",  &recoAk4CaloMHT40.first,  "recoAk4Calo_MhtPT40/f");
-    // tree->Branch("recoAk4Calo_MhtPhi40", &recoAk4CaloMHT40.second, "recoAk4Calo_MhtPhi40/f");
+    // tree->Branch("recoPF_MhtPT40",    &recoPFMHT40.first,    "recoPF_MhtPT40/f");
+    // tree->Branch("recoPF_MhtPhi40",   &recoPFMHT40.second,   "recoPF_MhtPhi40/f");
+    // tree->Branch("recoCalo_MhtPT40",  &recoCaloMHT40.first,  "recoCalo_MhtPT40/f");
+    // tree->Branch("recoCalo_MhtPhi40", &recoCaloMHT40.second, "recoCalo_MhtPhi40/f");
 
-    tree->Branch("hltAk4PFFor_MhtPT40",     &hltAk4PFForMHT40.first,     "hltAk4PFFor_MhtPT40/f");
-    tree->Branch("hltAk4PFFor_MhtPhi40",    &hltAk4PFForMHT40.second,    "hltAk4PFFor_MhtPhi40/f");
-    // tree->Branch("recoAk4PFFor_MhtPT40",    &recoAk4PFForMHT40.first,    "recoAk4PFFor_MhtPT40/f");
-    // tree->Branch("recoAk4PFFor_MhtPhi40",   &recoAk4PFForMHT40.second,   "recoAk4PFFor_MhtPhi40/f");
+    tree->Branch("hltPFFor_MhtPT40",     &hltPFForMHT40.first,     "hltPFFor_MhtPT40/f");
+    tree->Branch("hltPFFor_MhtPhi40",    &hltPFForMHT40.second,    "hltPFFor_MhtPhi40/f");
+    // tree->Branch("recoPFFor_MhtPT40",    &recoPFForMHT40.first,    "recoPFFor_MhtPT40/f");
+    // tree->Branch("recoPFFor_MhtPhi40",   &recoPFForMHT40.second,   "recoPFFor_MhtPhi40/f");
 
 
     tree->Branch("hltMetCaloPFMht40_DeltaPhi", &hltMetCaloPFMht40_DeltaPhi, "hltMetCaloPFMht40_DeltaPhi/f");
     //tree->Branch("genMetCaloMht40_DeltaPhi",   &genMetCaloMht40_DeltaPhi,   "genMetCaloMht40_DeltaPhi/f");
 
-    //tree->Branch("genAk4_NJet40",      &genAk4NJet40,       "genAk4_NJet40/i");
-    tree->Branch("hltAk4PF_NJet40",    &hltAk4PFNJet40,     "hltAk4PF_NJet40/i");
-    tree->Branch("hltAk4Calo_NJet40",  &hltAk4CaloNJet40,   "hltAk4Calo_NJet40/i");
-    tree->Branch("hltAk4CaloID_NJet40",  &hltAk4CaloIDNJet40,   "hltAk4CaloID_NJet40/i");
-    // tree->Branch("recoAk4PF_NJet40",   &recoAk4PFNJet40,    "recoAk4PF_NJet40/i");
-    // tree->Branch("recoAk4Calo_NJet40", &recoAk4CaloNJet40,  "recoAk4Calo_NJet40/i");
+    //tree->Branch("gen_NJet40",      &genNJet40,       "gen_NJet40/i");
+    tree->Branch("hltPF_NJet40",    &hltPFNJet40,     "hltPF_NJet40/i");
+    tree->Branch("hltCalo_NJet40",  &hltCaloNJet40,   "hltCalo_NJet40/i");
+    tree->Branch("hltCaloID_NJet40",  &hltCaloIDNJet40,   "hltCaloID_NJet40/i");
+    // tree->Branch("recoPF_NJet40",   &recoPFNJet40,    "recoPF_NJet40/i");
+    // tree->Branch("recoCalo_NJet40", &recoCaloNJet40,  "recoCalo_NJet40/i");
 
-    //tree->Branch("genAk4_NJetBin40",      &genAk4NJetBin40,       "genAk4_NJetBin40/I");
-    tree->Branch("hltAk4PF_NJetBin40",    &hltAk4PFNJetBin40,     "hltAk4PF_NJetBin40/I");
-    tree->Branch("hltAk4Calo_NJetBin40",  &hltAk4CaloNJetBin40,   "hltAk4Calo_NJetBin40/I");
-    tree->Branch("hltAk4CaloID_NJetBin40",  &hltAk4CaloIDNJetBin40,   "hltAk4CaloID_NJetBin40/I");
-    // tree->Branch("recoAk4PF_NJetBin40",   &recoAk4PFNJetBin40,    "recoAk4PF_NJetBin40/I");
-    // tree->Branch("recoAk4Calo_NJetBin40", &recoAk4CaloNJetBin40,  "recoAk4Calo_NJetBin40/I");
+    //tree->Branch("gen_NJetBin40",      &genNJetBin40,       "gen_NJetBin40/I");
+    tree->Branch("hltPF_NJetBin40",    &hltPFNJetBin40,     "hltPF_NJetBin40/I");
+    tree->Branch("hltCalo_NJetBin40",  &hltCaloNJetBin40,   "hltCalo_NJetBin40/I");
+    tree->Branch("hltCaloID_NJetBin40",  &hltCaloIDNJetBin40,   "hltCaloID_NJetBin40/I");
+    // tree->Branch("recoPF_NJetBin40",   &recoPFNJetBin40,    "recoPF_NJetBin40/I");
+    // tree->Branch("recoCalo_NJetBin40", &recoCaloNJetBin40,  "recoCalo_NJetBin40/I");
 
-    //tree->Branch("genAk4_HTBin40",      &genAk4HTBin40,       "genAk4_HTBin40/I");
-    tree->Branch("hltAk4PF_HTBin40",    &hltAk4PFHTBin40,     "hltAk4PF_HTBin40/I");
-    tree->Branch("hltAk4Calo_HTBin40",  &hltAk4CaloHTBin40,   "hltAk4Calo_HTBin40/I");
-    tree->Branch("hltAk4CaloID_HTBin40",  &hltAk4CaloIDHTBin40,   "hltAk4CaloID_HTBin40/I");
-    // tree->Branch("recoAk4PF_HTBin40",   &recoAk4PFHTBin40,    "recoAk4PF_HTBin40/I");
-    // tree->Branch("recoAk4Calo_HTBin40", &recoAk4CaloHTBin40,  "recoAk4Calo_HTBin40/I");
+    //tree->Branch("gen_HTBin40",      &genHTBin40,       "gen_HTBin40/I");
+    tree->Branch("hltPF_HTBin40",    &hltPFHTBin40,     "hltPF_HTBin40/I");
+    tree->Branch("hltCalo_HTBin40",  &hltCaloHTBin40,   "hltCalo_HTBin40/I");
+    tree->Branch("hltCaloID_HTBin40",  &hltCaloIDHTBin40,   "hltCaloID_HTBin40/I");
+    // tree->Branch("recoPF_HTBin40",   &recoPFHTBin40,    "recoPF_HTBin40/I");
+    // tree->Branch("recoCalo_HTBin40", &recoCaloHTBin40,  "recoCalo_HTBin40/I");
 
 #ifdef L1
     // Energy sums
@@ -692,7 +663,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     tree->Branch("genPhoton_Eta",    "std::vector<float>", &genPhotonEta);
     tree->Branch("genPhoton_Phi",    "std::vector<float>", &genPhotonPhi);		
 
-    tree->Branch("genMatchedAk4HLTPF", "std::vector<int>", &genMatchedAk4HLTPF);
+    tree->Branch("genMatchedHLTPF", "std::vector<int>", &genMatchedHLTPF);
 
     tree->Branch("genMuonMatchedGenMuon_Pt",          "std::vector<float>", &genMuonMatchedGenMuonPt);
     tree->Branch("genMuonMatchedGenJet_Pt",           "std::vector<float>", &genMuonMatchedGenJetPt);
@@ -751,11 +722,17 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
                                
     
     // Trigger bits
-    triggerBits_ = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
+    triggerBits_     = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
+    triggerBitsData_ = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResultsData"));
     for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
       TString path = hltPathNames[ iPath ];
       hltPathFired[ path ] = false;
       tree->Branch( path, &hltPathFired[ path ], path + "/b" );
+#ifdef DATA
+      TString dataPath = "Data_"+path;
+      hltPathFired[ dataPath ] = false;
+      tree->Branch( dataPath, &hltPathFired[ dataPath ], dataPath + "/b" );
+#endif
     }
 
 
@@ -786,17 +763,17 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 #endif
 
 
-    hltAk4CaloJetToken_   = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloSrc"));
-    hltAk4CaloJetIDToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltAk4CaloIDSrc"));
-    hltAk4PFJetToken_     = consumes<reco::PFJetCollection>(pset.getParameter<edm::InputTag>("hltAk4PFSrc"));
+    hltCaloJetToken_   = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltCaloSrc"));
+    hltCaloJetIDToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltCaloIDSrc"));
+    hltPFJetToken_     = consumes<reco::PFJetCollection>(pset.getParameter<edm::InputTag>("hltPFSrc"));
 
     hltCaloMetToken_      = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
     hltPFMetToken_        = consumes<reco::METCollection>(pset.getParameter<edm::InputTag>("hltPFMetSrc"));
 
 
 #ifdef RECO    
-    srcAk4Calo       = pset.getParameter<VInputTag>("srcAk4Calo");
-    srcAk4PF         = pset.getParameter<VInputTag>("srcAk4PF");
+    srcCalo       = pset.getParameter<VInputTag>("srcCalo");
+    srcPF         = pset.getParameter<VInputTag>("srcPF");
 #endif
     //Parameters for the HSums
     //htThreshold_      = pset.getParameter<double>("htThreshold");
@@ -997,31 +974,19 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
     edm::Handle<edm::TriggerResults> triggerBits;
     iEvent.getByToken(triggerBits_, triggerBits);
-    
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-
-    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-
-      //if ( (triggerBits->accept(i)) ){
-	if ( hltPathFired.find( names.triggerName(i) ) != hltPathFired.end() ){
-	  //std::cout << "Trigger " << names.triggerName(i) << std::endl;
-	  hltPathFired[ names.triggerName(i) ] = triggerBits->accept(i);
-	}
-      //}
+    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) { 
+      if ( hltPathFired.find( names.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ names.triggerName(i) ] = triggerBits->accept(i); } 
     }
 
-  // // Iterate through paths run
-  // // ------------------------------------------------------------
-  // for (unsigned i = 0; i < paths->size(); ++i) {
-  //   std::string name = paths->at(i).name();
-  //   //std::cout << name << "\n";
-
-  //   if ( hltPathFired.find( name ) != hltPathFired.end() ){
-  //     //      std::cout << name << " found. Fired = " << paths->at(i).wasAccept() << "\n";
-  //     hltPathFired[ name ] = paths->at(i).wasAccept();
-  //   }
-
-  // }
+#ifdef DATA
+    edm::Handle<edm::TriggerResults> triggerBitsData;
+    iEvent.getByToken(triggerBitsData_, triggerBitsData);
+    const edm::TriggerNames &namesData = iEvent.triggerNames(*triggerBitsData);
+    for (unsigned int i = 0, n = triggerBitsData->size(); i < n; ++i) {
+	if ( hltPathFired.find( namesData.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ namesData.triggerName(i) ] = triggerBitsData->accept(i); }
+    }
+#endif
 
   // ------------------------------------------------------------------------------------------------------------------------
   // ------------------------------------------------------------------------------------------------------------------------
@@ -1079,12 +1044,12 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   std::vector<const reco::Candidate*> hltCaloJetIDUnskimmed, hltCaloJetIDForUnskimmed;
   std::vector<const reco::Candidate*> hltPFJetUnskimmed,   hltPFJetForUnskimmed;
 
-  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetHandle; iEvent.getByToken(hltAk4CaloJetToken_, hltAk4CaloJetHandle);
-  if (hltAk4CaloJetHandle.isValid()){ hltCaloJetUnskimmed = getJetCollection( iEvent, hltAk4CaloJetHandle); }
-  edm::Handle<reco::CaloJetCollection> hltAk4CaloJetIDHandle; iEvent.getByToken(hltAk4CaloJetIDToken_, hltAk4CaloJetIDHandle);
-  if (hltAk4CaloJetIDHandle.isValid()){ hltCaloJetIDUnskimmed = getJetCollection( iEvent, hltAk4CaloJetIDHandle); }
-  edm::Handle<reco::PFJetCollection> hltAk4PFJetHandle; iEvent.getByToken(hltAk4PFJetToken_, hltAk4PFJetHandle);
-  if (hltAk4PFJetHandle.isValid())  { hltPFJetUnskimmed   = getJetCollection( iEvent, hltAk4PFJetHandle); }
+  edm::Handle<reco::CaloJetCollection> hltCaloJetHandle; iEvent.getByToken(hltCaloJetToken_, hltCaloJetHandle);
+  if (hltCaloJetHandle.isValid()){ hltCaloJetUnskimmed = getJetCollection( iEvent, hltCaloJetHandle); }
+  edm::Handle<reco::CaloJetCollection> hltCaloJetIDHandle; iEvent.getByToken(hltCaloJetIDToken_, hltCaloJetIDHandle);
+  if (hltCaloJetIDHandle.isValid()){ hltCaloJetIDUnskimmed = getJetCollection( iEvent, hltCaloJetIDHandle); }
+  edm::Handle<reco::PFJetCollection> hltPFJetHandle; iEvent.getByToken(hltPFJetToken_, hltPFJetHandle);
+  if (hltPFJetHandle.isValid())  { hltPFJetUnskimmed   = getJetCollection( iEvent, hltPFJetHandle); }
 
   // Forward jets
   hltCaloJetForUnskimmed   = hltCaloJetUnskimmed;
@@ -1093,10 +1058,10 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
   
 
-//     // std::vector<const reco::Candidate*> recoAk4CaloUnskimmed            = getJetCollection( iEvent, srcAk4Calo );
-//     // std::vector<const reco::Candidate*> recoAk4PFUnskimmed              = getJetCollection( iEvent, srcAk4PF   );
-//     // std::vector<const reco::Candidate*> recoAk4CaloForUnskimmed         = getJetCollection( iEvent, srcAk4Calo );
-//     // std::vector<const reco::Candidate*> recoAk4PFForUnskimmed           = getJetCollection( iEvent, srcAk4PF   );
+//     // std::vector<const reco::Candidate*> recoCaloUnskimmed            = getJetCollection( iEvent, srcCalo );
+//     // std::vector<const reco::Candidate*> recoPFUnskimmed              = getJetCollection( iEvent, srcPF   );
+//     // std::vector<const reco::Candidate*> recoCaloForUnskimmed         = getJetCollection( iEvent, srcCalo );
+//     // std::vector<const reco::Candidate*> recoPFForUnskimmed           = getJetCollection( iEvent, srcPF   );
 
     
 
@@ -1165,10 +1130,10 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 // #ifdef LEPTON_XCLEANING
 //     if (genMuonVeto){
-//       //crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, nIsoMuons, 0.3, 40. );
-//       crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltAk4PFUnskimmed, hltAk4CaloUnskimmed, 
+//       //crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltPFUnskimmed, nIsoMuons, 0.3, 40. );
+//       crosscleanIsolatedLeptons( genMuonPt,  genMuonEta,  genMuonPhi, genJet4Unskimmed, hltPFUnskimmed, hltCaloUnskimmed, 
 // 				 nIsoMuons, 0.3, 40.,
-// 				 hltAk4PFJetUnskimmed,
+// 				 hltPFJetUnskimmed,
 // 				 genMuonMatchedGenMuonPt,
 // 				 genMuonMatchedGenJetPt,
 // 				 genMuonMatchedHLTPFJetPt,
@@ -1177,11 +1142,11 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 //     }
 //     if (genElectronVeto){
-//       // crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltAk4PFUnskimmed, 
+//       // crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltPFUnskimmed, 
 //       // 				 nIsoElectrons, 0.3, 40. );
-//       crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltAk4PFUnskimmed,  hltAk4CaloUnskimmed,
+//       crosscleanIsolatedLeptons( genElectronPt,  genElectronEta,  genElectronPhi, genJet4Unskimmed, hltPFUnskimmed,  hltCaloUnskimmed,
 // 				 nIsoElectrons, 0.3, 40. ,
-// 				 hltAk4PFJetUnskimmed,
+// 				 hltPFJetUnskimmed,
 // 				 genElectronMatchedGenElectronPt,
 //                                  genElectronMatchedGenJetPt,
 //                                  genElectronMatchedHLTPFJetPt,
@@ -1189,7 +1154,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //                                  genElectronMatchedHLTPFJetElectronEF);
 
 //     }
-//     // std::cout << "\nAfter cleaning: " << genJet4Unskimmed.size() << "\t" << hltAk4PFUnskimmed.size() 
+//     // std::cout << "\nAfter cleaning: " << genJet4Unskimmed.size() << "\t" << hltPFUnskimmed.size() 
 //     // 	      << "\t" << nIsoMuons << "\t" << nIsoElectrons << "\n";
 // #endif
 
@@ -1204,26 +1169,26 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     std::vector<const reco::Candidate*> gctCen              = skimJets(gctCenUnskimmed,              minPt, minEtaCen, maxEtaCen );
 #endif
 #ifdef SIMULATION 
-    std::vector<const reco::Candidate*> genAk4              = skimJets(genJet4Unskimmed,             minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> genAk4For           = skimJets(genJet4ForUnskimmed,             minPt, minEtaFor, maxEtaFor );
+    std::vector<const reco::Candidate*> gen              = skimJets(genJet4Unskimmed,             minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> genFor           = skimJets(genJet4ForUnskimmed,             minPt, minEtaFor, maxEtaFor );
 #endif
 
 
     // Central jets
     // --------------------
-    std::vector<const reco::Candidate*> hltAk4Calo          = skimJets(hltCaloJetUnskimmed,          minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> hltAk4CaloID        = skimJets(hltCaloJetIDUnskimmed,        minPt, minEtaCen, maxEtaCen );
-    std::vector<const reco::Candidate*> hltAk4PF            = skimJets(hltPFJetUnskimmed,            minPt, minEtaCen, maxEtaCen );
-    // std::vector<const reco::Candidate*> recoAk4Calo         = skimJets(recoAk4CaloUnskimmed,         minPt, minEtaCen, maxEtaCen );
-    // std::vector<const reco::Candidate*> recoAk4PF           = skimJets(recoAk4PFUnskimmed,           minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> hltCalo          = skimJets(hltCaloJetUnskimmed,          minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> hltCaloID        = skimJets(hltCaloJetIDUnskimmed,        minPt, minEtaCen, maxEtaCen );
+    std::vector<const reco::Candidate*> hltPF            = skimJets(hltPFJetUnskimmed,            minPt, minEtaCen, maxEtaCen );
+    // std::vector<const reco::Candidate*> recoCalo         = skimJets(recoCaloUnskimmed,         minPt, minEtaCen, maxEtaCen );
+    // std::vector<const reco::Candidate*> recoPF           = skimJets(recoPFUnskimmed,           minPt, minEtaCen, maxEtaCen );
 
     // Forward jets
     // --------------------
-    std::vector<const reco::Candidate*> hltAk4CaloFor       = skimJets(hltCaloJetForUnskimmed,          minPt, minEtaFor, maxEtaFor );
-    std::vector<const reco::Candidate*> hltAk4CaloIDFor     = skimJets(hltCaloJetIDForUnskimmed,        minPt, minEtaFor, maxEtaFor );
-    std::vector<const reco::Candidate*> hltAk4PFFor         = skimJets(hltPFJetForUnskimmed,            minPt, minEtaFor, maxEtaFor );
-    // std::vector<const reco::Candidate*> recoAk4CaloFor         = skimJets(recoAk4CaloForUnskimmed,         minPt, minEtaFor, maxEtaFor );
-    // std::vector<const reco::Candidate*> recoAk4PFFor           = skimJets(recoAk4PFForUnskimmed,           minPt, minEtaFor, maxEtaFor );
+    std::vector<const reco::Candidate*> hltCaloFor       = skimJets(hltCaloJetForUnskimmed,          minPt, minEtaFor, maxEtaFor );
+    std::vector<const reco::Candidate*> hltCaloIDFor     = skimJets(hltCaloJetIDForUnskimmed,        minPt, minEtaFor, maxEtaFor );
+    std::vector<const reco::Candidate*> hltPFFor         = skimJets(hltPFJetForUnskimmed,            minPt, minEtaFor, maxEtaFor );
+    // std::vector<const reco::Candidate*> recoCaloFor         = skimJets(recoCaloForUnskimmed,         minPt, minEtaFor, maxEtaFor );
+    // std::vector<const reco::Candidate*> recoPFFor           = skimJets(recoPFForUnskimmed,           minPt, minEtaFor, maxEtaFor );
 
 
     // Jets
@@ -1232,55 +1197,55 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
     // Forward jet
 #ifdef SIMULATION 
-    genAk4ForMaxPt    = 0;
-    if ( genAk4For.size()   > 0){    genAk4ForMaxPt =    genAk4For.at(0)->pt(); }
+    genForMaxPt    = 0;
+    if ( genFor.size()   > 0){    genForMaxPt =    genFor.at(0)->pt(); }
 #endif
-    //recoAk4PFForMaxPt = 0;
-    hltAk4PFForMaxPt  = 0;
-    //if (recoAk4PFFor.size() > 0){ recoAk4PFForMaxPt = recoAk4PFFor.at(0)->pt(); }
-    if ( hltAk4PFFor.size() > 0){  hltAk4PFForMaxPt =  hltAk4PFFor.at(0)->pt(); }
+    //recoPFForMaxPt = 0;
+    hltPFForMaxPt  = 0;
+    //if (recoPFFor.size() > 0){ recoPFForMaxPt = recoPFFor.at(0)->pt(); }
+    if ( hltPFFor.size() > 0){  hltPFForMaxPt =  hltPFFor.at(0)->pt(); }
 
     // Lead jet 
 #ifdef SIMULATION 
-    genAk4LeadJetPt= 0;
-    if ( genAk4.size()     > 0){ genAk4LeadJetPt      =     genAk4.at(0)->pt(); }
+    genLeadJetPt= 0;
+    if ( gen.size()     > 0){ genLeadJetPt      =     gen.at(0)->pt(); }
 #endif
-    //recoAk4PFLeadJetPt= 0;
-    hltAk4PFLeadJetPt= 0;
-    hltAk4CaloLeadJetPt= 0;
-    hltAk4CaloIDLeadJetPt= 0;
-    //if (recoAk4PF.size()   > 0){ recoAk4PFLeadJetPt   =  recoAk4PF.at(0)->pt(); }
-    if ( hltAk4PF.size()   > 0){ hltAk4PFLeadJetPt    =   hltAk4PF.at(0)->pt(); }
-    if ( hltAk4Calo.size() > 0){ hltAk4CaloLeadJetPt  = hltAk4Calo.at(0)->pt(); }
-    if ( hltAk4CaloID.size() > 0){ hltAk4CaloIDLeadJetPt  = hltAk4CaloID.at(0)->pt(); }
+    //recoPFLeadJetPt= 0;
+    hltPFLeadJetPt= 0;
+    hltCaloLeadJetPt= 0;
+    hltCaloIDLeadJetPt= 0;
+    //if (recoPF.size()   > 0){ recoPFLeadJetPt   =  recoPF.at(0)->pt(); }
+    if ( hltPF.size()   > 0){ hltPFLeadJetPt    =   hltPF.at(0)->pt(); }
+    if ( hltCalo.size() > 0){ hltCaloLeadJetPt  = hltCalo.at(0)->pt(); }
+    if ( hltCaloID.size() > 0){ hltCaloIDLeadJetPt  = hltCaloID.at(0)->pt(); }
 
     // Second jet
 #ifdef SIMULATION 
-    genAk4SecondJetPt= 0;
-    if ( genAk4.size()     > 1){ genAk4SecondJetPt      =     genAk4.at(1)->pt(); }
+    genSecondJetPt= 0;
+    if ( gen.size()     > 1){ genSecondJetPt      =     gen.at(1)->pt(); }
 #endif
-    //    recoAk4PFSecondJetPt= 0;
-    hltAk4PFSecondJetPt= 0;
-    hltAk4CaloSecondJetPt= 0;
-    hltAk4CaloIDSecondJetPt= 0;
-    //    if (recoAk4PF.size()   > 1){ recoAk4PFSecondJetPt   =  recoAk4PF.at(1)->pt(); }
-    if ( hltAk4PF.size()   > 1){ hltAk4PFSecondJetPt    =   hltAk4PF.at(1)->pt(); }
-    if ( hltAk4Calo.size() > 1){ hltAk4CaloSecondJetPt  = hltAk4Calo.at(1)->pt(); }
-    if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDSecondJetPt  = hltAk4CaloID.at(1)->pt(); }
+    //    recoPFSecondJetPt= 0;
+    hltPFSecondJetPt= 0;
+    hltCaloSecondJetPt= 0;
+    hltCaloIDSecondJetPt= 0;
+    //    if (recoPF.size()   > 1){ recoPFSecondJetPt   =  recoPF.at(1)->pt(); }
+    if ( hltPF.size()   > 1){ hltPFSecondJetPt    =   hltPF.at(1)->pt(); }
+    if ( hltCalo.size() > 1){ hltCaloSecondJetPt  = hltCalo.at(1)->pt(); }
+    if ( hltCaloID.size() > 1){ hltCaloIDSecondJetPt  = hltCaloID.at(1)->pt(); }
 
     // Dijet avg 
 #ifdef SIMULATION
-    genAk4DijetAvgPt= 0;
-    if ( genAk4.size()     > 1){ genAk4DijetAvgPt      = 0.5*(genAk4.at(0)->pt()     + genAk4.at(1)->pt()); }
+    genDijetAvePt= 0;
+    if ( gen.size()     > 1){ genDijetAvePt      = 0.5*(gen.at(0)->pt()     + gen.at(1)->pt()); }
 #endif
-    //    recoAk4PFDijetAvgPt= 0;
-    hltAk4PFDijetAvgPt= 0;
-    hltAk4CaloDijetAvgPt= 0;
-    hltAk4CaloIDDijetAvgPt= 0;
-    //    if (recoAk4PF.size()   > 1){ recoAk4PFDijetAvgPt   = 0.5*(recoAk4PF.at(0)->pt()  + recoAk4PF.at(1)->pt()); }
-    if ( hltAk4PF.size()   > 1){ hltAk4PFDijetAvgPt    = 0.5*(hltAk4PF.at(0)->pt()   + hltAk4PF.at(1)->pt()); }
-    if ( hltAk4Calo.size() > 1){ hltAk4CaloDijetAvgPt  = 0.5*(hltAk4Calo.at(0)->pt() + hltAk4Calo.at(1)->pt()); }
-    if ( hltAk4CaloID.size() > 1){ hltAk4CaloIDDijetAvgPt  = 0.5*(hltAk4CaloID.at(0)->pt() + hltAk4CaloID.at(1)->pt()); }
+    //    recoPFDijetAvePt= 0;
+    hltPFDijetAvePt    = 0;
+    hltCaloDijetAvePt  = 0;
+    hltCaloIDDijetAvePt= 0;
+    //    if (recoPF.size()   > 1){ recoPFDijetAvePt   = 0.5*(recoPF.at(0)->pt()  + recoPF.at(1)->pt()); }
+    if ( hltPF.size()   > 1){ hltPFDijetAvePt    = 0.5*(hltPF.at(0)->pt()   + hltPF.at(1)->pt()); }
+    if ( hltCalo.size() > 1){ hltCaloDijetAvePt  = 0.5*(hltCalo.at(0)->pt() + hltCalo.at(1)->pt()); }
+    if ( hltCaloID.size() > 1){ hltCaloIDDijetAvePt  = 0.5*(hltCaloID.at(0)->pt() + hltCaloID.at(1)->pt()); }
 
     // ********************************************************************************
     // *                                  Energy sums                                 *
@@ -1326,23 +1291,23 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
     // HT and AlphaT
 #ifdef SIMULATION
-    genAk4AlphaTHT40              = calculateAlphaTHT( genAk4,      40.);
+    genAlphaTHT40              = calculateAlphaTHT( gen,      40.);
 #endif
-    hltAk4CaloAlphaTHT40          = calculateAlphaTHT( hltAk4Calo,  40.);
-    hltAk4CaloIDAlphaTHT40        = calculateAlphaTHT( hltAk4CaloID,  40.);
-    hltAk4PFAlphaTHT40            = calculateAlphaTHT( hltAk4PF,    40.);
-    // recoAk4CaloAlphaTHT40         = calculateAlphaTHT( recoAk4Calo, 40.);
-    // recoAk4PFAlphaTHT40           = calculateAlphaTHT( recoAk4PF,   40.);
+    hltCaloAlphaTHT40          = calculateAlphaTHT( hltCalo,  40.);
+    hltCaloIDAlphaTHT40        = calculateAlphaTHT( hltCaloID,  40.);
+    hltPFAlphaTHT40            = calculateAlphaTHT( hltPF,    40.);
+    // recoCaloAlphaTHT40         = calculateAlphaTHT( recoCalo, 40.);
+    // recoPFAlphaTHT40           = calculateAlphaTHT( recoPF,   40.);
 
 //     // Dynamic HT and AlphaT 
-//     // genAk4DynamicAlphaTHT40    = calculateDynamicAlphaTPairs( genAk4,    dynamicJetThreshold );
-//     // hltAk4PFDynamicAlphaTHT40  = calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold );
+//     // genDynamicAlphaTHT40    = calculateDynamicAlphaTPairs( gen,    dynamicJetThreshold );
+//     // hltPFDynamicAlphaTHT40  = calculateDynamicAlphaTPairs( hltPF,  dynamicJetThreshold );
 // #ifdef SIMULATION
-//     calculateDynamicAlphaTPairs( genAk4, dynamicJetThreshold, genAk4DynamicAlphaT40, genAk4DynamicHT40 );
+//     calculateDynamicAlphaTPairs( gen, dynamicJetThreshold, genDynamicAlphaT40, genDynamicHT40 );
 // #endif
-//     calculateDynamicAlphaTPairs( hltAk4PF,  dynamicJetThreshold, hltAk4PFDynamicAlphaT40, hltAk4PFDynamicHT40 );
+//     calculateDynamicAlphaTPairs( hltPF,  dynamicJetThreshold, hltPFDynamicAlphaT40, hltPFDynamicHT40 );
 
-//     //    recoAk4PFDynamicAlphaTHT40 = calculateDynamicAlphaTPairs( recoAk4PF, dynamicJetThreshold );
+//     //    recoPFDynamicAlphaTHT40 = calculateDynamicAlphaTPairs( recoPF, dynamicJetThreshold );
 
 //     // ******************************************************************************** 
 //     // Calculate: DeltaR of leading jets L1-Gen, HLT-Gen
@@ -1350,66 +1315,66 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
 // #ifdef SIMULATION
 //     L1GenDeltaR  = leadL1GenDeltaR(    gctCenUnskimmed,  gctForUnskimmed, genJet4Unskimmed );
-//     HLTGenDeltaR = leadHLTGenDeltaR( hltAk4PFUnskimmed, genJet4Unskimmed );
+//     HLTGenDeltaR = leadHLTGenDeltaR( hltPFUnskimmed, genJet4Unskimmed );
 //     hpuVeto      = (L1GenDeltaR < 0.5);
 
-//     genAk4_AlphaTPrime40     = calculateAlphaTPrime( genAk4MHT40.first,      genAk4AlphaTHT40.second );
-//     genAk4MHT40              = calculateMHT( genAk4,      40.);
-//     genAk4ForMHT40           = calculateMHT( genAk4For,      40.);
+//     gen_AlphaTPrime40     = calculateAlphaTPrime( genMHT40.first,      genAlphaTHT40.second );
+//     genMHT40              = calculateMHT( gen,      40.);
+//     genForMHT40           = calculateMHT( genFor,      40.);
 // #endif
 
     // MHT
-    hltAk4CaloMHT40          = calculateMHT( hltAk4Calo,  40.);
-    hltAk4CaloIDMHT40        = calculateMHT( hltAk4CaloID,40.);
-    hltAk4PFMHT40            = calculateMHT( hltAk4PF,    40.);
-    // recoAk4CaloMHT40         = calculateMHT( recoAk4Calo, 40.);
-    // recoAk4PFMHT40           = calculateMHT( recoAk4PF,   40.);
+    hltCaloMHT40          = calculateMHT( hltCalo,  40.);
+    hltCaloIDMHT40        = calculateMHT( hltCaloID,40.);
+    hltPFMHT40            = calculateMHT( hltPF,    40.);
+    // recoCaloMHT40         = calculateMHT( recoCalo, 40.);
+    // recoPFMHT40           = calculateMHT( recoPF,   40.);
 
-//     hltAk4PFForMHT40         = calculateMHT( hltAk4PFFor,    40.);
-//     //recoAk4PFForMHT40        = calculateMHT( recoAk4PFFor,   40.);
+//     hltPFForMHT40         = calculateMHT( hltPFFor,    40.);
+//     //recoPFForMHT40        = calculateMHT( recoPFFor,   40.);
 
     // AlphaT prime
-    hltAk4Calo_AlphaTPrime40    = calculateAlphaTPrime( hltAk4CaloMHT40.first,  hltAk4CaloAlphaTHT40.second );
-    hltAk4CaloID_AlphaTPrime40  = calculateAlphaTPrime( hltAk4CaloIDMHT40.first,  hltAk4CaloIDAlphaTHT40.second );
-    hltAk4PF_AlphaTPrime40      = calculateAlphaTPrime( hltAk4PFMHT40.first,    hltAk4PFAlphaTHT40.second );
-    // recoAk4Calo_AlphaTPrime40   = calculateAlphaTPrime( recoAk4CaloMHT40.first, recoAk4CaloAlphaTHT40.second );
-    // recoAk4PF_AlphaTPrime40     = calculateAlphaTPrime( recoAk4PFMHT40.first,   recoAk4PFAlphaTHT40.second );
+    hltCalo_AlphaTPrime40    = calculateAlphaTPrime( hltCaloMHT40.first,  hltCaloAlphaTHT40.second );
+    hltCaloID_AlphaTPrime40  = calculateAlphaTPrime( hltCaloIDMHT40.first,  hltCaloIDAlphaTHT40.second );
+    hltPF_AlphaTPrime40      = calculateAlphaTPrime( hltPFMHT40.first,    hltPFAlphaTHT40.second );
+    // recoCalo_AlphaTPrime40   = calculateAlphaTPrime( recoCaloMHT40.first, recoCaloAlphaTHT40.second );
+    // recoPF_AlphaTPrime40     = calculateAlphaTPrime( recoPFMHT40.first,   recoPFAlphaTHT40.second );
 
 
     // ****************************************
     // MHT-MET deltaPhi
     // ****************************************
-    hltMetCaloPFMht40_DeltaPhi = fabs( deltaPhi( metPhi_["hltMetCalo"], hltAk4PFMHT40.second ) );
-    //genMetCaloMht40_DeltaPhi   = fabs( deltaPhi( metPhi_["genMetCalo"], genAk4MHT40.second )   );
+    hltMetCaloPFMht40_DeltaPhi = fabs( deltaPhi( metPhi_["hltMetCalo"], hltPFMHT40.second ) );
+    //genMetCaloMht40_DeltaPhi   = fabs( deltaPhi( metPhi_["genMetCalo"], genMHT40.second )   );
 
 //     // ----------------------------------------
 //     // Analysis binning
 //     // ----------------------------------------
     
 // #ifdef SIMULATION
-//     genAk4NJet40              = calculateNJet( genAk4,      40.);
-//     genAk4NJetBin40           = calculateNJetBin( genAk4,      40.);
-//     genAk4HTBin40           = calculateHTBin( genAk4AlphaTHT40.second,      genAk4AlphaTHT40.first );
+//     genNJet40              = calculateNJet( gen,      40.);
+//     genNJetBin40           = calculateNJetBin( gen,      40.);
+//     genHTBin40           = calculateHTBin( genAlphaTHT40.second,      genAlphaTHT40.first );
 // #endif
-//     hltAk4CaloIDNJet40        = calculateNJet( hltAk4CaloID,  40.);
-//     hltAk4CaloNJet40          = calculateNJet( hltAk4Calo,  40.);
-//     hltAk4PFNJet40            = calculateNJet( hltAk4PF,    40.);
-//     // recoAk4CaloNJet40         = calculateNJet( recoAk4Calo, 40.);
-//     // recoAk4PFNJet40           = calculateNJet( recoAk4PF,   40.);
+//     hltCaloIDNJet40        = calculateNJet( hltCaloID,  40.);
+//     hltCaloNJet40          = calculateNJet( hltCalo,  40.);
+//     hltPFNJet40            = calculateNJet( hltPF,    40.);
+//     // recoCaloNJet40         = calculateNJet( recoCalo, 40.);
+//     // recoPFNJet40           = calculateNJet( recoPF,   40.);
 
 
-//     hltAk4CaloNJetBin40       = calculateNJetBin( hltAk4Calo,  40.);
-//     hltAk4CaloIDNJetBin40     = calculateNJetBin( hltAk4CaloID,  40.);
-//     hltAk4PFNJetBin40         = calculateNJetBin( hltAk4PF,    40.);
-//     // recoAk4CaloNJetBin40      = calculateNJetBin( recoAk4Calo, 40.);
-//     // recoAk4PFNJetBin40        = calculateNJetBin( recoAk4PF,   40.);
+//     hltCaloNJetBin40       = calculateNJetBin( hltCalo,  40.);
+//     hltCaloIDNJetBin40     = calculateNJetBin( hltCaloID,  40.);
+//     hltPFNJetBin40         = calculateNJetBin( hltPF,    40.);
+//     // recoCaloNJetBin40      = calculateNJetBin( recoCalo, 40.);
+//     // recoPFNJetBin40        = calculateNJetBin( recoPF,   40.);
 
 
-//     hltAk4CaloHTBin40       = calculateHTBin( hltAk4CaloAlphaTHT40.second,  hltAk4CaloAlphaTHT40.first );
-//     hltAk4CaloIDHTBin40     = calculateHTBin( hltAk4CaloIDAlphaTHT40.second,  hltAk4CaloIDAlphaTHT40.first );
-//     hltAk4PFHTBin40         = calculateHTBin( hltAk4PFAlphaTHT40.second,    hltAk4PFAlphaTHT40.first );
-//     // recoAk4CaloHTBin40      = calculateHTBin( recoAk4CaloAlphaTHT40.second, recoAk4CaloAlphaTHT40.first );
-//     // recoAk4PFHTBin40        = calculateHTBin( recoAk4PFAlphaTHT40.second,   recoAk4PFAlphaTHT40.first );
+//     hltCaloHTBin40       = calculateHTBin( hltCaloAlphaTHT40.second,  hltCaloAlphaTHT40.first );
+//     hltCaloIDHTBin40     = calculateHTBin( hltCaloIDAlphaTHT40.second,  hltCaloIDAlphaTHT40.first );
+//     hltPFHTBin40         = calculateHTBin( hltPFAlphaTHT40.second,    hltPFAlphaTHT40.first );
+//     // recoCaloHTBin40      = calculateHTBin( recoCaloAlphaTHT40.second, recoCaloAlphaTHT40.first );
+//     // recoPFHTBin40        = calculateHTBin( recoPFAlphaTHT40.second,   recoPFAlphaTHT40.first );
 
 
     // ----------------------------------------
@@ -1417,21 +1382,21 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // ----------------------------------------
 
 #ifdef SIMULATION
-    storeJet( "genAk4",                 genAk4,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "genAk4For",              genAk4For,              jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "gen",                 gen,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "genFor",              genFor,              jetPt, jetPx, jetPy, jetEta, jetPhi );
 #endif
 
-    storeJet( "hltAk4Calo",             hltAk4Calo,             jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloID",           hltAk4CaloID,           jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4PF",               hltAk4PF,               jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4Calo",            recoAk4Calo,            jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4PF",              recoAk4PF,              jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltCalo",             hltCalo,             jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltCaloID",           hltCaloID,           jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltPF",               hltPF,               jetPt, jetPx, jetPy, jetEta, jetPhi );
+    // storeJet( "recoCalo",            recoCalo,            jetPt, jetPx, jetPy, jetEta, jetPhi );
+    // storeJet( "recoPF",              recoPF,              jetPt, jetPx, jetPy, jetEta, jetPhi );
 
-    storeJet( "hltAk4CaloFor",          hltAk4CaloFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4CaloIDFor",        hltAk4CaloIDFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
-    storeJet( "hltAk4PFFor",            hltAk4PFFor,            jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4CaloFor",         recoAk4CaloFor,         jetPt, jetPx, jetPy, jetEta, jetPhi );
-    // storeJet( "recoAk4PFFor",           recoAk4PFFor,           jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltCaloFor",          hltCaloFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltCaloIDFor",        hltCaloIDFor,          jetPt, jetPx, jetPy, jetEta, jetPhi );
+    storeJet( "hltPFFor",            hltPFFor,            jetPt, jetPx, jetPy, jetEta, jetPhi );
+    // storeJet( "recoCaloFor",         recoCaloFor,         jetPt, jetPx, jetPy, jetEta, jetPhi );
+    // storeJet( "recoPFFor",           recoPFFor,           jetPt, jetPx, jetPy, jetEta, jetPhi );
 
 // #ifdef L1
 //     // ----------------------------------------
@@ -1455,11 +1420,11 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     // Perform jet matching
 //     // ----------------------------------------
 // #ifdef SIMULATION
-//     genMatchedAk4HLTPF  = matchJetCollections( jetPt["genAk4"],   jetEta["genAk4"],   jetPhi["genAk4"],
-//     					       jetPt["hltAk4PF"], jetEta["hltAk4PF"], jetPhi["hltAk4PF"], 20., 0.25 );
+//     genMatchedHLTPF  = matchJetCollections( jetPt["gen"],   jetEta["gen"],   jetPhi["gen"],
+//     					       jetPt["hltPF"], jetEta["hltPF"], jetPhi["hltPF"], 20., 0.25 );
 // #endif
-//     // genMatchedAk4RECOPF = matchJetCollections( jetPt["genAk4"],    jetEta["genAk4"],    jetPhi["genAk4"],
-//     // 					       jetPt["recoAk4PF"], jetEta["recoAk4PF"], jetPhi["recoAk4PF"], 20., 0.25 );
+//     // genMatchedRECOPF = matchJetCollections( jetPt["gen"],    jetEta["gen"],    jetPhi["gen"],
+//     // 					       jetPt["recoPF"], jetEta["recoPF"], jetPhi["recoPF"], 20., 0.25 );
     
 
     // Fill the trees
@@ -1514,14 +1479,14 @@ MakeTrees::storeJet( TString jetCollName, const std::vector<const reco::Candidat
 
 
 float
-MakeTrees::leadL1GenDeltaR( const std::vector<const reco::Candidate*>& gctCen, const std::vector<const reco::Candidate*>& gctFor, const std::vector<const reco::Candidate*>& genAk4){
+MakeTrees::leadL1GenDeltaR( const std::vector<const reco::Candidate*>& gctCen, const std::vector<const reco::Candidate*>& gctFor, const std::vector<const reco::Candidate*>& gen){
 
   const reco::Candidate* leadL1Jet  = NULL;
   const reco::Candidate* leadGenJet = NULL;
   float deltaR(20.);
 
   // Get lead genJet in acceptance
-  for ( std::vector<const reco::Candidate*>::const_iterator itr = genAk4.begin(); itr != genAk4.end(); ++itr ){
+  for ( std::vector<const reco::Candidate*>::const_iterator itr = gen.begin(); itr != gen.end(); ++itr ){
     if ( fabs((*itr)->eta()) < 5. ){ leadGenJet = (*itr); break; }
   }
   if ( leadGenJet == NULL )    { return deltaR; }
@@ -1554,15 +1519,15 @@ MakeTrees::leadL1GenDeltaR( const std::vector<const reco::Candidate*>& gctCen, c
 }
 
 float
-MakeTrees::leadHLTGenDeltaR( const std::vector<const reco::Candidate*>& hltAk4,
-			     const std::vector<const reco::Candidate*>& genAk4){
+MakeTrees::leadHLTGenDeltaR( const std::vector<const reco::Candidate*>& hlt,
+			     const std::vector<const reco::Candidate*>& gen){
 
   const reco::Candidate* leadHLTJet = NULL;
   const reco::Candidate* leadGenJet = NULL;
   float deltaR(20.);
 
   // Get lead genJet in acceptance
-  for ( std::vector<const reco::Candidate*>::const_iterator itr = genAk4.begin(); itr != genAk4.end(); ++itr ){
+  for ( std::vector<const reco::Candidate*>::const_iterator itr = gen.begin(); itr != gen.end(); ++itr ){
     if ( fabs((*itr)->eta()) < 5. ){
       leadGenJet = (*itr); break;
     }
@@ -1571,7 +1536,7 @@ MakeTrees::leadHLTGenDeltaR( const std::vector<const reco::Candidate*>& hltAk4,
   if ( leadGenJet->pt() < 10. ){ return deltaR; }
 
   // Get lead hltJet
-  if (hltAk4.size() > 0){ leadHLTJet = hltAk4.at(0); }
+  if (hlt.size() > 0){ leadHLTJet = hlt.at(0); }
   else{ return deltaR; }
   deltaR    = reco::deltaR( leadHLTJet->eta(), leadHLTJet->phi(), leadGenJet->eta(), leadGenJet->phi() );
 
