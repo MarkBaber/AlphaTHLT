@@ -704,7 +704,9 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
      hltPathNames.push_back("HLT_PFHT300_DiPFJetAve90_PFAlphaT0p54_v2"); 
      hltPathNames.push_back("HLT_PFHT350_DiPFJetAve90_PFAlphaT0p53_v2"); 
      hltPathNames.push_back("HLT_PFHT400_DiPFJetAve90_PFAlphaT0p52_v2");
-                                    
+                                 
+     hltPathNames.push_back("HLT_PFHT200_PFAlphaT0p51_v2");
+   
      hltPathNames.push_back("HLT_PFHT200_v2");
      hltPathNames.push_back("HLT_PFHT250_v2");
      hltPathNames.push_back("HLT_PFHT300_v2");
@@ -719,7 +721,8 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
      hltPathNames.push_back("HLT_PFMET100_PFMHT100_IDTight_v2");
      hltPathNames.push_back("HLT_PFMET110_PFMHT110_IDTight_v2");
      hltPathNames.push_back("HLT_PFMET120_PFMHT120_IDTight_v2");
-                               
+
+     hltPathNames.push_back("HLT_IsoMu20_v3");
     
     // Trigger bits
     triggerBits_     = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
@@ -984,7 +987,7 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     iEvent.getByToken(triggerBitsData_, triggerBitsData);
     const edm::TriggerNames &namesData = iEvent.triggerNames(*triggerBitsData);
     for (unsigned int i = 0, n = triggerBitsData->size(); i < n; ++i) {
-	if ( hltPathFired.find( namesData.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ namesData.triggerName(i) ] = triggerBitsData->accept(i); }
+      if ( hltPathFired.find( namesData.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ "Data_"+namesData.triggerName(i) ] = triggerBitsData->accept(i); }
     }
 #endif
 
