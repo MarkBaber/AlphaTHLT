@@ -59821,7 +59821,6 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
         # UCT 
        'keep l1extra*_*_*_*',
 
-
        # HLT 
        'keep recoPFJets_hltAK4PFJetsCorrected*_*_*',
        'drop recoPFJets_hltAK4PFJetsReg_*_*',
@@ -59833,22 +59832,24 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
        # 'keep *_ak4CaloJets*_*_*',
        # 'keep *_fixedGridRho*_*_*',
 
-#       'keep triggerTriggerFilterObjectWithRefs_*_*_HLT2',
-#       'keep triggerTriggerFilterObjectWithRefs_*AlphaT*_*_HLT2',
        'keep recoMETs_*_*_HLT2',
        'drop recoMETs_*Rsq*_*_HLT2',                                            
        'keep recoCaloMETs_*_*_HLT2',
 
        'keep *_hltL1GtObjectMap_*_HLT2',
-       'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
-       'keep FEDRawDataCollection_source_*_HLT2',
-
+       # 'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
+       # 'keep FEDRawDataCollection_source_*_HLT2',
 
        'keep edmTriggerResults_*_*_*',
-#       'keep edmTriggerResults_*_*_HLT2',
        'keep triggerTriggerEvent_*_*_HLT2',
 
        'drop *_*_*_reHLT',
+
+       'keep *_slimmedJets_*_*', 
+       'keep *_slimmedMETs_*_*', 
+       'keep *_l1extraParticles_MET_*',
+       'keep *_l1extraParticles_MHT_*',
+
     )
 )
 
@@ -59887,6 +59888,6 @@ process.HLTSchedule = cms.Schedule( process.HLTriggerFirstPath,
 
 
 
-# Schedule definition                                                           
+# Schedule definition 
 process.schedule = cms.Schedule()
 process.schedule.extend(process.HLTSchedule)
