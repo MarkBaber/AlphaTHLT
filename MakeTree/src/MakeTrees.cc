@@ -1,6 +1,7 @@
 // **************************************************
 // Switches
 // **************************************************
+#define DATA
 //#define SIMULATION
 //#define L1
 //#define RECO
@@ -123,7 +124,6 @@ class MakeTrees : public edm::EDAnalyzer {
 
     //Get the Gen stuff
     VInputTag srcGen4Jet_;
-    //VInputTag srcGen5Jet_;
 
     edm::InputTag srcGenMetCalo_;
     edm::InputTag srcGenMetCaloAndNonPrompt_;
@@ -135,7 +135,6 @@ class MakeTrees : public edm::EDAnalyzer {
     edm::InputTag srcHLTMetPF_;
     edm::InputTag srcHLTMhtCalo_;
     edm::InputTag srcHLTMhtPF_;
-
 
     edm::InputTag srcGenParticles_;
     bool          makeGenParticles;
@@ -152,16 +151,6 @@ class MakeTrees : public edm::EDAnalyzer {
     bool L1HTT175OrETM70;
     float L1Jet_DPhi;
 
-
-
-
-    VInputTag srcHLTAk4CaloID;
-    //VInputTag srcHLTAk4CaloNoFastJet;
-    VInputTag srcHLTAk4PF;
-    VInputTag srcHLTAk4PFNoPU;
-
-    VInputTag srcAk4Calo;
-    VInputTag srcAk4PF;
 
 
     //Define the levels
@@ -319,11 +308,11 @@ class MakeTrees : public edm::EDAnalyzer {
   float hltCaloSecondJetPt;
   float hltCaloIDSecondJetPt;
   // Dijet avg
-  float genDijetAvgPt;
-  //  float recoPFDijetAvgPt;
-  float hltPFDijetAvgPt;
-  float hltCaloDijetAvgPt;
-  float hltCaloIDDijetAvgPt;
+  float genDijetAvePt;
+  //  float recoPFDijetAvePt;
+  float hltPFDijetAvePt;
+  float hltCaloDijetAvePt;
+  float hltCaloIDDijetAvePt;
 
 
   // Biased deltaPhi
@@ -360,6 +349,7 @@ class MakeTrees : public edm::EDAnalyzer {
 
   edm::InputTag hltCaloMetTag_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
+  edm::EDGetTokenT<edm::TriggerResults> triggerBitsData_;
 
   edm::EDGetTokenT<reco::CaloJetCollection> hltCaloJetToken_;
   edm::EDGetTokenT<reco::CaloJetCollection> hltCaloJetIDToken_;
@@ -435,11 +425,11 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     hltCaloSecondJetPt= 0;
     hltCaloIDSecondJetPt= 0;
     // Dijet avg 
-    genDijetAvgPt    = 0;
-    //    recoPFDijetAvgPt = 0;
-    hltPFDijetAvgPt  = 0;
-    hltCaloDijetAvgPt= 0;
-    hltCaloIDDijetAvgPt= 0;
+    genDijetAvePt    = 0;
+    //    recoPFDijetAvePt = 0;
+    hltPFDijetAvePt  = 0;
+    hltCaloDijetAvePt= 0;
+    hltCaloIDDijetAvePt= 0;
 
 
     genMuonMatchedGenMuonPt          = std::vector<float>();
@@ -495,7 +485,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 #ifdef SIMULATION
     tree->Branch("genFor_MaxPt",      &genForMaxPt,               "genFor_MaxPt/f");
     tree->Branch("genLead_Pt",      &genLeadJetPt,               "genLead_Pt/f");
-    tree->Branch("genDijetAvg_Pt",      &genDijetAvgPt,               "genDijetAvg_Pt/f");
+    tree->Branch("genDijetAve_Pt",      &genDijetAvePt,               "genDijetAve_Pt/f");
     tree->Branch("genSecond_Pt",      &genSecondJetPt,               "genSecond_Pt/f");
 #endif
 
@@ -508,18 +498,18 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     //    tree->Branch("recoPFLead_Pt",   &recoPFLeadJetPt,            "recoPFLead_Pt/f");
     tree->Branch("hltPFLead_Pt",    &hltPFLeadJetPt,             "hltPFLead_Pt/f");
     tree->Branch("hltCaloLead_Pt",  &hltCaloLeadJetPt,           "hltCaloLead_Pt/f");
-    tree->Branch("hltCaloIDLead_Pt",  &hltCaloIDLeadJetPt,           "hltCaloIDLead_Pt/f");
+    tree->Branch("hltCaloIDLead_Pt",&hltCaloIDLeadJetPt,         "hltCaloIDLead_Pt/f");
     // Second jet 
     //tree->Branch("recoPFSecond_Pt",   &recoPFSecondJetPt,            "recoPFSecond_Pt/f");
     tree->Branch("hltPFSecond_Pt",    &hltPFSecondJetPt,             "hltPFSecond_Pt/f");
     tree->Branch("hltCaloSecond_Pt",  &hltCaloSecondJetPt,           "hltCaloSecond_Pt/f");
-    tree->Branch("hltCaloIDSecond_Pt",  &hltCaloIDSecondJetPt,           "hltCaloIDSecond_Pt/f");
+    tree->Branch("hltCaloIDSecond_Pt",&hltCaloIDSecondJetPt,         "hltCaloIDSecond_Pt/f");
     // Dijet avg 
 
-    //tree->Branch("recoPFDijetAvg_Pt",   &recoPFDijetAvgPt,            "recoPFDijetAvg_Pt/f");
-    tree->Branch("hltPFDijetAvg_Pt",    &hltPFDijetAvgPt,             "hltPFDijetAvg_Pt/f");
-    tree->Branch("hltCaloDijetAvg_Pt",  &hltCaloDijetAvgPt,           "hltCaloDijetAvg_Pt/f");
-    tree->Branch("hltCaloIDDijetAvg_Pt",  &hltCaloIDDijetAvgPt,           "hltCaloIDDijetAvg_Pt/f");
+    //tree->Branch("recoPFDijetAve_Pt",   &recoPFDijetAvePt,            "recoPFDijetAve_Pt/f");
+    tree->Branch("hltPFDijetAve_Pt",    &hltPFDijetAvePt,             "hltPFDijetAve_Pt/f");
+    tree->Branch("hltCaloDijetAve_Pt",  &hltCaloDijetAvePt,           "hltCaloDijetAve_Pt/f");
+    tree->Branch("hltCaloIDDijetAve_Pt",&hltCaloIDDijetAvePt,         "hltCaloIDDijetAve_Pt/f");
 
 #ifdef SIMULATION
     tree->Branch("hpuVeto",                  &hpuVeto,                      "hpuVeto/b");
@@ -732,11 +722,17 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
                                
     
     // Trigger bits
-    triggerBits_ = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
+    triggerBits_     = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
+    triggerBitsData_ = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResultsData"));
     for (uint iPath = 0; iPath < hltPathNames.size(); ++iPath){
       TString path = hltPathNames[ iPath ];
       hltPathFired[ path ] = false;
       tree->Branch( path, &hltPathFired[ path ], path + "/b" );
+#ifdef DATA
+      TString dataPath = "Data_"+path;
+      hltPathFired[ dataPath ] = false;
+      tree->Branch( dataPath, &hltPathFired[ dataPath ], dataPath + "/b" );
+#endif
     }
 
 
@@ -978,31 +974,19 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
     edm::Handle<edm::TriggerResults> triggerBits;
     iEvent.getByToken(triggerBits_, triggerBits);
-    
     const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
-
-    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-
-      //if ( (triggerBits->accept(i)) ){
-	if ( hltPathFired.find( names.triggerName(i) ) != hltPathFired.end() ){
-	  //std::cout << "Trigger " << names.triggerName(i) << std::endl;
-	  hltPathFired[ names.triggerName(i) ] = triggerBits->accept(i);
-	}
-      //}
+    for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) { 
+      if ( hltPathFired.find( names.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ names.triggerName(i) ] = triggerBits->accept(i); } 
     }
 
-  // // Iterate through paths run
-  // // ------------------------------------------------------------
-  // for (unsigned i = 0; i < paths->size(); ++i) {
-  //   std::string name = paths->at(i).name();
-  //   //std::cout << name << "\n";
-
-  //   if ( hltPathFired.find( name ) != hltPathFired.end() ){
-  //     //      std::cout << name << " found. Fired = " << paths->at(i).wasAccept() << "\n";
-  //     hltPathFired[ name ] = paths->at(i).wasAccept();
-  //   }
-
-  // }
+#ifdef DATA
+    edm::Handle<edm::TriggerResults> triggerBitsData;
+    iEvent.getByToken(triggerBitsData_, triggerBitsData);
+    const edm::TriggerNames &namesData = iEvent.triggerNames(*triggerBitsData);
+    for (unsigned int i = 0, n = triggerBitsData->size(); i < n; ++i) {
+	if ( hltPathFired.find( namesData.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ namesData.triggerName(i) ] = triggerBitsData->accept(i); }
+    }
+#endif
 
   // ------------------------------------------------------------------------------------------------------------------------
   // ------------------------------------------------------------------------------------------------------------------------
@@ -1251,17 +1235,17 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
     // Dijet avg 
 #ifdef SIMULATION
-    genDijetAvgPt= 0;
-    if ( gen.size()     > 1){ genDijetAvgPt      = 0.5*(gen.at(0)->pt()     + gen.at(1)->pt()); }
+    genDijetAvePt= 0;
+    if ( gen.size()     > 1){ genDijetAvePt      = 0.5*(gen.at(0)->pt()     + gen.at(1)->pt()); }
 #endif
-    //    recoPFDijetAvgPt= 0;
-    hltPFDijetAvgPt= 0;
-    hltCaloDijetAvgPt= 0;
-    hltCaloIDDijetAvgPt= 0;
-    //    if (recoPF.size()   > 1){ recoPFDijetAvgPt   = 0.5*(recoPF.at(0)->pt()  + recoPF.at(1)->pt()); }
-    if ( hltPF.size()   > 1){ hltPFDijetAvgPt    = 0.5*(hltPF.at(0)->pt()   + hltPF.at(1)->pt()); }
-    if ( hltCalo.size() > 1){ hltCaloDijetAvgPt  = 0.5*(hltCalo.at(0)->pt() + hltCalo.at(1)->pt()); }
-    if ( hltCaloID.size() > 1){ hltCaloIDDijetAvgPt  = 0.5*(hltCaloID.at(0)->pt() + hltCaloID.at(1)->pt()); }
+    //    recoPFDijetAvePt= 0;
+    hltPFDijetAvePt    = 0;
+    hltCaloDijetAvePt  = 0;
+    hltCaloIDDijetAvePt= 0;
+    //    if (recoPF.size()   > 1){ recoPFDijetAvePt   = 0.5*(recoPF.at(0)->pt()  + recoPF.at(1)->pt()); }
+    if ( hltPF.size()   > 1){ hltPFDijetAvePt    = 0.5*(hltPF.at(0)->pt()   + hltPF.at(1)->pt()); }
+    if ( hltCalo.size() > 1){ hltCaloDijetAvePt  = 0.5*(hltCalo.at(0)->pt() + hltCalo.at(1)->pt()); }
+    if ( hltCaloID.size() > 1){ hltCaloIDDijetAvePt  = 0.5*(hltCaloID.at(0)->pt() + hltCaloID.at(1)->pt()); }
 
     // ********************************************************************************
     // *                                  Energy sums                                 *
