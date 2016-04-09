@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-prodTag = "03Apr16"
+prodTag = "07Apr16"
 sampleN = 0   # 0 - 8
 jobName = "Run2015D"
 jobTag  = jobName + '_' + prodTag

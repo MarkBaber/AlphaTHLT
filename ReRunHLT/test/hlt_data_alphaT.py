@@ -59598,6 +59598,96 @@ process.PhysicsHadronsTausOutput,
 ))
 
 
+
+# ----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
+
+
+process.hltPrePFMETNoiseCleaned = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    offset = cms.uint32( 0 )
+)
+process.hltMET20 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMet" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 )
+)
+process.hltMETClean20 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMetClean" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 )
+)
+process.hltMETCleanUsingJetID20 = cms.EDFilter( "HLT1CaloMET",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( -1.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltMetCleanUsingJetID" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 87 )
+)
+
+process.HLT_PFMET_NoiseCleaned_v1 = cms.Path( process.HLTBeginSequence + process.hltL1sETM50IorETM60IorETM70
+                                              + process.hltPrePFMETNoiseCleaned + process.HLTRecoMETSequence 
+                                      + process.hltMET20 + process.HLTHBHENoiseCleanerSequence + process.hltMetClean + process.hltMETClean20 + 
+                                      process.HLTAK4CaloJetsSequence + process.hltMetCleanUsingJetID + process.hltMETCleanUsingJetID20 +
+                                      process.HLTAK4PFJetsSequence + process.hltPFMETProducer + process.HLTEndSequence )
+ 
+
+# Calojets 
+# ------------------------------ 
+process.hltSingleCaloJet20 = cms.EDFilter( "HLT1CaloJet",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( 5.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltAK4CaloJetsCorrectedIDPassed" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 85 )
+)
+process.HLT_CaloJet20_v1 = cms.Path( process.HLTBeginSequence +
+                             process.HLTAK4CaloJetsSequence + 
+                             process.hltSingleCaloJet20 + 
+                             process.HLTEndSequence )
+
+# PFJets
+# ------------------------------
+process.hltSinglePFJet20 = cms.EDFilter( "HLT1PFJet",
+    saveTags = cms.bool( True ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    MaxEta = cms.double( 5.0 ),
+    MinMass = cms.double( -1.0 ),
+    inputTag = cms.InputTag( "hltAK4PFJetsCorrected" ),
+    MinE = cms.double( -1.0 ),
+    triggerType = cms.int32( 85 )
+)
+process.HLT_PFJet20_v1   = cms.Path( process.HLTBeginSequence  + 
+                             process.HLTAK4PFJetsSequence + 
+                             process.hltAK4PFJetsCorrected+
+                             process.hltSinglePFJet20 + 
+                             process.HLTEndSequence )
+
+
+
+
+
+# ----------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------
+
 process.source = cms.Source( "PoolSource",
     fileNames = cms.untracked.vstring(
         '/store/relval/CMSSW_8_0_1/SingleElectron/FEVTDEBUGHLT/80X_dataRun2_HLT_relval_v3_RelVal_sigEl2015D-v1/10000/F6BDA09C-15E4-E511-8CC2-002618B27F8A.root',
@@ -59729,7 +59819,7 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
        'drop *_mix_*_*',
 
         # UCT 
-       #'keep l1extra*_*_*_*',
+       'keep l1extra*_*_*_*',
 
 
        # HLT 
@@ -59752,7 +59842,10 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
        'keep *_hltL1GtObjectMap_*_HLT2',
        'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
        'keep FEDRawDataCollection_source_*_HLT2',
-       'keep edmTriggerResults_*_*_HLT2',
+
+
+       'keep edmTriggerResults_*_*_*',
+#       'keep edmTriggerResults_*_*_HLT2',
        'keep triggerTriggerEvent_*_*_HLT2',
 
        'drop *_*_*_reHLT',
@@ -59762,6 +59855,12 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
 process.Output = cms.EndPath( process.hltOutput )
 
 process.HLTSchedule = cms.Schedule( process.HLTriggerFirstPath, 
+
+                                    
+                                    process.HLT_CaloJet20_v1,
+                                    process.HLT_PFJet20_v1,
+                                    process.HLT_PFMET_NoiseCleaned_v1,
+
 
                                     process.HLT_PFHT200_v2, process.HLT_PFHT250_v2, 
                                     process.HLT_PFHT300_v2, process.HLT_PFHT350_v3, 
