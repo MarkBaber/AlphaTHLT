@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-prodTag = "09Apr16_2"
+prodTag = "10Apr16"
 sampleN = 0   # 0 - 8
 jobName = "Run2015D"
 jobTag  = jobName + '_' + prodTag
@@ -42,9 +42,10 @@ config.JobType.outputFiles = ['hltReRunResults.root']
 config.section_('Data')
 config.Data.outLFNDirBase   = '/store/user/mbaber/' + jobTag
 config.Data.inputDBS        = 'global'
-#config.Data.inputDataset          = dataset
-config.Data.inputDataset          = datasetPair[0][0]
-config.Data.secondaryInputDataset = datasetPair[0][1]
+config.Data.inputDataset          = dataset
+# config.Data.inputDataset          = datasetPair[0][0]
+# config.Data.secondaryInputDataset = datasetPair[0][1]
+
 config.Data.publication  = False
 # config.Data.splitting = 'FileBased'
 # config.Data.unitsPerJob = 1
