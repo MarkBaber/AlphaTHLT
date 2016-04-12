@@ -54,7 +54,7 @@ Then execute `getCRAB3Jobs.py` using the name of the CRAB basedirectory:
   ```
   /home/hep/mb1512/.scripts/Jobs/getCRAB3Jobs.py <NAME_OF_CRABDIR>
   ```
-This will automatically search through directories on the Tier-2 for all files associated with the CRAB job, producing filtered CMSSW `cfi` files with links to all the processed files stored in a PSet. After generation perform a `scram build`:
+This will automatically search through directories on the Tier-2 for all files associated with the CRAB job, producing filtered CMSSW `cfi` files with links to all the processed files stored in a PSet. Make sure after generation to perform a `scram build` to compile the new configuration files:
 ```
   cd ../../..
   scram b -j8
@@ -65,7 +65,14 @@ Trigger ntuples are produced by the configuration file `MakeTrees_cfg.py` in the
 ```
 cmsRun MakeTrees_cfg.py
 ```
+This can be submitted to the batch using the script `submitBatchIC.py`:
+```
+./submitBatchIC.py MakeTrees_cfg.py N_JOBS TAG_NAME
+```
+ Where `N_JOBS` is the number of jobs to process and `TAG_NAME` is an optional suffix affixed to the processed directory for book keeping. The script will automatically split the number of files processed in each job to meet the required number of jobs to process.
 
+Extra information
+-----------------
 You can browse files on the Tier-2 with the command:
   ```
   lcg-ls $DCACHE_SRM_ROOT/store/user/
