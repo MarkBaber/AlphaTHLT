@@ -59805,7 +59805,8 @@ _customInfo['inputFiles'][True]  = "file:RelVal_Raw_GRun_DATA.root"
 _customInfo['inputFiles'][False] = "file:RelVal_Raw_GRun_MC.root"
 _customInfo['maxEvents' ]=  300
 _customInfo['globalTag' ]= "auto:run2_hlt_GRun"
-_customInfo['inputFile' ]=  ['/store/relval/CMSSW_8_0_1/SingleElectron/FEVTDEBUGHLT/80X_dataRun2_HLT_relval_v3_RelVal_sigEl2015D-v1/10000/F6BDA09C-15E4-E511-8CC2-002618B27F8A.root']
+#_customInfo['inputFile' ]=  ['/store/relval/CMSSW_8_0_1/SingleElectron/FEVTDEBUGHLT/80X_dataRun2_HLT_relval_v3_RelVal_sigEl2015D-v1/10000/F6BDA09C-15E4-E511-8CC2-002618B27F8A.root']
+_customInfo['inputFile' ]= ['file:MyOutputFile_Data.root']
 _customInfo['realData'  ]=  True
 from HLTrigger.Configuration.customizeHLTforALL import customizeHLTforAll
 process = customizeHLTforAll(process,"GRun",_customInfo)
