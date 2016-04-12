@@ -59639,7 +59639,7 @@ process.hltMETCleanUsingJetID20 = cms.EDFilter( "HLT1CaloMET",
     triggerType = cms.int32( 87 )
 )
 
-process.HLT_PFMET_NoiseCleaned_v1 = cms.Path( process.HLTBeginSequence + process.hltL1sETM50IorETM60IorETM70
+process.HLT_PFMET_NoiseCleaned_v1 = cms.Path( process.HLTBeginSequence + #process.hltL1sETM50IorETM60IorETM70
                                               + process.hltPrePFMETNoiseCleaned + process.HLTRecoMETSequence 
                                       + process.hltMET20 + process.HLTHBHENoiseCleanerSequence + process.hltMetClean + process.hltMETClean20 + 
                                       process.HLTAK4CaloJetsSequence + process.hltMetCleanUsingJetID + process.hltMETCleanUsingJetID20 +
