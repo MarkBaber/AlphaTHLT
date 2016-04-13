@@ -1,0 +1,2 @@
+# T2tt_2J_mStop_500_mLSP_325, Files: 260
+from AlphaTHLT.MakeTree.samples.MC_76X_13Apr16.T2tt_2J_mStop_500_mLSP_325_cfi import T2tt_2J_mStop_500_mLSP_325

@@ -14,19 +14,19 @@ process.maxEvents = cms.untracked.PSet(
 
 # --------------------------------------------------------------------------------
 # Select bx to process
-#bx = "25ns"
-#bx = "50ns"
-#bx = "20PU25ns"
-#bx = "40PU25ns"
-#bx = "AVE30BX50"
-bx = "Data"
+#bx = "25ns" #bx = "50ns" #bx = "20PU25ns" #bx = "40PU25ns" #bx = "AVE30BX50"
+#bx = "MC"
+#bx = "Data"
+bx = "ZB"
 
 if   (bx == "25ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15_cfi import * 
 elif (bx == "50ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15_cfi import * 
 elif (bx == "AVE30BX50"): from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU30bx50_26May15v2_cfi import *
 elif (bx == "20PU25ns"):  from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
 elif (bx == "40PU25ns"):  from AlphaTHLT.MakeTree.samples._74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3_25Jul15_cfi import *
-elif (bx =="Data"):       from AlphaTHLT.MakeTree.samples.Run2015D_07Apr16_cfi import *
+elif (bx == "MC"):        from AlphaTHLT.MakeTree.samples.MC_76X_13Apr16_cfi   import *
+elif (bx =="Data"):       from AlphaTHLT.MakeTree.samples.Run2015D_11Apr16_cfi import *
+elif (bx =="ZB"):         from AlphaTHLT.MakeTree.samples.Run2015D_Loose_12Apr16_cfi import *
 else:  
     print "Error: Bunch spacing '", bx, "' not recognised\n"
     exit(0)
@@ -107,19 +107,22 @@ elif (bx == "50ns"):
                QCD800to1000, # 8
                TTbar,        # 9
                DYJets ]      # 10
-elif (bx == "50nsPU1"):
-    samples = [QCD30to50,    # 0
-               # QCD50to80,    # 1
-               # QCD80to120,   # 2
-               # QCD120to170,  # 3
-               QCD170to300,  # 4
-               QCD300to470,  # 5 
-               # QCD470to600,  # 6
-               # QCD600to800,  # 7
-               #QCD800to1000] # 8
+elif (bx == "MC"):
+    samples = [T2tt_2J_mStop_500_mLSP_325,
                ]
 elif (bx == "Data"):
-    samples = [HLTPhysics3]
+    samples = [#HLTPhysics1,
+               #HLTPhysics2,
+               #HLTPhysics3,
+               #HLTPhysics4
+               ]
+elif (bx == "ZB"):
+    samples = [ZeroBias1,
+               # ZeroBias2,
+               # ZeroBias3,
+               # ZeroBias4,
+               ]
+
 selectedSample = samples[0]
 
 
