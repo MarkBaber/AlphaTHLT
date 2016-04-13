@@ -30,7 +30,10 @@ rehash
 
 1. HLT emulation
 =========
-The first stage for trigger measurements is the remulation of the HLT using from CMSSW RAW datasets. This utilises configurations in `AlphaTHLT/ReRunHLT/test/` which are generated using the `hltGetConfiguration` command described in https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGlobalHLT.
+The first stage for trigger measurements is the remulation of the HLT using from CMSSW RAW datasets. This utilises configurations in `AlphaTHLT/ReRunHLT/test/` which are generated using the `hltGetConfiguration` command described in https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideGlobalHLT. For example to perform a remulation for MC in 80X:
+```
+hltGetConfiguration /dev/CMSSW_8_0_0/GRun --full --offline --mc --unprescale --process HLT2 --globaltag auto:run2_mc_GRun --l1-emulator 'Full' > hlt.py
+```
 
 Running jobs
 ------------
