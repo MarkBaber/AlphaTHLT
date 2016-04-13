@@ -2,31 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 # General purpose tree maker
 MakeTrees = cms.EDAnalyzer("MakeTrees",
-
-
-
-                           
-
-    #UCT inputs  
-    #srcUctMht = cms.InputTag("caloStage1FinalDigis","", "L1TEMULATION"),
-    srcUctMht = cms.InputTag("caloStage1FinalDigis"),
-    srcUctMet = cms.InputTag("caloStage1FinalDigis"),
-    srcUctJet = cms.InputTag("caloStage1FinalDigis"),
-#    srcUctJet = cms.InputTag("caloStage1LegacyFormatDigis"),
-
-
-    srcS2Met = cms.InputTag("Stage2JetProducer", "l1Stage2Met"),
-    #Stage 2 inputs
-    srcS2DonutMht = cms.InputTag("Stage2JetProducer","l1Stage2DonutPUSMht"),
-    srcS2DonutJetCentral = cms.VInputTag(cms.InputTag("Stage2JetProducer","l1Stage2JetsDonutPUS")),
-    #Stage 2 inputs
-    srcS2NopusMht = cms.InputTag("Stage2JetProducer","l1Stage2NoPUSMht"),
-    srcS2NopusJetCentral = cms.VInputTag(cms.InputTag("Stage2JetProducer","l1Stage2JetsNoPUS")),
-
-    #Stage 2 inputs
-    srcS2GlobalMht = cms.InputTag("Stage2JetProducer","l1Stage2GlobalPUSMht"),
-    srcS2GlobalJetCentral = cms.VInputTag(cms.InputTag("Stage2JetProducer","l1Stage2JetsGlobalPUS")),
-
+                       
     # ----------------------------------------
     # Level -1
     # ----------------------------------------
@@ -69,7 +45,7 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     hltCaloSrc          = cms.InputTag("hltAK4CaloJetsCorrected"),
     hltCaloIDSrc        = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
     hltPFSrc            = cms.InputTag("hltAK4PFJetsCorrected"),
-
+    genSrc              = cms.InputTag("ak4NoNuGenJets"),
     
     HLTResults     = cms.InputTag("TriggerResults"),          # Emulated
     HLTResultsData = cms.InputTag("TriggerResults","","HLT"), # Recorded (In data)

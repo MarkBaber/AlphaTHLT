@@ -15,9 +15,9 @@ process.maxEvents = cms.untracked.PSet(
 # --------------------------------------------------------------------------------
 # Select bx to process
 #bx = "25ns" #bx = "50ns" #bx = "20PU25ns" #bx = "40PU25ns" #bx = "AVE30BX50"
-#bx = "MC"
+bx = "MC"
 #bx = "Data"
-bx = "ZB"
+#bx = "ZB"
 
 if   (bx == "25ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_25V4_742_PU40bx25_HCAL3_24May15_cfi import * 
 elif (bx == "50ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40bx50_24May15_cfi import * 
