@@ -38,6 +38,8 @@
 #include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/CaloMETCollection.h"
+#include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/METReco/interface/PFMETCollection.h"
 
 // NVTX
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
@@ -69,7 +71,7 @@
 
 TLorentzVector P4toTLV (reco::Particle::LorentzVector a){ return TLorentzVector( a.px(), a.py(), a.pz(), a.energy() ); }
 
-
+typedef std::vector<reco::GenParticle> GenParticleCollection;
 typedef std::vector<edm::InputTag> VInputTag;
 
 
@@ -346,6 +348,8 @@ class MakeTrees : public edm::EDAnalyzer {
   edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBitsData_;
 
+  edm::EDGetTokenT<std::vector<reco::GenParticle> >  genParticlesToken_;
+
   // Jets
   edm::EDGetTokenT<reco::CaloJetCollection> hltCaloJetToken_;
   edm::EDGetTokenT<reco::CaloJetCollection> hltCaloJetIDToken_;
@@ -356,7 +360,7 @@ class MakeTrees : public edm::EDAnalyzer {
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetCleanToken_;
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetCleanUsingJetIDToken_;
-  edm::EDGetTokenT<reco::METCollection>     hltPFMetToken_;
+  edm::EDGetTokenT<reco::PFMETCollection>   hltPFMetToken_;
   edm::EDGetTokenT<reco::GenMETCollection>  genMetCaloToken_;
   edm::EDGetTokenT<reco::GenMETCollection>  genMetTrueToken_;
 
@@ -763,6 +767,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcGctJetForward_ = pset.getParameter<VInputTag>("srcGctJetForward");
 #endif
 
+    genParticlesToken_ = consumes<std::vector<reco::GenParticle> >(pset.getParameter<edm::InputTag>("srcGenParticles"));
 
     hltCaloJetToken_   = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltCaloSrc"));
     hltCaloJetIDToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltCaloIDSrc"));
@@ -772,7 +777,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     hltCaloMetToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
     hltCaloMetCleanToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetCleanSrc"));
     hltCaloMetCleanUsingJetIDToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetCleanUsingJetIDSrc"));
-    hltPFMetToken_     = consumes<reco::METCollection>    (pset.getParameter<edm::InputTag>("hltPFMetSrc"));
+    hltPFMetToken_     = consumes<reco::PFMETCollection>  (pset.getParameter<edm::InputTag>("hltPFMetSrc"));
     genMetCaloToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetCaloSrc")); 
     genMetTrueToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetTrueSrc")); 
 
@@ -849,7 +854,7 @@ namespace {
 	if(!handle.isValid()){ pt  = 0; phi = 0; }
 	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
   }
-  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::MET> >& handle, Float_t& pt, Float_t& phi) {
+  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::PFMET> >& handle, Float_t& pt, Float_t& phi) {
 	if(!handle.isValid()){ pt  = 0; phi = 0; }
 	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
   }
@@ -1072,72 +1077,71 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   hltPFJetForUnskimmed     = hltPFJetUnskimmed;
   genJetForUnskimmed       = genJetUnskimmed;
   
-
 //     // std::vector<const reco::Candidate*> recoCaloUnskimmed            = getJetCollection( iEvent, srcCalo );
 //     // std::vector<const reco::Candidate*> recoPFUnskimmed              = getJetCollection( iEvent, srcPF   );
 //     // std::vector<const reco::Candidate*> recoCaloForUnskimmed         = getJetCollection( iEvent, srcCalo );
 //     // std::vector<const reco::Candidate*> recoPFForUnskimmed           = getJetCollection( iEvent, srcPF   );
 
-    
+   
+#ifdef SIMULATION
+    // --------------------------------------------------------------------------------
+    // Gen particles
+    // --------------------------------------------------------------------------------
 
-//     // Gen particles
-//     // --------------------------------------------------------------------------------
+    genLeptonVeto      = false;
+    genElectronVeto    = false;
+    genMuonVeto        = false;
+    genPhotonVeto      = false;
+    genIsoLeptonVeto   = false;
+    genIsoElectronVeto = false;
 
-//     genLeptonVeto      = false;
-//     genElectronVeto    = false;
-//     genMuonVeto        = false;
-//     genPhotonVeto      = false;
-//     genIsoLeptonVeto   = false;
-//     genIsoElectronVeto = false;
+    std::vector<int> selLeptonIndices;
+    int particleIndex(0);
 
-//     std::vector<int> selLeptonIndices;
-//     int particleIndex(0);
+    if (makeGenParticles){
+      edm::Handle<std::vector<reco::GenParticle> > genParticles; iEvent.getByToken(genParticlesToken_, genParticles);
 
-//     if (makeGenParticles){
-//       edm::Handle< std::vector<reco::GenParticle> > genParticles;
-//       iEvent.getByLabel(srcGenParticles_, genParticles);
-//       for(std::vector<reco::GenParticle>::const_iterator iter = genParticles->begin(); iter != genParticles->end(); ++iter){
-//     	const reco::GenParticle& genParticle = *iter;
+      for(std::vector<reco::GenParticle>::const_iterator iter = genParticles->begin(); iter != genParticles->end(); ++iter){
+    	const reco::GenParticle& genParticle = *iter;
 
-//     	double genParticlePt  = genParticle.p4().pt();
-//     	double genParticleEta = genParticle.p4().eta();
-//     	double genParticlePhi = genParticle.p4().phi();
+    	double genParticlePt  = genParticle.p4().pt();
+    	double genParticleEta = genParticle.p4().eta();
+    	double genParticlePhi = genParticle.p4().phi();
 
+    	if(TMath::Abs(genParticle.pdgId()) == 11){    	// Electron
+    	  if ( (genParticlePt >= genElectronMinPt) && (TMath::Abs(genParticleEta) <= genElectronMaxEta) ){
+    	    genElectronPt ->push_back( genParticlePt  );
+    	    genElectronEta->push_back( genParticleEta );
+    	    genElectronPhi->push_back( genParticlePhi );
+    	    genLeptonVeto   = true;
+    	    genElectronVeto = true;
+	    selLeptonIndices.push_back( particleIndex );
+    	  }
+    	} // End lepton requirement
+    	else if(TMath::Abs(genParticle.pdgId()) == 13){ // Muon
+    	  if ( (genParticlePt >= genMuonMinPt) && (TMath::Abs(genParticleEta) <= genMuonMaxEta) ){
+    	    genMuonPt ->push_back( genParticlePt  );
+   	    genMuonEta->push_back( genParticleEta );
+    	    genMuonPhi->push_back( genParticlePhi );
+    	    genLeptonVeto = true;
+	    genMuonVeto   = true;
+	    selLeptonIndices.push_back( particleIndex );
+    	  }
+    	} // End Muon requirement
+    	else if(TMath::Abs(genParticle.pdgId()) == 22){ // Photon
+    	  if ( (genParticlePt >= genPhotonMinPt) && (TMath::Abs(genParticleEta) <= genPhotonMaxEta) ){
+    	    genPhotonPt ->push_back( genParticlePt  );
+   	    genPhotonEta->push_back( genParticleEta );
+    	    genPhotonPhi->push_back( genParticlePhi );
+    	    genPhotonVeto = true;
+    	  }
+    	} // End Photon requirement
 
-//     	if(TMath::Abs(genParticle.pdgId()) == 11){    	// Electron
-//     	  if ( (genParticlePt >= genElectronMinPt) && (TMath::Abs(genParticleEta) <= genElectronMaxEta) ){
-//     	    genElectronPt ->push_back( genParticlePt  );
-//     	    genElectronEta->push_back( genParticleEta );
-//     	    genElectronPhi->push_back( genParticlePhi );
-//     	    genLeptonVeto   = true;
-//     	    genElectronVeto = true;
-// 	    selLeptonIndices.push_back( particleIndex );
-//     	  }
-//     	} // End lepton requirement
-//     	else if(TMath::Abs(genParticle.pdgId()) == 13){ // Muon
-//     	  if ( (genParticlePt >= genMuonMinPt) && (TMath::Abs(genParticleEta) <= genMuonMaxEta) ){
-//     	    genMuonPt ->push_back( genParticlePt  );
-//    	    genMuonEta->push_back( genParticleEta );
-//     	    genMuonPhi->push_back( genParticlePhi );
-//     	    genLeptonVeto = true;
-// 	    genMuonVeto   = true;
-// 	    selLeptonIndices.push_back( particleIndex );
-//     	  }
-//     	} // End Muon requirement
-//     	else if(TMath::Abs(genParticle.pdgId()) == 22){ // Photon
-//     	  if ( (genParticlePt >= genPhotonMinPt) && (TMath::Abs(genParticleEta) <= genPhotonMaxEta) ){
-//     	    genPhotonPt ->push_back( genParticlePt  );
-//    	    genPhotonEta->push_back( genParticleEta );
-//     	    genPhotonPhi->push_back( genParticlePhi );
-//     	    genPhotonVeto = true;
-//     	  }
-//     	} // End Photon requirement
+	particleIndex++;
+      } // End loop
+    } // End gen particles
 
-// 	particleIndex++;
-//       } // End loop
-//     } // End gen particles
-
-
+#endif
 
 
 //     // Jet lepton cleaning
@@ -1277,10 +1281,8 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     getValue(iEvent, hltCaloMetCleanHandle,           metPt_["hltMetCleanCalo"], metPhi_["hltMetCleanCalo"]);
     edm::Handle<reco::CaloMETCollection> hltCaloMetCleanUsingJetIDHandle;  iEvent.getByToken(hltCaloMetCleanUsingJetIDToken_, hltCaloMetCleanUsingJetIDHandle);    
     getValue(iEvent, hltCaloMetCleanUsingJetIDHandle, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
-
-    edm::Handle<reco::METCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
+    edm::Handle<reco::PFMETCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
     getValue(iEvent, hltPFMetHandle,                  metPt_["hltMetPF"],   metPhi_["hltMetPF"]);
-
 #ifdef SIMULATION
     edm::Handle<reco::GenMETCollection> genMetCaloHandle;  iEvent.getByToken(genMetCaloToken_, genMetCaloHandle);    
     getValue(iEvent, genMetCaloHandle,              metPt_["genMetCalo"], metPhi_["genMetCalo"]);
