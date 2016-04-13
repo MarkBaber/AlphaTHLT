@@ -123,10 +123,6 @@ class MakeTrees : public edm::EDAnalyzer {
     VInputTag srcGctJetForward_;
     VInputTag srcGctJetAll_;
 
-    edm::InputTag srcGenMetCalo_;
-    edm::InputTag srcGenMetCaloAndNonPrompt_;
-    edm::InputTag srcGenMetTrue_;
-
     edm::InputTag srcHLTMetCalo_;
     edm::InputTag srcHLTMetCleanCalo_;
     edm::InputTag srcHLTMetCleanUsingJetIDCalo_;
@@ -358,6 +354,8 @@ class MakeTrees : public edm::EDAnalyzer {
 
   // Met
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
+  edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetCleanToken_;
+  edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetCleanUsingJetIDToken_;
   edm::EDGetTokenT<reco::METCollection>     hltPFMetToken_;
   edm::EDGetTokenT<reco::GenMETCollection>  genMetCaloToken_;
   edm::EDGetTokenT<reco::GenMETCollection>  genMetTrueToken_;
@@ -745,9 +743,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
 
     // Gen 
-    srcGenMetCalo_                = pset.getParameter<edm::InputTag>("srcGenMetCalo");
-    srcGenMetCaloAndNonPrompt_    = pset.getParameter<edm::InputTag>("srcGenMetCaloAndNonPrompt");
-    srcGenMetTrue_                = pset.getParameter<edm::InputTag>("srcGenMetTrue");
     makeGenParticles           = pset.getParameter<bool>("MakeGenParticles");
     srcGenParticles_           = pset.getParameter<edm::InputTag>("srcGenParticles");
     genElectronMinPt           = pset.getParameter<double>("genElectronMinPt");
@@ -775,6 +770,8 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     genJetToken_       = consumes<reco::GenJetCollection> (pset.getParameter<edm::InputTag>("genSrc"));
 
     hltCaloMetToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
+    hltCaloMetCleanToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetCleanSrc"));
+    hltCaloMetCleanUsingJetIDToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetCleanUsingJetIDSrc"));
     hltPFMetToken_     = consumes<reco::METCollection>    (pset.getParameter<edm::InputTag>("hltPFMetSrc"));
     genMetCaloToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetCaloSrc")); 
     genMetTrueToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetTrueSrc")); 
@@ -873,35 +870,35 @@ namespace {
   // 	}
   //   }
 
-  // UInt_t calculateNJet(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
+  UInt_t calculateNJet(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
     
-  //   UInt_t NJets(0);
-  //   for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
-  //     if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
-  //     NJets++;
-  //   }
-  //   return NJets;
-  // }
-  // Int_t calculateNJetBin(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
-  //   // Returns the following:
-  //   // 0 = No bin
-  //   //-1 = eq2a,-2 = eq3a,-3 = ge4a
-  //   // 1 = eq2j, 2 = eq3j, 3 = ge4j
-  //   Int_t NJetBin(-1); 
-  //   for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
-  //     if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
-  //     NJetBin++;
-  //     if (NJetBin == 3){ break; }
-  //   }
-  //   if ( NJetBin == -1){ NJetBin = 0; } // No jets
+    UInt_t NJets(0);
+    for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
+      if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
+      NJets++;
+    }
+    return NJets;
+  }
+  Int_t calculateNJetBin(const std::vector<const reco::Candidate*>& jets, float jetThreshold){
+    // Returns the following:
+    // 0 = No bin
+    //-1 = eq2a,-2 = eq3a,-3 = ge4a
+    // 1 = eq2j, 2 = eq3j, 3 = ge4j
+    Int_t NJetBin(-1); 
+    for (unsigned int iJet = 0; iJet < jets.size(); ++iJet ){
+      if ( jets.at(iJet)->pt() < jetThreshold ){ break; }
+      NJetBin++;
+      if (NJetBin == 3){ break; }
+    }
+    if ( NJetBin == -1){ NJetBin = 0; } // No jets
 
-  //   // Asymmetric bin
-  //   if ( NJetBin > 0 ){ // Require two jets
-  //     if ( jets.at(1)->pt() < 100. ){ NJetBin *= -1; } // Bin is asymmetric
-  //   }
+    // Asymmetric bin
+    if ( NJetBin > 0 ){ // Require two jets
+      if ( jets.at(1)->pt() < 100. ){ NJetBin *= -1; } // Bin is asymmetric
+    }
 
-  //   return NJetBin;
-  // }
+    return NJetBin;
+  }
 
   // Int_t calculateHTBin( float ht, float alphaT ){
 
@@ -1275,10 +1272,14 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // getValue(iEvent, srcHLTMetCleanUsingJetIDCalo_, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
 
     edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;  iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);    
-    getValue(iEvent, hltCaloMetHandle,              metPt_["hltMetCalo"], metPhi_["hltMetCalo"]);
+    getValue(iEvent, hltCaloMetHandle,                metPt_["hltMetCalo"], metPhi_["hltMetCalo"]);
+    edm::Handle<reco::CaloMETCollection> hltCaloMetCleanHandle;  iEvent.getByToken(hltCaloMetCleanToken_, hltCaloMetCleanHandle);    
+    getValue(iEvent, hltCaloMetCleanHandle,           metPt_["hltMetCleanCalo"], metPhi_["hltMetCleanCalo"]);
+    edm::Handle<reco::CaloMETCollection> hltCaloMetCleanUsingJetIDHandle;  iEvent.getByToken(hltCaloMetCleanUsingJetIDToken_, hltCaloMetCleanUsingJetIDHandle);    
+    getValue(iEvent, hltCaloMetCleanUsingJetIDHandle, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
 
     edm::Handle<reco::METCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
-    getValue(iEvent, hltPFMetHandle,                metPt_["hltMetPF"],   metPhi_["hltMetPF"]);
+    getValue(iEvent, hltPFMetHandle,                  metPt_["hltMetPF"],   metPhi_["hltMetPF"]);
 
 #ifdef SIMULATION
     edm::Handle<reco::GenMETCollection> genMetCaloHandle;  iEvent.getByToken(genMetCaloToken_, genMetCaloHandle);    
@@ -1353,20 +1354,20 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     // Analysis binning
 //     // ----------------------------------------
     
-// #ifdef SIMULATION
-//     genNJet40              = calculateNJet( gen,      40.);
-//     genNJetBin40           = calculateNJetBin( gen,      40.);
-//     genHTBin40           = calculateHTBin( genAlphaTHT40.second,      genAlphaTHT40.first );
-// #endif
-//     hltCaloIDNJet40        = calculateNJet( hltCaloID,  40.);
-//     hltCaloNJet40          = calculateNJet( hltCalo,  40.);
-//     hltPFNJet40            = calculateNJet( hltPF,    40.);
-//     // recoCaloNJet40         = calculateNJet( recoCalo, 40.);
-//     // recoPFNJet40           = calculateNJet( recoPF,   40.);
+#ifdef SIMULATION
+    genNJet40              = calculateNJet( gen,      40.);
+    genNJetBin40           = calculateNJetBin( gen,      40.);
+    //    genHTBin40           = calculateHTBin( genAlphaTHT40.second,      genAlphaTHT40.first );
+#endif
+    hltCaloIDNJet40        = calculateNJet( hltCaloID,  40.);
+    hltCaloNJet40          = calculateNJet( hltCalo,  40.);
+    hltPFNJet40            = calculateNJet( hltPF,    40.);
+    // recoCaloNJet40         = calculateNJet( recoCalo, 40.);
+    // recoPFNJet40           = calculateNJet( recoPF,   40.);
 
-//     hltCaloNJetBin40       = calculateNJetBin( hltCalo,  40.);
-//     hltCaloIDNJetBin40     = calculateNJetBin( hltCaloID,  40.);
-//     hltPFNJetBin40         = calculateNJetBin( hltPF,    40.);
+    hltCaloNJetBin40       = calculateNJetBin( hltCalo,  40.);
+    hltCaloIDNJetBin40     = calculateNJetBin( hltCaloID,  40.);
+    hltPFNJetBin40         = calculateNJetBin( hltPF,    40.);
 //     // recoCaloNJetBin40      = calculateNJetBin( recoCalo, 40.);
 //     // recoPFNJetBin40        = calculateNJetBin( recoPF,   40.);
 

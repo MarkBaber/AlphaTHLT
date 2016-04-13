@@ -24,7 +24,7 @@ elif (bx == "50ns"):      from AlphaTHLT.MakeTree.samples.FALL1374_50V0_742_PU40
 elif (bx == "AVE30BX50"): from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU30bx50_26May15v2_cfi import *
 elif (bx == "20PU25ns"):  from AlphaTHLT.MakeTree.samples.PHY1474_STV4_742_PU20bx25_28May15_cfi import * 
 elif (bx == "40PU25ns"):  from AlphaTHLT.MakeTree.samples._74X_HLT_mcRun2_asymptotic_fromSpring15DR_v0_PU40bx25_HCAL3_25Jul15_cfi import *
-elif (bx == "MC"):        from AlphaTHLT.MakeTree.samples.MC_76X_13Apr16_cfi   import *
+elif (bx == "MC"):        from AlphaTHLT.MakeTree.samples.MC_76X_Full_13Apr16_cfi   import *
 elif (bx =="Data"):       from AlphaTHLT.MakeTree.samples.Run2015D_11Apr16_cfi import *
 elif (bx =="ZB"):         from AlphaTHLT.MakeTree.samples.Run2015D_Loose_12Apr16_cfi import *
 else:  
@@ -129,8 +129,8 @@ selectedSample = samples[0]
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ),  # Test on local file
-#                             fileNames = selectedSample.files,                                  # Execute file from imported PSet
+#                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ),  # Test on local file
+                             fileNames = selectedSample.files,                                  # Execute file from imported PSet
 #                             fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MCRUN2_72_V3A_74X_PU40bx25/TT_Tune4C_13TeV-pythia8-tauola/crab_TT/150322_224937/0000/hltReRunResults_1.root')
 
 )
