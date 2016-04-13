@@ -1,8 +1,8 @@
 // **************************************************
 // Switches
 // **************************************************
-#define DATA
-//#define SIMULATION
+//#define DATA
+#define SIMULATION
 //#define L1
 //#define RECO
 // Remove isolated leptons from gen and HLT jets
