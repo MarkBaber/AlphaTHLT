@@ -59260,7 +59260,6 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
         'keep *_genMetCaloAndNonPrompt_*_*',
         'keep *_genMetTrue_*_*',
 
-       #'keep *_hlt*_*_HLT2', 
        #'keep *_*_*_HLT2', 
        'drop *_*Digi*_*_',
        'drop *_mix_*_*',
@@ -59274,15 +59273,17 @@ process.hltOutput = cms.OutputModule( "PoolOutputModule",
        'drop recoPFJets_hltAK4PFJetsForTaus_*_*',
        'keep recoCaloJets_hltAK4CaloJetsCorrected*_*_*',
 
+       'keep recoMETs_*_*_HLT2',
+       'drop recoMETs_*Rsq*_*_HLT2',                                            
+       'keep recoCaloMETs_*_*_HLT2',
+       'keep *_hltPFMET*_*_HLT2',
+
        # RECO 
        'keep *_ak4PFJetsCHS_*_*',
        'keep *_fixedGridRho*_*_*',
        'keep *_pfMet_*_*',
-
-       'keep recoMETs_*_*_HLT2',
-       'drop recoMETs_*Rsq*_*_HLT2',                                            
-       'keep recoCaloMETs_*_*_HLT2',
-
+       'keep *_fixedGridRho*_*_*',
+       
        'keep *_hltL1GtObjectMap_*_HLT2',
        # 'keep FEDRawDataCollection_rawDataCollector_*_HLT2',
        # 'keep FEDRawDataCollection_source_*_HLT2',
@@ -59308,7 +59309,6 @@ process.HLTSchedule = cms.Schedule( process.HLTriggerFirstPath,
                                     process.HLT_CaloJet20_v1,
                                     process.HLT_PFJet20_v1,
                                     process.HLT_PFMET_NoiseCleaned_v1,
-
 
                                     process.HLT_PFHT200_v2, process.HLT_PFHT250_v2, 
                                     process.HLT_PFHT300_v2, process.HLT_PFHT350_v3, 
