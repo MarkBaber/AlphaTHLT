@@ -32,9 +32,10 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
-#include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/METReco/interface/GenMET.h"
+#include "DataFormats/METReco/interface/GenMETCollection.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/METReco/interface/CaloMETCollection.h"
 
@@ -116,15 +117,11 @@ class MakeTrees : public edm::EDAnalyzer {
 
   private:
 
-    //Get the GCT stuff
     edm::InputTag srcGctMht_;
     edm::InputTag srcGctMet_;
     VInputTag srcGctJetCentral_;
     VInputTag srcGctJetForward_;
     VInputTag srcGctJetAll_;
-
-    //Get the Gen stuff
-    VInputTag srcGen4Jet_;
 
     edm::InputTag srcGenMetCalo_;
     edm::InputTag srcGenMetCaloAndNonPrompt_;
@@ -241,6 +238,7 @@ class MakeTrees : public edm::EDAnalyzer {
     // std::pair<float,float> recoCaloMHT40;
 
     std::pair<float,float> genForMHT40;
+    std::pair<float,float> hltCaloForMHT40;
     std::pair<float,float> hltPFForMHT40;
   //std::pair<float,float> recoPFForMHT40;
 
@@ -361,6 +359,8 @@ class MakeTrees : public edm::EDAnalyzer {
   // Met
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
   edm::EDGetTokenT<reco::METCollection>     hltPFMetToken_;
+  edm::EDGetTokenT<reco::GenMETCollection>  genMetCaloToken_;
+  edm::EDGetTokenT<reco::GenMETCollection>  genMetTrueToken_;
 
 
 };
@@ -584,6 +584,8 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // tree->Branch("recoCalo_MhtPT40",  &recoCaloMHT40.first,  "recoCalo_MhtPT40/f");
     // tree->Branch("recoCalo_MhtPhi40", &recoCaloMHT40.second, "recoCalo_MhtPhi40/f");
 
+    tree->Branch("hltCaloFor_MhtPT40",   &hltCaloForMHT40.first,   "hltCaloFor_MhtPT40/f");
+    tree->Branch("hltCaloFor_MhtPhi40",  &hltCaloForMHT40.second,  "hltCaloFor_MhtPhi40/f");
     tree->Branch("hltPFFor_MhtPT40",     &hltPFForMHT40.first,     "hltPFFor_MhtPT40/f");
     tree->Branch("hltPFFor_MhtPhi40",    &hltPFForMHT40.second,    "hltPFFor_MhtPhi40/f");
     // tree->Branch("recoPFFor_MhtPT40",    &recoPFForMHT40.first,    "recoPFFor_MhtPT40/f");
@@ -746,7 +748,6 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     srcGenMetCalo_                = pset.getParameter<edm::InputTag>("srcGenMetCalo");
     srcGenMetCaloAndNonPrompt_    = pset.getParameter<edm::InputTag>("srcGenMetCaloAndNonPrompt");
     srcGenMetTrue_                = pset.getParameter<edm::InputTag>("srcGenMetTrue");
-    srcGen4Jet_                   = pset.getParameter<VInputTag>("srcGen4Jet");
     makeGenParticles           = pset.getParameter<bool>("MakeGenParticles");
     srcGenParticles_           = pset.getParameter<edm::InputTag>("srcGenParticles");
     genElectronMinPt           = pset.getParameter<double>("genElectronMinPt");
@@ -770,11 +771,13 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
 
     hltCaloJetToken_   = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltCaloSrc"));
     hltCaloJetIDToken_ = consumes<reco::CaloJetCollection>(pset.getParameter<edm::InputTag>("hltCaloIDSrc"));
-    hltPFJetToken_     = consumes<reco::PFJetCollection>(pset.getParameter<edm::InputTag>("hltPFSrc"));
-    genJetToken_       = consumes<reco::GenJetCollection>(pset.getParameter<edm::InputTag>("genSrc"));
+    hltPFJetToken_     = consumes<reco::PFJetCollection>  (pset.getParameter<edm::InputTag>("hltPFSrc"));
+    genJetToken_       = consumes<reco::GenJetCollection> (pset.getParameter<edm::InputTag>("genSrc"));
 
-    hltCaloMetToken_      = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
-    hltPFMetToken_        = consumes<reco::METCollection>(pset.getParameter<edm::InputTag>("hltPFMetSrc"));
+    hltCaloMetToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
+    hltPFMetToken_     = consumes<reco::METCollection>    (pset.getParameter<edm::InputTag>("hltPFMetSrc"));
+    genMetCaloToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetCaloSrc")); 
+    genMetTrueToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetTrueSrc")); 
 
 
 #ifdef RECO    
@@ -850,6 +853,10 @@ namespace {
 	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
   }
   void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::MET> >& handle, Float_t& pt, Float_t& phi) {
+	if(!handle.isValid()){ pt  = 0; phi = 0; }
+	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
+  }
+  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::GenMET> >& handle, Float_t& pt, Float_t& phi) {
 	if(!handle.isValid()){ pt  = 0; phi = 0; }
 	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
   }
@@ -948,12 +955,10 @@ namespace {
 
 void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 
-
-
+  // Event information
   run   = (unsigned int) iEvent.id().run();
   lumi  = (unsigned int) iEvent.id().luminosityBlock();
   event = (unsigned int) iEvent.id().event();
-
 
 
   NVTX = 0;
@@ -1063,7 +1068,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   if (hltPFJetHandle.isValid())  { hltPFJetUnskimmed       = getJetCollection( iEvent, hltPFJetHandle); }
   edm::Handle<reco::GenJetCollection> genJetHandle;        iEvent.getByToken(genJetToken_, genJetHandle);
   if (genJetHandle.isValid())  { genJetUnskimmed           = getJetCollection( iEvent, genJetHandle); }
-
 
   // Forward jets
   hltCaloJetForUnskimmed   = hltCaloJetUnskimmed;
@@ -1264,38 +1268,24 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // ********************************************************************************
     // *                                  Energy sums                                 *
     // ********************************************************************************
-    
-// #ifdef L1
-//     getValue(iEvent,   srcGctMht_, mhtPt_["gct"], mhtPhi_["gct"]);
-//     getValue(iEvent,   srcGctMet_, metPt_["gct"], metPhi_["gct"]);
-//     getSumEtL1(iEvent, srcGctMht_, ht_["gct"], false);
-//     getSumEtL1(iEvent, srcGctMet_, et_["gct"], false); 
-
-//     if  ( ht_["gct"] > 0.){ mhtDivHt_["gct"] = mhtPt_["gct"]/ht_["gct"]; }
-//     else                  { mhtDivHt_["gct"] = 0; }
-// #endif
-// #ifdef SIMULATION
-//     // genMet
-//     getValue(iEvent, srcGenMetCalo_,                metPt_["genMetCalo"],                metPhi_["genMetCalo"]);
-//     getValue(iEvent, srcGenMetCaloAndNonPrompt_,    metPt_["genMetCaloAndNonPrompt"],    metPhi_["genMetCaloAndNonPrompt"]);
-//     getValue(iEvent, srcGenMetTrue_,                metPt_["genMetTrue"],                metPhi_["genMetTrue"]);
-// #endif
 
     // hltMet
     // getValue(iEvent, srcHLTMetCalo_,                metPt_["hltMetCalo"],                metPhi_["hltMetCalo"]);
     // getValue(iEvent, srcHLTMetCleanCalo_,           metPt_["hltMetCleanCalo"],           metPhi_["hltMetCleanCalo"]);
     // getValue(iEvent, srcHLTMetCleanUsingJetIDCalo_, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
 
-    //    if(!handle.isValid()){
-
-    // const reco::CaloMET &hltCaloMetH = hltCaloMetHandle->front();
-    // std::cout << hltCaloMetH.pt() << "\t" << hltCaloMetH.phi() << "\n";
-
     edm::Handle<reco::CaloMETCollection> hltCaloMetHandle;  iEvent.getByToken(hltCaloMetToken_, hltCaloMetHandle);    
     getValue(iEvent, hltCaloMetHandle,              metPt_["hltMetCalo"], metPhi_["hltMetCalo"]);
 
     edm::Handle<reco::METCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
     getValue(iEvent, hltPFMetHandle,                metPt_["hltMetPF"],   metPhi_["hltMetPF"]);
+
+#ifdef SIMULATION
+    edm::Handle<reco::GenMETCollection> genMetCaloHandle;  iEvent.getByToken(genMetCaloToken_, genMetCaloHandle);    
+    getValue(iEvent, genMetCaloHandle,              metPt_["genMetCalo"], metPhi_["genMetCalo"]);
+    edm::Handle<reco::GenMETCollection> genMetTrueHandle;  iEvent.getByToken(genMetTrueToken_, genMetTrueHandle);    
+    getValue(iEvent, genMetTrueHandle,              metPt_["genMetTrue"], metPhi_["genMetTrue"]);
+#endif
 
 
 
@@ -1327,25 +1317,23 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     // Calculate: DeltaR of leading jets L1-Gen, HLT-Gen
 //     // ******************************************************************************** 
 
-// #ifdef SIMULATION
+#ifdef SIMULATION
 //     L1GenDeltaR  = leadL1GenDeltaR(    gctCenUnskimmed,  gctForUnskimmed, genJetUnskimmed );
 //     HLTGenDeltaR = leadHLTGenDeltaR( hltPFUnskimmed, genJetUnskimmed );
 //     hpuVeto      = (L1GenDeltaR < 0.5);
-
-//     gen_AlphaTPrime40     = calculateAlphaTPrime( genMHT40.first,      genAlphaTHT40.second );
-//     genMHT40              = calculateMHT( gen,      40.);
-//     genForMHT40           = calculateMHT( genFor,      40.);
-// #endif
+    gen_AlphaTPrime40     = calculateAlphaTPrime( genMHT40.first,      genAlphaTHT40.second );
+    genMHT40              = calculateMHT( gen,      40.);
+    genForMHT40           = calculateMHT( genFor,      40.);
+#endif
 
     // MHT
-    hltCaloMHT40          = calculateMHT( hltCalo,  40.);
-    hltCaloIDMHT40        = calculateMHT( hltCaloID,40.);
-    hltPFMHT40            = calculateMHT( hltPF,    40.);
-    // recoCaloMHT40         = calculateMHT( recoCalo, 40.);
-    // recoPFMHT40           = calculateMHT( recoPF,   40.);
-
-//     hltPFForMHT40         = calculateMHT( hltPFFor,    40.);
-//     //recoPFForMHT40        = calculateMHT( recoPFFor,   40.);
+    hltCaloMHT40          = calculateMHT( hltCalo,    40.);
+    hltCaloForMHT40       = calculateMHT( hltCaloFor, 40.);
+    hltCaloIDMHT40        = calculateMHT( hltCaloID,  40.);
+    hltPFMHT40            = calculateMHT( hltPF,      40.);
+    hltPFForMHT40         = calculateMHT( hltPFFor,   40.);
+    //recoPFMHT40         = calculateMHT( recoPF,     40.);
+    //recoPFForMHT40      = calculateMHT( recoPFFor,  40.);
 
     // AlphaT prime
     hltCalo_AlphaTPrime40    = calculateAlphaTPrime( hltCaloMHT40.first,  hltCaloAlphaTHT40.second );
@@ -1376,13 +1364,11 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 //     // recoCaloNJet40         = calculateNJet( recoCalo, 40.);
 //     // recoPFNJet40           = calculateNJet( recoPF,   40.);
 
-
 //     hltCaloNJetBin40       = calculateNJetBin( hltCalo,  40.);
 //     hltCaloIDNJetBin40     = calculateNJetBin( hltCaloID,  40.);
 //     hltPFNJetBin40         = calculateNJetBin( hltPF,    40.);
 //     // recoCaloNJetBin40      = calculateNJetBin( recoCalo, 40.);
 //     // recoPFNJetBin40        = calculateNJetBin( recoPF,   40.);
-
 
 //     hltCaloHTBin40       = calculateHTBin( hltCaloAlphaTHT40.second,  hltCaloAlphaTHT40.first );
 //     hltCaloIDHTBin40     = calculateHTBin( hltCaloIDAlphaTHT40.second,  hltCaloIDAlphaTHT40.first );
@@ -1412,23 +1398,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     // storeJet( "recoCaloFor",         recoCaloFor,         jetPt, jetPx, jetPy, jetEta, jetPhi );
     // storeJet( "recoPFFor",           recoPFFor,           jetPt, jetPx, jetPy, jetEta, jetPhi );
 
-// #ifdef L1
-//     // ----------------------------------------
-//     // L1 seeds
-//     // ----------------------------------------
-
-//     storeJet( "gctCen",                 gctCen,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
-//     storeJet( "gctFor",                 gctFor,                 jetPt, jetPx, jetPy, jetEta, jetPhi );
-
-//     L1HTT175        = ( ht_["gct"]    >= 175);
-//     L1ETM70         = ( metPt_["gct"] >= 70);
-//     L1HTT175OrETM70 = (L1HTT175 || L1ETM70);
-
-//     L1Jet_DPhi  = -1;
-//     if (jetPhi["gctCen"]->size() > 1){
-//       L1Jet_DPhi      = fabs( deltaPhi( (*jetPhi["gctCen"])[0], (*jetPhi["gctCen"])[1] ) );
-//     }
-// #endif
     
 //     // ----------------------------------------
 //     // Perform jet matching

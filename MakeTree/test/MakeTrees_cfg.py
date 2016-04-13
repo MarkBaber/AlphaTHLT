@@ -129,8 +129,8 @@ selectedSample = samples[0]
 # --------------------------------------------------------------------------------
 
 process.source = cms.Source ("PoolSource",
-#                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ),  # Test on local file
-                             fileNames = selectedSample.files,                                  # Execute file from imported PSet
+                             fileNames = cms.untracked.vstring( 'file:hltReRunResults.root' ),  # Test on local file
+#                             fileNames = selectedSample.files,                                  # Execute file from imported PSet
 #                             fileNames = cms.untracked.vstring( 'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MCRUN2_72_V3A_74X_PU40bx25/TT_Tune4C_13TeV-pythia8-tauola/crab_TT/150322_224937/0000/hltReRunResults_1.root')
 
 )

@@ -12,15 +12,10 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     srcGctJetForward = cms.VInputTag(cms.InputTag("hltL1extraParticles", "Forward")),
     srcGctJetAll = cms.VInputTag(cms.InputTag("hltL1extraParticles", "Central"),cms.InputTag("hltL1extraParticles", "Forward")),
 
-    #Gen inputs
-    srcGen4Jet = cms.VInputTag(cms.InputTag("ak4NoNuGenJets","","")),
-#    srcGen4Jet = cms.VInputTag(cms.InputTag("ak4NoMuNoNuGenJets","","")),
-#    srcGen5Jet = cms.VInputTag(cms.InputTag("ak5NoMuNoNuGenJets","","")),
-
+    # MET
     srcGenMetCalo             = cms.InputTag( "genMetCalo" ),
     srcGenMetCaloAndNonPrompt = cms.InputTag( "genMetCaloAndNonPrompt" ),
     srcGenMetTrue             = cms.InputTag( "genMetTrue" ),
-
                            
     srcHLTMetCalo                = cms.InputTag( "hltMet" ), 
     srcHLTMetCleanCalo           = cms.InputTag( "hltMetClean" ), 
@@ -29,7 +24,6 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
 
     srcHLTMhtCalo             = cms.InputTag( "hltHtMht" ), 
     srcHLTMhtPF               = cms.InputTag( "hltPFHT" ), 
-
 
     # Gen particles                           
     MakeGenParticles          = cms.bool( True ),
@@ -41,30 +35,20 @@ MakeTrees = cms.EDAnalyzer("MakeTrees",
     genPhotonMinPt            = cms.double( 25. ),                           
     genPhotonMaxEta           = cms.double( 2.5 ),                           
 
-    # HLT jets
+    # Jets
     hltCaloSrc          = cms.InputTag("hltAK4CaloJetsCorrected"),
     hltCaloIDSrc        = cms.InputTag("hltAK4CaloJetsCorrectedIDPassed"),
     hltPFSrc            = cms.InputTag("hltAK4PFJetsCorrected"),
-    genSrc              = cms.InputTag("ak4NoNuGenJets"),
+    genSrc              = cms.InputTag("ak4GenJetsNoNu"),
     
-    HLTResults     = cms.InputTag("TriggerResults"),          # Emulated
-    HLTResultsData = cms.InputTag("TriggerResults","","HLT"), # Recorded (In data)
+
+    HLTResults     = cms.InputTag("TriggerResults"),          # Remulated
+    HLTResultsData = cms.InputTag("TriggerResults","","HLT"), # Recorded (In ntuple)
 
     #hltCaloMetSrc = cms.InputTag( "hltMet","","HLT2"),
     hltCaloMetSrc = cms.InputTag( "hltMet"),
     hltPFMetSrc   = cms.InputTag( "hltPFMETProducer"),
 
-    srcHLTPF            = cms.VInputTag(cms.InputTag("hltAK4PFJetsCorrected","","")),                           
-    srcHLTCalo          = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrected","","")), 
-    srcHLTCaloID        = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassed","","")), 
-    srcHLTCaloNoFastJet = cms.VInputTag(cms.InputTag("hltAK4CaloJetsCorrectedIDPassedNoFastJet","","")),                           
-
-    #Reco inputs
-#     srcCaloJet = cms.VInputTag(cms.InputTag("ak5CaloJets")),
-#     srcPfJet = cms.VInputTag(cms.InputTag("ak5PFJets")),
-#     srcCaloJet = cms.VInputTag(cms.InputTag("PUsubAK5CaloJetProducer")),
-#     srcPfJet   = cms.VInputTag(cms.InputTag("PUsubAK5PFJetProducer")),
-                           
 
     #Parameters for HT
     #htThreshold = cms.double(30.0),
