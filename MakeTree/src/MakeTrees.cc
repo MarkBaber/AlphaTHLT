@@ -360,7 +360,7 @@ class MakeTrees : public edm::EDAnalyzer {
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetToken_;
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetCleanToken_;
   edm::EDGetTokenT<reco::CaloMETCollection> hltCaloMetCleanUsingJetIDToken_;
-  edm::EDGetTokenT<reco::PFMETCollection>   hltPFMetToken_;
+  edm::EDGetTokenT<reco::METCollection>     hltPFMetToken_;
   edm::EDGetTokenT<reco::GenMETCollection>  genMetCaloToken_;
   edm::EDGetTokenT<reco::GenMETCollection>  genMetTrueToken_;
 
@@ -783,7 +783,7 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     hltCaloMetToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetSrc"));
     hltCaloMetCleanToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetCleanSrc"));
     hltCaloMetCleanUsingJetIDToken_   = consumes<reco::CaloMETCollection>(pset.getParameter<edm::InputTag>("hltCaloMetCleanUsingJetIDSrc"));
-    hltPFMetToken_     = consumes<reco::PFMETCollection>  (pset.getParameter<edm::InputTag>("hltPFMetSrc"));
+    hltPFMetToken_     = consumes<reco::METCollection>    (pset.getParameter<edm::InputTag>("hltPFMetSrc"));
     genMetCaloToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetCaloSrc")); 
     genMetTrueToken_   = consumes<reco::GenMETCollection> (pset.getParameter<edm::InputTag>("genMetTrueSrc")); 
 
@@ -860,8 +860,8 @@ namespace {
 	if(!handle.isValid()){ pt  = 0; phi = 0; }
 	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
   }
-  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::PFMET> >& handle, Float_t& pt, Float_t& phi) {
-	if(!handle.isValid()){ pt  = 0; phi = 0; }
+  void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::MET> >& handle, Float_t& pt, Float_t& phi) {
+        if(!handle.isValid()){ pt  = 0; phi = 0; }
 	else{ pt  = handle->at(0).pt(); phi = handle->at(0).phi(); }
   }
   void getValue(const edm::Event& evt, edm::Handle<std::vector<reco::GenMET> >& handle, Float_t& pt, Float_t& phi) {
@@ -1002,7 +1002,6 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) { 
       if ( hltPathFired.find( names.triggerName(i) ) != hltPathFired.end() ){ hltPathFired[ names.triggerName(i) ] = triggerBits->accept(i); } 
     }
-
 #ifdef DATA
     edm::Handle<edm::TriggerResults> triggerBitsData;
     iEvent.getByToken(triggerBitsData_, triggerBitsData);
@@ -1287,8 +1286,9 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
     getValue(iEvent, hltCaloMetCleanHandle,           metPt_["hltMetCleanCalo"], metPhi_["hltMetCleanCalo"]);
     edm::Handle<reco::CaloMETCollection> hltCaloMetCleanUsingJetIDHandle;  iEvent.getByToken(hltCaloMetCleanUsingJetIDToken_, hltCaloMetCleanUsingJetIDHandle);    
     getValue(iEvent, hltCaloMetCleanUsingJetIDHandle, metPt_["hltMetCleanUsingJetIDCalo"], metPhi_["hltMetCleanUsingJetIDCalo"]);
-    edm::Handle<reco::PFMETCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
+    edm::Handle<reco::METCollection> hltPFMetHandle;  iEvent.getByToken(hltPFMetToken_, hltPFMetHandle);    
     getValue(iEvent, hltPFMetHandle,                  metPt_["hltMetPF"],   metPhi_["hltMetPF"]);
+
 #ifdef SIMULATION
     edm::Handle<reco::GenMETCollection> genMetCaloHandle;  iEvent.getByToken(genMetCaloToken_, genMetCaloHandle);    
     getValue(iEvent, genMetCaloHandle,              metPt_["genMetCalo"], metPhi_["genMetCalo"]);
