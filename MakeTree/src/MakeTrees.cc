@@ -1,8 +1,8 @@
 // **************************************************
 // Switches
 // **************************************************
-//#define DATA
-#define SIMULATION
+#define DATA
+//#define SIMULATION
 //#define L1
 //#define RECO
 // Remove isolated leptons from gen and HLT jets
@@ -699,36 +699,42 @@ MakeTrees::MakeTrees(const edm::ParameterSet& pset){
     // Store HLT paths
     // ------------------------------------------------------------
 
+    hltPathNames.push_back("HLT_PFHT200_PFAlphaT0p57_v2"); 
+    hltPathNames.push_back("HLT_PFHT250_PFAlphaT0p55_v2"); 
+    hltPathNames.push_back("HLT_PFHT300_PFAlphaT0p53_v2"); 
+    hltPathNames.push_back("HLT_PFHT350_PFAlphaT0p52_v2"); 
+    hltPathNames.push_back("HLT_PFHT400_PFAlphaT0p51_v2"); 
+
     hltPathNames.push_back("HLT_PFHT200_DiPFJetAve90_PFAlphaT0p57_v2"); 
     hltPathNames.push_back("HLT_PFHT250_DiPFJetAve90_PFAlphaT0p55_v2"); 
     hltPathNames.push_back("HLT_PFHT300_DiPFJetAve90_PFAlphaT0p53_v2"); 
     hltPathNames.push_back("HLT_PFHT350_DiPFJetAve90_PFAlphaT0p52_v2"); 
     hltPathNames.push_back("HLT_PFHT400_DiPFJetAve90_PFAlphaT0p51_v2"); 
 
-     hltPathNames.push_back("HLT_PFHT200_DiPFJetAve90_PFAlphaT0p63_v2"); 
-     hltPathNames.push_back("HLT_PFHT250_DiPFJetAve90_PFAlphaT0p58_v2");
-     hltPathNames.push_back("HLT_PFHT300_DiPFJetAve90_PFAlphaT0p54_v2"); 
-     hltPathNames.push_back("HLT_PFHT350_DiPFJetAve90_PFAlphaT0p53_v2"); 
-     hltPathNames.push_back("HLT_PFHT400_DiPFJetAve90_PFAlphaT0p52_v2");
-                                 
-     hltPathNames.push_back("HLT_PFHT200_PFAlphaT0p51_v2");
+    hltPathNames.push_back("HLT_PFHT200_DiPFJetAve90_PFAlphaT0p63_v2"); 
+    hltPathNames.push_back("HLT_PFHT250_DiPFJetAve90_PFAlphaT0p58_v2");
+    hltPathNames.push_back("HLT_PFHT300_DiPFJetAve90_PFAlphaT0p54_v2"); 
+    hltPathNames.push_back("HLT_PFHT350_DiPFJetAve90_PFAlphaT0p53_v2"); 
+    hltPathNames.push_back("HLT_PFHT400_DiPFJetAve90_PFAlphaT0p52_v2");
+    
+    hltPathNames.push_back("HLT_PFHT200_PFAlphaT0p51_v2");
    
-     hltPathNames.push_back("HLT_PFHT200_v2");
-     hltPathNames.push_back("HLT_PFHT250_v2");
-     hltPathNames.push_back("HLT_PFHT300_v2");
-     hltPathNames.push_back("HLT_PFHT350_v3");
-     hltPathNames.push_back("HLT_PFHT400_v2");
-     hltPathNames.push_back("HLT_PFHT475_v2"); 
-     hltPathNames.push_back("HLT_PFHT600_v3");
-     hltPathNames.push_back("HLT_PFHT650_v3");
-     hltPathNames.push_back("HLT_PFHT800_v2");
+    hltPathNames.push_back("HLT_PFHT200_v2");
+    hltPathNames.push_back("HLT_PFHT250_v2");
+    hltPathNames.push_back("HLT_PFHT300_v2");
+    hltPathNames.push_back("HLT_PFHT350_v3");
+    hltPathNames.push_back("HLT_PFHT400_v2");
+    hltPathNames.push_back("HLT_PFHT475_v2"); 
+    hltPathNames.push_back("HLT_PFHT600_v3");
+    hltPathNames.push_back("HLT_PFHT650_v3");
+    hltPathNames.push_back("HLT_PFHT800_v2");
 
-     hltPathNames.push_back("HLT_PFMET90_PFMHT90_IDTight_v2");
-     hltPathNames.push_back("HLT_PFMET100_PFMHT100_IDTight_v2");
-     hltPathNames.push_back("HLT_PFMET110_PFMHT110_IDTight_v2");
-     hltPathNames.push_back("HLT_PFMET120_PFMHT120_IDTight_v2");
-
-     hltPathNames.push_back("HLT_IsoMu20_v3");
+    hltPathNames.push_back("HLT_PFMET90_PFMHT90_IDTight_v2");
+    hltPathNames.push_back("HLT_PFMET100_PFMHT100_IDTight_v2");
+    hltPathNames.push_back("HLT_PFMET110_PFMHT110_IDTight_v2");
+    hltPathNames.push_back("HLT_PFMET120_PFMHT120_IDTight_v2");
+    
+    hltPathNames.push_back("HLT_IsoMu20_v3");
     
     // Trigger bits
     triggerBits_     = consumes<edm::TriggerResults> (pset.getParameter<edm::InputTag>("HLTResults"));
