@@ -7,6 +7,7 @@ T1bbbb_2J_mGluino_1500_mLSP_100 = cms.PSet(
 	files = cms.untracked.vstring()
 )
 T1bbbb_2J_mGluino_1500_mLSP_100.files.extend([
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_35.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_30.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_1.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_29.root',
