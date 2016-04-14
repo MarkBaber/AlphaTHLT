@@ -7,8 +7,8 @@ HLTPhysics1 = cms.PSet(
 	files = cms.untracked.vstring()
 )
 HLTPhysics1.files.extend([
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics1/crab_HLTPhysics1/160411_220041/0000/hltReRunResults_345.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics1/crab_HLTPhysics1/160411_220041/0000/hltReRunResults_294.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics1/crab_HLTPhysics1/160411_220041/0000/hltReRunResults_345.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics1/crab_HLTPhysics1/160411_220041/0000/hltReRunResults_249.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics1/crab_HLTPhysics1/160411_220041/0000/hltReRunResults_251.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics1/crab_HLTPhysics1/160411_220041/0000/hltReRunResults_211.root',

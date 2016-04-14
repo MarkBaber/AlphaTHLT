@@ -7,16 +7,17 @@ HLTPhysics2 = cms.PSet(
 	files = cms.untracked.vstring()
 )
 HLTPhysics2.files.extend([
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_332.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_317.root',
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_264.root',
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_110.root',
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_244.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_211.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_21.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_110.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_344.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_332.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_264.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_244.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_324.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_334.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_259.root',
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_211.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_105.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_306.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_321.root',
@@ -256,9 +257,9 @@ HLTPhysics2.files.extend([
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_164.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_172.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_131.root',
-	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_40.root',
 ])
 HLTPhysics2.files.extend([
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_40.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_117.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_73.root',
 	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/Run2015D_11Apr16/HLTPhysics2/crab_HLTPhysics2/160411_215904/0000/hltReRunResults_98.root',

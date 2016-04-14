@@ -1,8 +1,8 @@
 // **************************************************
 // Switches
 // **************************************************
-//#define DATA
-#define SIMULATION
+#define DATA
+//#define SIMULATION
 //#define L1
 //#define RECO
 // Remove isolated leptons from gen and HLT jets
@@ -1056,6 +1056,9 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
 #ifdef SIMULATION
     std::vector<const reco::Candidate*> genJetUnskimmed;
     std::vector<const reco::Candidate*> genJetForUnskimmed;
+    edm::Handle<reco::GenJetCollection> genJetHandle;        iEvent.getByToken(genJetToken_, genJetHandle);
+    if (genJetHandle.isValid())  { genJetUnskimmed           = getJetCollection( iEvent, genJetHandle); }
+    genJetForUnskimmed       = genJetUnskimmed;
 #endif
 
   std::vector<const reco::Candidate*> hltCaloJetUnskimmed, hltCaloJetForUnskimmed;
@@ -1068,14 +1071,11 @@ void MakeTrees::analyze(const edm::Event& iEvent, const edm::EventSetup& es) {
   if (hltCaloJetIDHandle.isValid()){ hltCaloJetIDUnskimmed = getJetCollection( iEvent, hltCaloJetIDHandle); }
   edm::Handle<reco::PFJetCollection> hltPFJetHandle;       iEvent.getByToken(hltPFJetToken_, hltPFJetHandle);
   if (hltPFJetHandle.isValid())  { hltPFJetUnskimmed       = getJetCollection( iEvent, hltPFJetHandle); }
-  edm::Handle<reco::GenJetCollection> genJetHandle;        iEvent.getByToken(genJetToken_, genJetHandle);
-  if (genJetHandle.isValid())  { genJetUnskimmed           = getJetCollection( iEvent, genJetHandle); }
 
   // Forward jets
   hltCaloJetForUnskimmed   = hltCaloJetUnskimmed;
   hltCaloJetIDForUnskimmed = hltCaloJetIDUnskimmed;
   hltPFJetForUnskimmed     = hltPFJetUnskimmed;
-  genJetForUnskimmed       = genJetUnskimmed;
   
 //     // std::vector<const reco::Candidate*> recoCaloUnskimmed            = getJetCollection( iEvent, srcCalo );
 //     // std::vector<const reco::Candidate*> recoPFUnskimmed              = getJetCollection( iEvent, srcPF   );

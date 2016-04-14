@@ -1,0 +1,46 @@
+import FWCore.ParameterSet.Config as cms
+# ---------------------------------------------------------------------------------------------------------------------------------------
+# T1bbbb_2J_mGluino_1500_mLSP_100
+# ---------------------------------------------------------------------------------------------------------------------------------------
+T1bbbb_2J_mGluino_1500_mLSP_100 = cms.PSet(
+	name  = cms.string("SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root"),
+	files = cms.untracked.vstring()
+)
+T1bbbb_2J_mGluino_1500_mLSP_100.files.extend([
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_30.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_1.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_29.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_10.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_6.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_2.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_34.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_27.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_5.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_31.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_8.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_32.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_9.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_7.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_23.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_15.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_16.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_25.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_28.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_13.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_18.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_26.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_14.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_24.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_20.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_11.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_33.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_12.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_17.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_21.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_22.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_3.root',
+	'root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mbaber/MC_76X_Full_14Apr16/SMS-T1bbbb_mGluino-1500_mLSP-100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_T1bbbb_mGluino_1500_mLSP_100/160413_200900/0000/hltReRunResults_19.root',
+])
+
+# ---------------------------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------------------------
